@@ -8,7 +8,7 @@ This site is designed to present engineering work the way I actually think about
 
 Add your deployed URL here:
 
-**Portfolio:** `https://your-domain.com`
+**Portfolio:** `https://portfolio-dqs5tus8t-kulmeet-singhs-projects.vercel.app/`
 
 ---
 
