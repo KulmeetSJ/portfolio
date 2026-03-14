@@ -6,9 +6,7 @@ This site is designed to present engineering work the way I actually think about
 
 ## Live Demo
 
-Add your deployed URL here:
-
-**Portfolio:** [https://portfolio-one-ashen-c8e7anc8i0.vercel.app/](Kulmeet Singh)
+**Portfolio:** [Kulmeet Singh](https://portfolio-one-ashen-c8e7anc8i0.vercel.app/)
 
 ---
 
