@@ -223,7 +223,7 @@ export default function CommandPalette() {
               className="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-sm"
             />
 
-            <div className="fixed inset-0 z-[101] flex items-start justify-center pt-[15vh] px-4 pointer-events-none">
+            <div className="fixed inset-0 z-[101] flex items-start justify-center pt-[15vh] px-4 pointer-events-none" id="command-palette">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: -20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}

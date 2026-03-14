@@ -70,7 +70,7 @@ export default function EngineeringDecisions() {
     const [active, setActive] = useState<string | null>(null);
 
     return (
-        <section className="py-24 px-6 md:px-12 max-w-5xl mx-auto scroll-mt-32">
+        <section className="py-24 px-6 md:px-12 max-w-5xl mx-auto scroll-mt-32" id="engineering-decisions">
             <div className="mb-16">
                 <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
                     <span className="text-teal-400 font-black text-2xl">07.</span>

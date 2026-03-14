@@ -31,7 +31,7 @@ export default function CertificationsCard() {
             className="col-span-1 md:col-span-6 lg:col-span-4 h-full"
         >
             <SpotlightCard className="p-6 h-full flex flex-col justify-center">
-                <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase mb-4">
+                <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase mb-4" id="certifications">
                     <Award size={14} className="text-teal-400" />
                     Certifications
                 </div>

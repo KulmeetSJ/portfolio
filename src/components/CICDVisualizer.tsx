@@ -300,7 +300,7 @@ export default function ComposerPipelineVisualizer() {
     }, [stepIndex, isRunning, completed, failed, rolledBack, activeRollback]);
 
     return (
-        <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
+        <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto" id="cicd">
             <div className="mb-12">
                 <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
                     <span className="text-teal-400 font-black text-2xl">09.</span>

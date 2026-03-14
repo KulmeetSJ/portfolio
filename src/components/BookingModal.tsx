@@ -30,7 +30,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
           />
 
           {/* Modal Container */}
-          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 md:p-8 pointer-events-none">
+          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 md:p-8 pointer-events-none" id="booking">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
