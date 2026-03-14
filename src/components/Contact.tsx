@@ -27,7 +27,7 @@ export default function Contact() {
 
         {/* Added motion.a with physics */}
         <motion.a
-          href="mailto:anichandan124@gmail.com"
+          href="mailto:singhkulmeet3@gmail.com"
           whileHover={{ scale: 0.97 }}
           whileTap={{ scale: 0.93 }}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}

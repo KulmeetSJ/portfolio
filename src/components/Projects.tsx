@@ -3,64 +3,60 @@
 import { motion } from "framer-motion";
 import {
   Github,
-  ExternalLink,
   Folder,
-  Database,
-  HardDrive,
+  FileText,
+  Terminal,
+  Sparkles,
   Zap,
+  ShieldCheck,
+  Clock3
 } from "lucide-react";
 import SpotlightCard from "./SpotlightCard";
 
 const heroProject = {
-  title: "PyDB: Storage Engine",
+  title: "Terraform Log Summarizer and Compliance Checker",
   description:
-    "A disk-based relational B-Tree storage engine implemented in Python. Features a custom Disk Pager, WAL for ACID compliance, and raw binary serialization using struct packing. Engineered to handle high-throughput reads/writes with strict O(log n) performance.",
-  tech: ["Python", "B-Tree", "Binary Serialization", "File I/O", "ACID"],
-  github: "https://github.com/AnirudhChandan/PyDB",
+    "(Internal HSBC) Built a CI/CD pipeline enhancement for GCP deployments with a Python-based shift-left compliance checker that blocks unauthorized IAM role assignments before release. Also developed a Terraform plan summarizer that highlights critical infrastructure changes—such as schema updates, service account bindings, and resource modifications—directly inside Jenkins logs for faster review.",
+  tech: ["Python", "Groovy", "Terraform", "Jenkins", "GCP"],
+  github: ""
 };
 
 const otherProjects = [
   {
-    title: "Real-Time Chat Architecture",
+    title: "CI/CD Pipeline for Cloud Composer",
     description:
-      "A scalable full-stack chat platform engineered for high concurrency. Features real-time bi-directional communication, websocket connection pooling, and persistent message storage.",
-    tech: ["Node.js", "Socket.io", "React", "MongoDB"],
-    github: "https://github.com/AnirudhChandan/chat-app-v2",
+      "(Internal HSBC) Built a secure CI/CD pipeline for Cloud Composer DAG deployments, replacing VM-based scheduling workflows with managed orchestration. Integrated Sonar, Nexus, and Checkmarx to improve release safety and standardize deployment quality.",
+    tech: ["Python", "Jenkins", "Cloud Composer", "GCP", "Sonar", "Nexus", "Checkmarx"]
   },
   {
-    title: "Inventory Sync Engine",
+    title: "Data Storage Cost Optimization",
     description:
-      "Built for Docplix. A background worker service that synchronizes legacy SQL data with modern NoSQL cloud storage, handling conflict resolution, race conditions, and retry logic at scale.",
-    tech: ["Typescript", "PostgreSQL", "BullMQ", "Redis"],
+      "(Internal HSBC) Built a proof-of-concept storage optimization workflows across BigQuery and GCS, including Parquet conversion for large datasets and automated storage-class transitions based on access patterns. Reduced storage costs and improved lifecycle efficiency.",
+    tech: ["Python", "Google Cloud", "BigQuery", "Cloud Functions"],
   },
+  {
+    title: "AI-Powered RFP Management System",
+    description:
+      "An end-to-end AI platform that leverages LLMs to transform unstructured procurement text into structured RFPs, reducing manual drafting time by 80%. Engineered scalable APIs for automated proposal parsing, AI-based scoring, and systemized email workflows to seamlessly handle vendor invitations.",
+    tech: ["Next.js", "Node.js", "TypeScript", "PostgreSQL", "Prisma", "Ollama LLM"],
+    github: "https://github.com/KulmeetSJ/rfp-management-system",
+  },
+  {
+    title: "E-Commerce Platform",
+    description:
+      "Developed a full-stack e-commerce web application with features such as product browsing, category-based search, wishlist, cart management, and secure checkout. Implemented user authentication, Razorpay payment integration, and automated order confirmation emails using Nodemailer. Also built an admin dashboard for managing users, books, and inventory through a centralized interface.",
+    tech: ["React.js", "Node.js", "MongoDB", "Razorpay", "Nodemailer"]
+  },
+  {
+    title: "Conversational Fashion Recommendation System",
+    description:
+      "Engineered a production-ready AI recommendation system supporting intent classification, dialog routing, and dynamic image generation. Integrated an LLM backend with a scalable API to achieve 95% intent accuracy. Fine-tuned Falcon-7b for personalized outfit suggestions, utilized Diffusion AI for generating outfit images, and implemented DialoGPT for natural conversational flow alongside a RASA model for precise intent classification.",
+    tech: ["React.js", "Python", "Falcon-7b", "Diffusion AI", "DialoGPT", "RASA"],
+    github: "https://github.com/yodhaDevelopers/flipfashion"
+  },
+
 ];
 
-const hexBytes = [
-  "0x00",
-  "0x1A",
-  "0x2F",
-  "0xFF",
-  "0x4C",
-  "0x8B",
-  "0x9E",
-  "0x3D",
-  "0x7A",
-  "0x00",
-  "0x11",
-  "0x22",
-  "0x33",
-  "0x44",
-  "0x55",
-  "0x66",
-  "0x77",
-  "0x88",
-  "0x99",
-  "0xAA",
-  "0xBB",
-  "0xCC",
-  "0xDD",
-  "0xEE",
-];
 
 export default function Projects() {
   return (
@@ -96,16 +92,19 @@ export default function Projects() {
               <div className="flex-1 p-8 md:p-12 flex flex-col justify-center relative z-20">
                 <div className="flex justify-between items-start mb-6">
                   <div className="p-3 bg-teal-500/10 rounded-xl text-teal-400 border border-teal-500/20">
-                    <Database size={28} />
+                    <FileText size={28} />
                   </div>
                   <div className="flex gap-4 text-slate-400">
-                    <a
-                      href={heroProject.github}
-                      target="_blank"
-                      className="hover:text-teal-400 transition-colors"
-                    >
-                      <Github size={22} />
-                    </a>
+                    {heroProject.github && (
+                      <a
+                        href={heroProject.github}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-teal-400 transition-colors"
+                      >
+                        <Github size={22} />
+                      </a>
+                    )}
                     {/* <a
                       href={heroProject.link}
                       className="hover:text-teal-400 transition-colors"
@@ -131,44 +130,185 @@ export default function Projects() {
                   ))}
                 </div>
               </div>
-              <div className="w-full lg:w-[45%] bg-[#080b11] border-t lg:border-t-0 lg:border-l border-slate-800 relative flex flex-col justify-center p-8">
+              <div className="w-full lg:w-[45%] bg-[#080b11] border-t lg:border-t-0 lg:border-l border-slate-800 relative flex flex-col justify-center p-6 md:p-8 overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none"></div>
-                <div className="relative z-10 w-full max-w-sm mx-auto">
-                  <div className="flex items-center justify-between mb-4 px-2">
+
+                <div className="relative z-10 w-full max-w-md mx-auto space-y-4">
+                  {/* TOP BAR */}
+                  <div className="flex items-center justify-between px-1">
                     <div className="flex items-center gap-2 text-slate-500 font-mono text-[10px] uppercase tracking-widest">
-                      <HardDrive size={14} className="text-purple-400" />
-                      <span>Disk / Page_01</span>
+                      <Terminal size={14} className="text-teal-400" />
+                      <span>Terraform Analysis Pipeline</span>
                     </div>
+
                     <div className="flex items-center gap-1.5">
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
                       </span>
                       <span className="text-[10px] text-teal-400 font-mono uppercase">
-                        I/O Active
+                        Running
                       </span>
                     </div>
                   </div>
+
+                  {/* PIPELINE STEPS */}
                   <div className="bg-[#020408] border border-slate-800 rounded-xl p-4 shadow-inner">
-                    <div className="grid grid-cols-6 gap-2">
-                      {hexBytes.map((byte, i) => (
+                    <div className="space-y-3">
+                      {[
+                        {
+                          label: "terraform plan",
+                          status: "done",
+                          icon: <FileText size={14} />,
+                        },
+                        {
+                          label: "policy validation",
+                          status: "done",
+                          icon: <ShieldCheck size={14} />,
+                        },
+                        {
+                          label: "change summarization",
+                          status: "active",
+                          icon: <Sparkles size={14} />,
+                        },
+                        {
+                          label: "deployment review",
+                          status: "pending",
+                          icon: <Clock3 size={14} />,
+                        },
+                      ].map((step, i) => (
                         <motion.div
                           key={i}
-                          initial={{ opacity: 0.3 }}
-                          animate={{ opacity: [0.3, 1, 0.3] }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            delay: i * 0.1,
-                            ease: "easeInOut",
-                          }}
-                          className={`aspect-square rounded text-[8px] md:text-[10px] font-mono flex items-center justify-center border transition-colors ${byte !== "0x00" ? "bg-purple-500/20 border-purple-500/30 text-purple-300" : "bg-slate-900 border-slate-800 text-slate-600"}`}
+                          initial={{ opacity: 0.4, y: 6 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.15 * i, duration: 0.35 }}
+                          className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2.5"
                         >
-                          {byte}
+                          <div className="flex items-center gap-2.5">
+                            <div
+                              className={`p-1.5 rounded-md border ${step.status === "done"
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                : step.status === "active"
+                                  ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                                  : "bg-slate-800 border-slate-700 text-slate-500"
+                                }`}
+                            >
+                              {step.icon}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`h-2.5 w-2.5 rounded-full ${step.status === "done"
+                                  ? "bg-emerald-400"
+                                  : step.status === "active"
+                                    ? "bg-yellow-400 animate-pulse"
+                                    : "bg-slate-600"
+                                  }`}
+                              />
+                              <span className="text-sm font-mono text-slate-300">
+                                {step.label}
+                              </span>
+                            </div>
+                          </div>
+
+                          <span
+                            className={`text-[10px] font-mono uppercase tracking-wider ${step.status === "done"
+                              ? "text-emerald-400"
+                              : step.status === "active"
+                                ? "text-yellow-400"
+                                : "text-slate-500"
+                              }`}
+                          >
+                            {step.status}
+                          </span>
                         </motion.div>
                       ))}
                     </div>
                   </div>
+
+                  {/* METRICS */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <motion.div
+                      initial={{ opacity: 0.5, scale: 0.96 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1 }}
+                      className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4"
+                    >
+                      <div className="text-[10px] uppercase tracking-widest font-mono text-emerald-400/80 mb-1">
+                        Added
+                      </div>
+                      <div className="text-2xl font-bold font-display text-emerald-400">
+                        +3
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0.5, scale: 0.96 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.15 }}
+                      className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4"
+                    >
+                      <div className="text-[10px] uppercase tracking-widest font-mono text-amber-400/80 mb-1">
+                        Changed
+                      </div>
+                      <div className="text-2xl font-bold font-display text-amber-400">
+                        ~2
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0.5, scale: 0.96 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="rounded-xl border border-red-500/20 bg-red-500/10 p-4"
+                    >
+                      <div className="text-[10px] uppercase tracking-widest font-mono text-red-400/80 mb-1">
+                        Destroyed
+                      </div>
+                      <div className="text-2xl font-bold font-display text-red-400">
+                        0
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0.5, scale: 0.96 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.25 }}
+                      className="rounded-xl border border-teal-500/20 bg-teal-500/10 p-4"
+                    >
+                      <div className="text-[10px] uppercase tracking-widest font-mono text-teal-400/80 mb-1">
+                        Compliance
+                      </div>
+                      <div className="text-lg font-bold font-display text-teal-400">
+                        PASS
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  {/* AI SUMMARY */}
+                  {/* <motion.div
+                    initial={{ opacity: 0.4, y: 8 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="rounded-xl border border-slate-800 bg-slate-950/80 p-4"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles size={14} className="text-purple-400" />
+                      <span className="text-[10px] uppercase tracking-widest font-mono text-slate-400">
+                        AI Summary
+                      </span>
+                    </div>
+
+                    <p className="text-sm leading-relaxed text-slate-300">
+                      This plan provisions{" "}
+                      <span className="text-emerald-400">3 new resources</span>,
+                      updates{" "}
+                      <span className="text-amber-400">2 existing resources</span>,
+                      and introduces{" "}
+                      <span className="text-teal-400">no destructive changes</span>.
+                      Policy checks passed, and the deployment is ready for review.
+                    </p>
+                  </motion.div> */}
                 </div>
               </div>
             </div>
@@ -188,20 +328,19 @@ export default function Projects() {
               <SpotlightCard className="p-8 h-full flex flex-col group">
                 <div className="flex justify-between items-start mb-8">
                   <div className="p-3 bg-slate-800/50 rounded-xl text-teal-400 group-hover:text-white group-hover:bg-slate-700 transition-colors border border-white/5">
-                    {project.title.includes("Chat") ? (
-                      <Zap size={24} />
-                    ) : (
-                      <Folder size={24} />
-                    )}
+                    <Folder size={24} />
                   </div>
                   <div className="flex gap-4 text-slate-400 z-20">
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      className="hover:text-teal-400 transition-colors"
-                    >
-                      <Github size={20} />
-                    </a>
+                    {project.github && (
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-teal-400 transition-colors"
+                      >
+                        <Github size={20} />
+                      </a>
+                    )}
                     {/* <a
                       href={project.link}
                       className="hover:text-teal-400 transition-colors"

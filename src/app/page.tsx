@@ -5,17 +5,18 @@ import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, FileText } from "lucide-react";
 import Image from "next/image";
 import { useEffect } from "react";
+import { EMAIL_ADDRESS } from "@/constants/consts";
 
 // Infrastructure
 import { SystemProvider } from "@/components/SystemContext";
 import Toaster from "@/components/Toaster";
-import Navbar from "@/components/Navbar";
 
 // Standard Imports
 import Experience from "@/components/Experience";
 import Projects from "@/components/Projects";
 import ServerMonitor from "@/components/ServerMonitor";
 import SpotlightCard from "@/components/SpotlightCard";
+import CertificationsCard from "@/components/CertificationsCard";
 
 // --- CHANGED: Import TerminalContact instead of Contact ---
 import TerminalContact from "@/components/TerminalContact";
@@ -24,21 +25,27 @@ import TerminalContact from "@/components/TerminalContact";
 const Architecture = dynamic(() => import("@/components/Architecture"), {
   ssr: false,
 });
-const StorageVisualizer = dynamic(
-  () => import("@/components/StorageVisualizer"),
+const CICDVisualizer = dynamic(
+  () => import("@/components/CICDVisualizer"),
   { ssr: false },
 );
-const Impact = dynamic(() => import("@/components/Impact"), { ssr: false });
-const ApiPlayground = dynamic(() => import("@/components/ApiPlayground"), {
+const Impact = dynamic(() => import("@/components/Impact"), { ssr: true });
+const TerraformPlayground = dynamic(() => import("@/components/TerraformPlayground"), {
   ssr: false,
 });
-const CodeComparison = dynamic(() => import("@/components/CodeComparison"), {
+const CodeComparison = dynamic(() => import("@/components/PerformanceEngineering"), {
   ssr: false,
 });
-const ShardingDemo = dynamic(() => import("@/components/ShardingDemo"), {
+const IngestionDemo = dynamic(() => import("@/components/IngestionDemo"), {
   ssr: false,
 });
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), {
+  ssr: true,
+});
+const AiChatbot = dynamic(() => import("@/components/AiChatbot"), {
+  ssr: true,
+});
+const EngineeringDecisions = dynamic(() => import("@/components/EngineeringDecisions"), {
   ssr: false,
 });
 
@@ -50,17 +57,16 @@ function PageContent() {
       "color: #2dd4bf; font-family: monospace;",
     );
     console.table({
-      Name: "Anirudh Chandan",
-      Specialty: "Distributed Systems & API Design",
+      Name: "Kulmeet Singh",
+      Specialty: "Cloud & Data Engineer",
       Status: "Open to new opportunities",
-      Contact: "anichandan124@gmail.com",
+      Contact: EMAIL_ADDRESS,
     });
   }, []);
 
   return (
     <main className="min-h-screen selection:bg-teal-500/30 selection:text-teal-200 relative">
       <Toaster />
-      <Navbar />
 
       <div className="relative z-10">
         <section
@@ -81,14 +87,13 @@ function PageContent() {
                   System Status: Online
                 </span>
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-black text-slate-50 mb-4 tracking-tighter drop-shadow-sm leading-none">
-                  Anirudh Chandan.
+                  Kulmeet Singh.
                 </h1>
                 <h2 className="text-2xl md:text-4xl font-display font-bold tracking-tight text-slate-300 mb-6 drop-shadow-sm">
-                  I build scalable backend systems.
+                  I build safe, scalable platform systems and infrastructure automation.
                 </h2>
                 <p className="max-w-xl text-slate-400 text-lg leading-relaxed mb-10">
-                  Software Engineer specializing in high-performance APIs and
-                  distributed architectures. Creator of the PyDB storage engine.
+                  Software Engineer focused on cloud infrastructure, deployment automation, and high-performance data systems.
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 mb-10">
@@ -99,13 +104,13 @@ function PageContent() {
                     href="#projects"
                     className="px-6 py-3 border border-white/10 text-slate-300 rounded-lg hover:bg-white/5 hover:text-white transition-colors font-mono text-sm backdrop-blur-sm shadow-xl"
                   >
-                    View Architecture
+                    View Projects
                   </motion.a>
                   <motion.a
                     whileHover={{ scale: 0.97 }}
                     whileTap={{ scale: 0.93 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    href="/ANIRUDH_CHANDAN_RESUME_2026.pdf"
+                    href="/ks_resume.pdf"
                     target="_blank"
                     className="px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-lg hover:bg-teal-400 transition-colors font-mono flex items-center gap-2 text-sm shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_25px_rgba(45,212,191,0.5)]"
                   >
@@ -116,7 +121,7 @@ function PageContent() {
                 <div className="flex items-center gap-6 text-slate-500">
                   <motion.a
                     whileHover={{ y: -3, scale: 1.1 }}
-                    href="https://github.com/AnirudhChandan"
+                    href="https://github.com/KulmeetSJ"
                     target="_blank"
                     className="hover:text-slate-300 transition-colors"
                   >
@@ -124,7 +129,7 @@ function PageContent() {
                   </motion.a>
                   <motion.a
                     whileHover={{ y: -3, scale: 1.1 }}
-                    href="https://www.linkedin.com/in/anirudh-chandan-82bb121a6/"
+                    href="https://www.linkedin.com/in/kulmeet-singh/"
                     target="_blank"
                     className="hover:text-slate-300 transition-colors"
                   >
@@ -132,7 +137,7 @@ function PageContent() {
                   </motion.a>
                   <motion.a
                     whileHover={{ y: -3, scale: 1.1 }}
-                    href="mailto:anichandan124@gmail.com"
+                    href={`mailto:${EMAIL_ADDRESS}`}
                     className="hover:text-slate-300 transition-colors"
                   >
                     <Mail size={24} />
@@ -151,8 +156,8 @@ function PageContent() {
               <SpotlightCard className="w-full h-full p-0 overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent z-10 pointer-events-none"></div>
                 <Image
-                  src="/profile.jpeg"
-                  alt="Anirudh Chandan"
+                  src="/kulmeet.jpeg"
+                  alt="Kulmeet Singh"
                   fill
                   className="object-cover transition-all duration-700 grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 scale-100 group-hover:scale-105"
                   priority
@@ -162,21 +167,23 @@ function PageContent() {
 
             {/* BLOCK 3: SERVER METRICS (4 Mini Cards integrated into grid) */}
             <ServerMonitor />
+            {/* BLOCK 4: CERTIFICATIONS (4 Mini Cards integrated into grid) */}
+            <CertificationsCard />
           </div>
         </section>
 
-        <div className="flex flex-col gap-32 pb-32 mt-32">
+        <div className="flex flex-col gap-28 pb-32 mt-32">
           <Experience />
           <Projects />
-          <StorageVisualizer />
           <Architecture />
           <Impact />
-          <ApiPlayground />
+          <TerraformPlayground />
+          <EngineeringDecisions />
           <CodeComparison />
-          <ShardingDemo />
-
-          {/* --- CHANGED: Using TerminalContact here --- */}
+          <CICDVisualizer />
+          <IngestionDemo />
           <TerminalContact />
+          <AiChatbot />
         </div>
       </div>
 

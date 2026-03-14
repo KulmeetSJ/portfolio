@@ -6,45 +6,49 @@ import SpotlightCard from "./SpotlightCard";
 
 const experiences = [
   {
-    company: "Docplix",
-    role: "Lead Backend Architect (V2.0)",
-    period: "Nov 2025 - Present",
-    type: "Infrastructure",
-    description:
-      "Spearheading the migration from a monolithic legacy system to a decoupled, high-performance microservices architecture.",
-    achievements: [
-      "Architected 30+ RESTful endpoints ensuring 99.9% data consistency.",
-      "Engineered a centralized sync service to resolve critical inventory mismatches.",
-      "Optimized Sequelize query patterns for high-concurrency patient dashboards.",
-    ],
-    tech: ["Node.js", "Sequelize", "Microservices", "Redis"],
-  },
-  {
-    company: "Genpact",
+    company: "HSBC",
     role: "Software Engineer",
-    period: "Apr 2024 - Oct 2025",
-    type: "Data Engineering",
+    period: "Jan 2025 - Present",
+    type: "Data Engineering and DevOps",
     description:
-      "Promoted from intern to lead serverless pipeline development for tax computation software.",
+      "Building cloud-native data pipelines and deployment automation for payment platforms, with a focus on infrastructure reliability, operational efficiency, and scalable orchestration.",
     achievements: [
-      "Designed serverless data pipelines (Python/GCP) boosting efficiency by 35%.",
-      "Reduced API response times by 40% using Kafka event streams.",
-      "Integrated LLM summarization for automated reporting.",
+      "Built reusable Terraform modules to provision and manage large-scale GCP infrastructure across ~2000 resources.",
+      "Developed Jenkins automation for weekend shutdown and restart cycles of Dataflow jobs, reducing compute costs by 30%.",
+      "Optimized Apache Beam pipelines in Java and Spring Boot for streaming Pub/Sub events into BigQuery.",
+      "Designed CI/CD pipelines with Sonar, Nexus, and Checkmarx for Cloud Composer DAG deployments, replacing VM-based schedulers with managed orchestration."
     ],
-    tech: ["Python", "GCP", "Kafka", "Docker"],
+    tech: ["Terraform", "Jenkins", "Apache Beam", "Cloud Composer", "GCP", "Sonar", "Nexus", "Checkmarx"],
+    currentRole: true,
   },
   {
-    company: "Docplix",
-    role: "Junior Software Engineer",
-    period: "Jan 2020 - July 2024",
-    type: "Product Engineering",
+    company: "AnyaSoftek",
+    role: "Full Stack Developer Intern",
+    period: "May 2024 - Jun 2024",
+    type: "Fullstack Development",
     description:
-      "Early member of the engineering team focused on optimizing core health record systems.",
+      "Contributed to internal web platforms and client-facing portfolio builds, focusing on responsive frontend development and backend integration.",
     achievements: [
-      "Reduced patient record retrieval latency by 40% via advanced indexing.",
-      "Built real-time analytics dashboard with React and interactive charts.",
+      "Developed a responsive and user-friendly interface for the consultancy's website using Next.js and TailwindCSS.",
+      "Implemented a MongoDB backend to store and manage client data and project information.",
+      "Built a portfolio website for a client showcasing their projects and services.",
     ],
-    tech: ["React", "PostgreSQL", "SQL Optimization"],
+    tech: ["Next.js", "MongoDB", "TailwindCSS"],
+    currentRole: false,
+  },
+  {
+    company: "Koders",
+    role: "FullStack Developer Intern",
+    period: "Jan 2024 - Apr 2024",
+    type: "Fullstack Development",
+    description:
+      "Worked on fast-moving client projects across web development and automation, delivering full-stack features for real-world use cases.",
+    achievements: [
+      "Built Discord bot integrations that improved automated responses for a 300+ member developer community.",
+      "Developed an e-commerce platform with Razorpay checkout and automated email notifications, supporting 1000+ SKUs while improving page load performance by 30%.",
+    ],
+    tech: ["React", "Node.js", "MongoDB", "REST API", "Python", "TailwindCSS"],
+    currentRole: false,
   },
 ];
 
@@ -74,9 +78,7 @@ export default function Experience() {
           Professional Path
         </h2>
         <p className="text-slate-400 max-w-2xl text-lg leading-relaxed">
-          My career has been a journey through{" "}
-          <span className="text-teal-400">system design</span>, from
-          product-focused engineering to high-scale infrastructure architecture.
+          I've worked across <span className="text-teal-400">application engineering, cloud infrastructure, and data platforms</span>, building systems focused on reliability, automation, and scale.
         </p>
       </motion.div>
 
@@ -121,9 +123,17 @@ export default function Experience() {
                       <Briefcase size={14} className="text-slate-500" />
                       {exp.company}
                     </p>
-                    <span className="inline-block px-3 py-1 bg-slate-800/50 text-slate-300 text-[10px] font-mono rounded-full border border-white/5 uppercase tracking-widest">
-                      {exp.type}
-                    </span>
+                    <div className="flex flex-col items-start gap-3">
+                      <span className="inline-block px-3 py-1 bg-slate-800/50 text-slate-300 text-[10px] font-mono rounded-full border border-white/5 uppercase tracking-widest">
+                        {exp.type}
+                      </span>
+
+                      {exp.currentRole && (
+                        <span className="inline-block px-3 py-1 bg-teal-500/10 text-teal-300 text-[10px] font-mono rounded-full border border-teal-400/20 uppercase tracking-widest">
+                          Current Role
+                        </span>
+                      )}
+                    </div>
                   </motion.div>
                 </div>
 

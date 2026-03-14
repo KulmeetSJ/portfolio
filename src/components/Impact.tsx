@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   BarChart,
   Bar,
@@ -22,43 +22,38 @@ import {
 } from "lucide-react";
 import SpotlightCard from "./SpotlightCard";
 
-// --- DATASETS ---
-const LEGACY_DATA = {
-  latency: [
-    { name: "Avg Response", ms: 480 },
-    { name: "P99 Tail", ms: 1250 },
+const STANDARD_LOGS = {
+  debugTime: [
+    { name: "Log Analysis", minutes: 60 },
+    { name: "Critical Changes", minutes: 30 },
   ],
   efficiency: [
-    { month: "Jan", efficiency: 45 },
-    { month: "Feb", efficiency: 42 },
-    { month: "Mar", efficiency: 48 },
-    { month: "Apr", efficiency: 40 },
-    { month: "May", efficiency: 35 }, // Degrading over time
-    { month: "Jun", efficiency: 30 },
+    { stage: "Plan Review", efficiency: 30 },
+    { stage: "IAM Validation", efficiency: 40 },
+    { stage: "Change Detection", efficiency: 35 },
+    { stage: "Deployment Prep", efficiency: 45 },
   ],
-  consistency: 92.4,
-  uptimeColor: "text-red-500",
-  strokeColor: "#ef4444", // Red-500
-  gradientId: "colorEffLegacy",
+  compliance: 70,
+  labelColor: "text-red-500",
+  strokeColor: "#ef4444",
+  gradientId: "colorStandard",
 };
 
-const OPTIMIZED_DATA = {
-  latency: [
-    { name: "Avg Response", ms: 45 },
-    { name: "P99 Tail", ms: 120 },
+const OPTIMIZED_LOGS = {
+  debugTime: [
+    { name: "Log Analysis", minutes: 5 },
+    { name: "Critical Changes", minutes: 2 },
   ],
   efficiency: [
-    { month: "Jan", efficiency: 60 },
-    { month: "Feb", efficiency: 65 },
-    { month: "Mar", efficiency: 75 },
-    { month: "Apr", efficiency: 82 },
-    { month: "May", efficiency: 90 },
-    { month: "Jun", efficiency: 95 },
+    { stage: "Plan Review", efficiency: 80 },
+    { stage: "IAM Validation", efficiency: 90 },
+    { stage: "Change Detection", efficiency: 92 },
+    { stage: "Deployment Prep", efficiency: 95 },
   ],
-  consistency: 99.9,
-  uptimeColor: "text-teal-400",
-  strokeColor: "#2dd4bf", // Teal-400
-  gradientId: "colorEffOptimized",
+  compliance: 100,
+  labelColor: "text-teal-400",
+  strokeColor: "#2dd4bf",
+  gradientId: "colorOptimized",
 };
 
 // Tooltip Helpers
@@ -89,9 +84,9 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export default function Impact() {
-  const [mode, setMode] = useState<"legacy" | "optimized">("optimized");
-  const isLegacy = mode === "legacy";
-  const currentData = isLegacy ? LEGACY_DATA : OPTIMIZED_DATA;
+  const [mode, setMode] = useState<"standard" | "optimized">("optimized");
+  const isStandard = mode === "standard";
+  const currentData = isStandard ? STANDARD_LOGS : OPTIMIZED_LOGS;
 
   return (
     <section
@@ -114,23 +109,22 @@ export default function Impact() {
               Measuring Impact
             </h2>
             <p className="text-slate-400 max-w-xl text-lg">
-              Compare the performance metrics of the{" "}
-              <span className="text-red-400">Legacy Monolith</span> versus my{" "}
-              <span className="text-teal-400">Optimized Architecture</span>.
+              Compare the review experience of
+              <span className="text-red-400"> raw Terraform plan output</span> versus my
+              <span className="text-teal-400">summarized CI/CD change intelligence pipeline</span>.
             </p>
           </div>
 
           {/* THE TOGGLE SWITCH */}
           <div className="bg-slate-900 p-1.5 rounded-xl border border-slate-800 flex items-center shadow-inner">
             <button
-              onClick={() => setMode("legacy")}
-              className={`relative px-6 py-2.5 rounded-lg text-sm font-bold font-mono transition-colors z-10 ${
-                isLegacy
-                  ? "text-red-100"
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
+              onClick={() => setMode("standard")}
+              className={`relative px-6 py-2.5 rounded-lg text-sm font-bold font-mono transition-colors z-10 ${isStandard
+                ? "text-red-100"
+                : "text-slate-500 hover:text-slate-300"
+                }`}
             >
-              {isLegacy && (
+              {isStandard && (
                 <motion.div
                   layoutId="activeTab"
                   className="absolute inset-0 bg-red-600 rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.4)]"
@@ -138,19 +132,18 @@ export default function Impact() {
                 />
               )}
               <span className="relative flex items-center gap-2">
-                <AlertTriangle size={14} /> Legacy Monolith
+                <AlertTriangle size={14} /> Standard Logs
               </span>
             </button>
 
             <button
               onClick={() => setMode("optimized")}
-              className={`relative px-6 py-2.5 rounded-lg text-sm font-bold font-mono transition-colors z-10 ${
-                !isLegacy
-                  ? "text-teal-950"
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
+              className={`relative px-6 py-2.5 rounded-lg text-sm font-bold font-mono transition-colors z-10 ${!isStandard
+                ? "text-teal-950"
+                : "text-slate-500 hover:text-slate-300"
+                }`}
             >
-              {!isLegacy && (
+              {!isStandard && (
                 <motion.div
                   layoutId="activeTab"
                   className="absolute inset-0 bg-teal-400 rounded-lg shadow-[0_0_20px_rgba(45,212,191,0.4)]"
@@ -158,7 +151,7 @@ export default function Impact() {
                 />
               )}
               <span className="relative flex items-center gap-2">
-                <Zap size={14} /> Optimized V2.0
+                <Zap size={14} /> Optimized Logs
               </span>
             </button>
           </div>
@@ -170,30 +163,30 @@ export default function Impact() {
           <SpotlightCard
             className="p-8 group flex flex-col h-full"
             spotlightColor={
-              isLegacy ? "rgba(239, 68, 68, 0.1)" : "rgba(45, 212, 191, 0.1)"
+              isStandard ? "rgba(239, 68, 68, 0.1)" : "rgba(45, 212, 191, 0.1)"
             }
           >
             <div className="flex items-center justify-between mb-6 relative z-20">
               <div className="flex items-center gap-3">
                 <div
-                  className={`p-3 rounded-lg transition-colors duration-500 ${isLegacy ? "bg-red-500/10 text-red-500" : "bg-teal-400/10 text-teal-400"}`}
+                  className={`p-3 rounded-lg transition-colors duration-500 ${isStandard ? "bg-red-500/10 text-red-500" : "bg-teal-400/10 text-teal-400"}`}
                 >
                   <Activity size={24} />
                 </div>
                 <h3 className="text-xl font-display font-bold tracking-tight text-slate-100">
-                  Latency
+                  Debugging Time
                 </h3>
               </div>
               <span
-                className={`text-xs font-mono px-2 py-1 rounded border ${isLegacy ? "border-red-500/30 text-red-400 bg-red-500/10" : "border-teal-500/30 text-teal-400 bg-teal-500/10"}`}
+                className={`text-xs font-mono px-2 py-1 rounded border ${isStandard ? "border-red-500/30 text-red-400 bg-red-500/10" : "border-teal-500/30 text-teal-400 bg-teal-500/10"}`}
               >
-                {isLegacy ? "CRITICAL" : "HEALTHY"}
+                {isStandard ? "CRITICAL" : "HEALTHY"}
               </span>
             </div>
 
             <div className="h-[220px] w-full relative z-20">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={currentData.latency}>
+                <BarChart data={currentData.debugTime}>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke="rgba(255,255,255,0.05)"
@@ -211,15 +204,15 @@ export default function Impact() {
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
-                    unit="ms"
+                    unit="min"
                   />
                   <Tooltip
                     cursor={{ fill: "rgba(255,255,255,0.02)" }}
                     content={<CustomTooltip />}
                   />
                   <Bar
-                    dataKey="ms"
-                    fill={isLegacy ? "#ef4444" : "#2dd4bf"}
+                    dataKey="minutes"
+                    fill={isStandard ? "#ef4444" : "#2dd4bf"}
                     radius={[4, 4, 0, 0]}
                     barSize={40}
                     animationDuration={1000}
@@ -228,9 +221,9 @@ export default function Impact() {
               </ResponsiveContainer>
             </div>
             <p className="mt-6 text-slate-400 text-sm relative z-20 flex-grow leading-relaxed">
-              {isLegacy
-                ? "Legacy N+1 queries caused P99 latency spikes up to 1.2s during high traffic loads."
-                : "Optimized indexing and Redis caching reduced average latency to 45ms, a 90% improvement."}
+              {isStandard
+                ? "Terraform plan outputs were large and difficult to interpret, requiring engineers to manually scan logs to identify critical infrastructure changes."
+                : "The log summarizer extracts key infrastructure changes such as IAM roles, Pub/Sub resources, and BigQuery updates, reducing debugging time from nearly an hour to just a few minutes."}
             </p>
           </SpotlightCard>
 
@@ -238,18 +231,18 @@ export default function Impact() {
           <SpotlightCard
             className="p-8 group flex flex-col h-full"
             spotlightColor={
-              isLegacy ? "rgba(239, 68, 68, 0.1)" : "rgba(168, 85, 247, 0.1)"
+              isStandard ? "rgba(239, 68, 68, 0.1)" : "rgba(168, 85, 247, 0.1)"
             }
           >
             <div className="flex items-center justify-between mb-6 relative z-20">
               <div className="flex items-center gap-3">
                 <div
-                  className={`p-3 rounded-lg transition-colors duration-500 ${isLegacy ? "bg-red-500/10 text-red-500" : "bg-purple-500/10 text-purple-400"}`}
+                  className={`p-3 rounded-lg transition-colors duration-500 ${isStandard ? "bg-red-500/10 text-red-500" : "bg-purple-500/10 text-purple-400"}`}
                 >
                   <TrendingUp size={24} />
                 </div>
                 <h3 className="text-xl font-display font-bold tracking-tight text-slate-100">
-                  Throughput
+                  Deployment Efficiency
                 </h3>
               </div>
             </div>
@@ -259,7 +252,7 @@ export default function Impact() {
                 <AreaChart data={currentData.efficiency}>
                   <defs>
                     <linearGradient
-                      id="colorEffLegacy"
+                      id="colorStandard"
                       x1="0"
                       y1="0"
                       x2="0"
@@ -269,7 +262,7 @@ export default function Impact() {
                       <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient
-                      id="colorEffOptimized"
+                      id="colorOptimized"
                       x1="0"
                       y1="0"
                       x2="0"
@@ -285,7 +278,7 @@ export default function Impact() {
                     vertical={false}
                   />
                   <XAxis
-                    dataKey="month"
+                    dataKey="stage"
                     stroke="#64748b"
                     fontSize={12}
                     tickLine={false}
@@ -302,7 +295,7 @@ export default function Impact() {
                   <Area
                     type="monotone"
                     dataKey="efficiency"
-                    stroke={isLegacy ? "#ef4444" : "#c084fc"}
+                    stroke={isStandard ? "#ef4444" : "#c084fc"}
                     fillOpacity={1}
                     fill={`url(#${currentData.gradientId})`}
                     strokeWidth={3}
@@ -312,9 +305,9 @@ export default function Impact() {
               </ResponsiveContainer>
             </div>
             <p className="mt-6 text-slate-400 text-sm relative z-20 flex-grow leading-relaxed">
-              {isLegacy
-                ? "Synchronous processing led to thread blocking and declining throughput under load."
-                : "Event-driven architecture (Kafka) decoupled services, boosting throughput by 35%."}
+              {isStandard
+                ? "Engineers had to manually analyze Terraform plan outputs before deployments, slowing down the CI/CD workflow."
+                : "Automated log summarization and validation allow engineers to quickly understand infrastructure changes, enabling faster and more confident deployments."}
             </p>
           </SpotlightCard>
 
@@ -322,18 +315,18 @@ export default function Impact() {
           <SpotlightCard
             className="p-8 flex flex-col h-full group"
             spotlightColor={
-              isLegacy ? "rgba(239, 68, 68, 0.1)" : "rgba(59, 130, 246, 0.1)"
+              isStandard ? "rgba(239, 68, 68, 0.1)" : "rgba(59, 130, 246, 0.1)"
             }
           >
             <div className="flex items-center justify-between mb-6 relative z-20">
               <div className="flex items-center gap-3">
                 <div
-                  className={`p-3 rounded-lg transition-colors duration-500 ${isLegacy ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-400"}`}
+                  className={`p-3 rounded-lg transition-colors duration-500 ${isStandard ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-400"}`}
                 >
                   <CheckCircle size={24} />
                 </div>
                 <h3 className="text-xl font-display font-bold tracking-tight text-slate-100">
-                  Consistency
+                  Compliance Safety
                 </h3>
               </div>
             </div>
@@ -351,7 +344,7 @@ export default function Impact() {
                     cy="96"
                   />
                   <motion.circle
-                    className={isLegacy ? "text-red-500" : "text-blue-500"}
+                    className={isStandard ? "text-red-500" : "text-blue-500"}
                     strokeWidth="8"
                     strokeLinecap="round"
                     stroke="currentColor"
@@ -362,29 +355,29 @@ export default function Impact() {
                     initial={{ strokeDasharray: 553, strokeDashoffset: 553 }} // 2 * PI * 88 ~= 553
                     animate={{
                       strokeDashoffset:
-                        553 - (553 * currentData.consistency) / 100,
+                        553 - (553 * currentData.compliance) / 100,
                     }}
                     transition={{ duration: 1.5, ease: "easeOut" }}
                   />
                 </svg>
                 <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center flex-col">
                   <span
-                    className={`text-5xl font-display font-black tracking-tighter drop-shadow-md transition-colors duration-500 ${isLegacy ? "text-red-500" : "text-white"}`}
+                    className={`text-5xl font-display font-black tracking-tighter drop-shadow-md transition-colors duration-500 ${isStandard ? "text-red-500" : "text-white"}`}
                   >
-                    {currentData.consistency}%
+                    {currentData.compliance}%
                   </span>
                   <span
-                    className={`text-[10px] font-bold font-mono uppercase tracking-widest mt-2 ${isLegacy ? "text-red-400" : "text-blue-400"}`}
+                    className={`text-[10px] font-bold font-mono uppercase tracking-widest mt-2 ${isStandard ? "text-red-400" : "text-blue-400"}`}
                   >
-                    {isLegacy ? "Data Drift" : "Synced"}
+                    {isStandard ? "Manual Review" : "Automated"}
                   </span>
                 </div>
               </div>
             </div>
             <p className="mt-6 text-slate-400 text-sm relative z-20 flex-grow leading-relaxed">
-              {isLegacy
-                ? "Dual-write anti-patterns caused frequent data mismatches during sync."
-                : "Implemented CDC (Change Data Capture) to guarantee 99.9% consistency."}
+              {isStandard
+                ? "Manual review of Terraform plans could miss IAM misconfigurations, potentially allowing restricted roles to be assigned incorrectly."
+                : "The shift-left compliance checker validates IAM roles during the pipeline stage, preventing unauthorized role assignments before deployment."}
             </p>
           </SpotlightCard>
         </div>

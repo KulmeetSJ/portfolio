@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Bot, User, Sparkles } from "lucide-react";
+import { EMAIL_ADDRESS } from "@/constants/consts";
 
 // 1. Define the Interface
 interface KnowledgeEntry {
@@ -13,39 +14,39 @@ interface KnowledgeEntry {
 // 2. Type the Data
 const knowledgeBase: KnowledgeEntry[] = [
   {
+    keywords: ["skills", "tech", "stack", "technologies"],
+    text: "Kulmeet works primarily on **Backend and Platform Engineering**. His core stack includes **Java, Python, Node.js, React, Terraform, Docker, and CI/CD systems**. He focuses on building scalable backend services and infrastructure automation.",
+  },
+  {
+    keywords: ["hsbc", "work", "experience", "job"],
+    text: "At **HSBC**, Kulmeet worked on internal engineering platforms. One key project was an **LLM-powered procurement system** that converts unstructured text into structured RFP documents, reducing manual drafting time by **80%**.",
+  },
+  {
+    keywords: ["terraform", "pipeline", "ci", "cicd", "infrastructure"],
+    text: "Kulmeet built a **Terraform CI/CD pipeline** that analyzes Terraform plan logs, summarizes infrastructure changes, and validates IAM policies before deployment. This helps engineers quickly understand infrastructure changes and ensures compliance.",
+  },
+  {
+    keywords: ["composer", "security", "devops", "scans"],
+    text: "Kulmeet also implemented a **secure CI/CD pipeline** integrating **SonarQube, Nexus IQ, and Checkmarx scans**, ensuring code quality and security before deployments.",
+  },
+  {
+    keywords: ["projects", "portfolio", "built"],
+    text: "Some of Kulmeet's featured projects include:\n\n• **Terraform Log Analyzer** for infrastructure change summaries\n• **LLM-powered RFP automation platform**\n• **Secure CI/CD pipelines with automated security scans**\n• **E-commerce platform built with React and MongoDB**",
+  },
+  {
+    keywords: ["contact", "email", "hire", "reach"],
+    text: `You can reach Kulmeet directly at **${EMAIL_ADDRESS}**. He is currently open to opportunities in **Backend Engineering, Platform Engineering, and Infrastructure Automation**.`,
+  },
+  {
+    keywords: ["hello", "hi", "hey"],
+    text: "Hello! I'm **KuliBot**, Kulmeet's portfolio assistant. I can tell you about his **projects, experience at HSBC, Terraform pipelines, CI/CD systems, and backend skills**.",
+  },
+  {
     keywords: [
-      "skills",
-      "stack",
-      "tech",
-      "technologies",
-      "languages",
-      "coding",
+      "certification", "certifications", "certificate", "google cloud", "gcp", "cloud architect", "wipro", "java certification",
+      "java fullstack"
     ],
-    text: "I am proficient in **Node.js, Python, and React**. On the backend, I specialize in **Express, Sequelize, MongoDB, and PostgreSQL**. I also have deep experience with system design tools like **Docker, Kafka, Redis, and AWS**.",
-  },
-  {
-    keywords: ["experience", "work", "history", "job", "career", "companies"],
-    text: "I have worked at **Docplix** as a Software Engineer (Lead Backend) and at **Genpact** where I built serverless data pipelines. My focus has always been on scalable architecture.",
-  },
-  {
-    keywords: ["docplix", "inventory", "migration", "api", "consistency"],
-    text: "At **Docplix**, I returned to lead the backend architecture for a V2.0 migration. I architected **30+ RESTful endpoints** and ensured **99.9% data consistency** during a critical inventory system migration using a custom sync service.",
-  },
-  {
-    keywords: ["genpact", "python", "serverless", "pipeline", "optimization"],
-    text: "At **Genpact**, I designed serverless data pipelines using **Python and GCP**, which boosted efficiency by **35%**. I also reduced API response times by **40%** using Kafka and Redis caching.",
-  },
-  {
-    keywords: ["projects", "built", "app", "chat", "movie", "recommendation"],
-    text: "I've built some cool systems! Notable ones include a **Real-Time Chat App** (Node.js/Socket.io) handling high concurrency, and a **Movie Recommendation API** that uses Machine Learning (Cosine Similarity) to personalize content.",
-  },
-  {
-    keywords: ["contact", "email", "hire", "reach", "touch"],
-    text: "You can reach me directly at **anichandan124@gmail.com**. I am currently open to new opportunities as a Backend or Full Stack Engineer!",
-  },
-  {
-    keywords: ["hello", "hi", "hey", "greeting", "who"],
-    text: "Hello! I am **AniBot**, Anirudh's virtual assistant. I can answer questions about his **skills**, **experience at Docplix/Genpact**, or his **backend projects**. Ask me anything!",
+    text: "Kulmeet holds the **Google Cloud Professional Cloud Architect Certification**, which validates expertise in designing scalable cloud architectures on **Google Cloud Platform**. He also completed the **Wipro Java Full Stack Certification**, covering backend development with **Java, Spring Boot, databases, and modern web technologies**."
   },
 ];
 
@@ -71,7 +72,7 @@ const findBestMatch = (query: string): string => {
     return bestMatch.text;
   }
 
-  return "I'm not sure about that specific detail, but I can tell you about Anirudh's **skills**, **work experience**, or **projects**. Try asking 'What are his skills?'";
+  return "I'm not sure about that specific detail, but I can tell you about Kulmeet's **skills**, **work experience**, or **projects**. Try asking 'What are his skills?'";
 };
 
 interface Message {
@@ -86,7 +87,7 @@ export default function AiChatbot() {
     {
       id: 1,
       role: "bot",
-      text: "Hi! I'm AniBot. Ask me anything about Anirudh's work!",
+      text: "Hi! I'm KuliBot. Ask me anything about Kulmeet's work!",
     },
   ]);
   const [input, setInput] = useState("");
@@ -123,7 +124,7 @@ export default function AiChatbot() {
       };
       setMessages((prev) => [...prev, botMessage]);
       setIsTyping(false);
-    }, 1000);
+    }, 600);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -139,11 +140,10 @@ export default function AiChatbot() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-8 right-8 z-[9999] p-4 rounded-full shadow-2xl transition-all duration-300 ${
-          isOpen
-            ? "scale-0 opacity-0"
-            : "bg-teal-500 hover:bg-teal-400 text-slate-900"
-        }`}
+        className={`fixed bottom-8 right-8 z-[9999] p-4 rounded-full shadow-2xl transition-all duration-300 ${isOpen
+          ? "scale-0 opacity-0"
+          : "bg-teal-500 hover:bg-teal-400 text-slate-900"
+          }`}
       >
         <Sparkles size={28} fill="currentColor" />
       </motion.button>
@@ -165,7 +165,7 @@ export default function AiChatbot() {
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-100 text-sm">
-                    AniBot AI
+                    KuliBot AI
                   </h3>
                   <span className="text-xs text-green-400 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
@@ -189,11 +189,10 @@ export default function AiChatbot() {
                   className={`flex items-start gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
                 >
                   <div
-                    className={`p-2 rounded-full flex-shrink-0 ${
-                      msg.role === "user"
-                        ? "bg-slate-700 text-slate-300"
-                        : "bg-teal-500/20 text-teal-400"
-                    }`}
+                    className={`p-2 rounded-full flex-shrink-0 ${msg.role === "user"
+                      ? "bg-slate-700 text-slate-300"
+                      : "bg-teal-500/20 text-teal-400"
+                      }`}
                   >
                     {msg.role === "user" ? (
                       <User size={16} />
@@ -202,11 +201,10 @@ export default function AiChatbot() {
                     )}
                   </div>
                   <div
-                    className={`p-3 rounded-2xl text-sm leading-relaxed max-w-[80%] ${
-                      msg.role === "user"
-                        ? "bg-slate-700 text-slate-200 rounded-tr-none"
-                        : "bg-slate-800 text-slate-300 border border-slate-700 rounded-tl-none"
-                    }`}
+                    className={`p-3 rounded-2xl text-sm leading-relaxed max-w-[80%] ${msg.role === "user"
+                      ? "bg-slate-700 text-slate-200 rounded-tr-none"
+                      : "bg-slate-800 text-slate-300 border border-slate-700 rounded-tl-none"
+                      }`}
                   >
                     {msg.text.split("**").map((part, i) =>
                       i % 2 === 1 ? (
@@ -234,6 +232,24 @@ export default function AiChatbot() {
                 </div>
               )}
               <div ref={messagesEndRef} />
+              {messages.length === 1 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {[
+                    "What projects has Kulmeet built?",
+                    "Tell me about the Terraform pipeline",
+                    "What technologies does he use?",
+                    "How can I contact him?",
+                  ].map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => setInput(prompt)}
+                      className="text-xs px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 hover:border-teal-400 hover:text-teal-400 transition"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* INPUT */}

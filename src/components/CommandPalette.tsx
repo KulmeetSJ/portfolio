@@ -19,6 +19,7 @@ import {
 
 // Import the new Modal
 import BookingModal from "./BookingModal";
+import { EMAIL_ADDRESS } from "@/constants/consts";
 
 type Action = {
   id: string;
@@ -63,23 +64,23 @@ export default function CommandPalette() {
         category: "Documents",
         icon: <FileText size={16} />,
         perform: () =>
-          window.open("/ANIRUDH_CHANDAN_RESUME_2026.pdf", "_blank"),
+          window.open("/ks_resume.pdf", "_blank"),
       },
-      {
-        id: "pydb",
-        title: "View PyDB Source Code",
-        category: "Projects",
-        icon: <Database size={16} />,
-        perform: () =>
-          window.open("https://github.com/anichandan124", "_blank"),
-      },
+      // {
+      //   id: "pydb",
+      //   title: "View PyDB Source Code",
+      //   category: "Projects",
+      //   icon: <Database size={16} />,
+      //   perform: () =>
+      //     window.open("https://github.com/KulmeetSJ", "_blank"),
+      // },
       {
         id: "contact",
-        title: "Contact Anirudh (Email)",
+        title: "Contact Kulmeet (Email)",
         category: "Connect",
         icon: <Mail size={16} />,
         perform: () => {
-          window.location.href = "mailto:anichandan124@gmail.com";
+          window.location.href = `mailto:${EMAIL_ADDRESS}`;
         },
       },
       {
@@ -88,14 +89,14 @@ export default function CommandPalette() {
         category: "Connect",
         icon: <Github size={16} />,
         perform: () =>
-          window.open("https://github.com/anichandan124", "_blank"),
+          window.open("https://github.com/KulmeetSJ", "_blank"),
       },
       {
         id: "linkedin",
         title: "Open LinkedIn Profile",
         category: "Connect",
         icon: <Linkedin size={16} />,
-        perform: () => window.open("https://linkedin.com", "_blank"),
+        perform: () => window.open("https://www.linkedin.com/in/kulmeet-singh/", "_blank"),
       },
       {
         id: "nav-experience",
@@ -135,8 +136,8 @@ export default function CommandPalette() {
     query === ""
       ? actions
       : actions.filter((action) =>
-          action.title.toLowerCase().includes(query.toLowerCase()),
-        );
+        action.title.toLowerCase().includes(query.toLowerCase()),
+      );
 
   // Setup keyboard listeners
   useEffect(() => {
@@ -270,11 +271,10 @@ export default function CommandPalette() {
                                 setQuery("");
                               }
                             }}
-                            className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ${
-                              isSelected
-                                ? "bg-teal-500/10 border border-teal-500/20 shadow-[inset_0_0_15px_rgba(45,212,191,0.05)]"
-                                : "bg-transparent border border-transparent hover:bg-white/5"
-                            }`}
+                            className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ${isSelected
+                              ? "bg-teal-500/10 border border-teal-500/20 shadow-[inset_0_0_15px_rgba(45,212,191,0.05)]"
+                              : "bg-transparent border border-transparent hover:bg-white/5"
+                              }`}
                           >
                             <div className="flex items-center gap-3">
                               <div

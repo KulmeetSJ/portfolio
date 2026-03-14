@@ -12,41 +12,92 @@ import {
   Zap,
 } from "lucide-react";
 
-const legacyCode = `// ❌ THE PROBLEM: N+1 Query Issue
-async function getUsersWithPosts() {
-  // 1. Fetch all users (1 query)
-  const users = await User.findAll();
-  const results = [];
+const optimizationCases = [
+  {
+    id: "algorithm",
+    title: "Algorithm Optimization",
+    legacy: `// ❌ O(n²) Duplicate Detection
+public List<Integer> findDuplicates(List<Integer> users) {
 
-  // 2. Loop triggers DB call for EACH user
-  for (const user of users) {
-    // ⚠️ CRITICAL: 100 users = 100 extra queries
-    const posts = await Post.findAll({
-      where: { userId: user.id }
-    });
-    
-    results.push({ ...user, posts });
-  }
-  
-  return results;
-}`;
+    List<Integer> duplicates = new ArrayList<>();
 
-const optimizedCode = `// ✅ THE FIX: Eager Loading & Projection
-async function getUsersWithPosts() {
-  // 1. Fetch everything in ONE optimized query
-  const users = await User.findAll({
-    // JOIN is handled at DB level
-    include: [{
-      model: Post,
-      attributes: ['title', 'content'] 
-    }],
-    // Select only needed fields
-    attributes: ['id', 'name', 'email'],
-    limit: 100
-  });
+    for (int i = 0; i < users.size(); i++) {
+        for (int j = i + 1; j < users.size(); j++) {
 
-  return users;
-}`;
+            if (users.get(i).equals(users.get(j))) {
+                duplicates.add(users.get(i));
+            }
+        }
+    }
+
+    return duplicates;
+}`,
+    optimized: `// ✅ O(n) using HashSet
+public List<Integer> findDuplicates(List<Integer> users) {
+
+    Set<Integer> seen = new HashSet<>();
+    List<Integer> duplicates = new ArrayList<>();
+
+    for (Integer user : users) {
+
+        if (!seen.add(user)) {
+            duplicates.add(user);
+        }
+    }
+
+    return duplicates;
+}`,
+    before: "O(n²)",
+    after: "O(n)",
+    beforeTime: "1200ms",
+    afterTime: "40ms",
+    beforeQuery: "Nested loops",
+    afterQuery: "HashSet lookup",
+  },
+
+  {
+    id: "database",
+    title: "Database Query Optimization",
+    legacy: `// ❌ Multiple database calls
+List<Order> orders = new ArrayList<>();
+
+for(Long userId : userIds){
+    orders.add(orderRepository.findByUserId(userId));
+}`,
+    optimized: `// ✅ Batch database query
+List<Order> orders =
+    orderRepository.findByUserIdIn(userIds);`,
+    before: "N queries",
+    after: "1 query",
+    beforeTime: "800ms",
+    afterTime: "120ms",
+    beforeQuery: "100 DB calls",
+    afterQuery: "1 batch query",
+  },
+
+  {
+    id: "memory",
+    title: "Memory Optimization",
+    legacy: `// ❌ Inefficient string concatenation
+String result = "";
+
+for(String item : items){
+    result += item;
+}`,
+    optimized: `// ✅ Using StringBuilder
+StringBuilder result = new StringBuilder();
+
+for(String item : items){
+    result.append(item);
+}`,
+    before: "High allocations",
+    after: "Efficient memory",
+    beforeTime: "200ms",
+    afterTime: "40ms",
+    beforeQuery: "Repeated String creation",
+    afterQuery: "StringBuilder buffer",
+  },
+];
 
 // Reusable Syntax Highlighter
 const HighlightedCode = ({
@@ -141,6 +192,11 @@ export default function CodeComparison() {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [selectedCase, setSelectedCase] = useState(optimizationCases[0]);
+
+  const legacyCode = selectedCase.legacy;
+  const optimizedCode = selectedCase.optimized;
+
   const handleMouseMove = (
     e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent,
   ) => {
@@ -180,16 +236,29 @@ export default function CodeComparison() {
       <div className="mb-16">
         <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
           <span className="text-teal-400 font-display font-black text-2xl">
-            07.
+            08.
           </span>{" "}
-          Code Optimization
+          Performance Engineering
         </h2>
         <p className="text-slate-400 max-w-2xl text-lg">
           I do not just write code; I{" "}
           <span className="text-teal-400">profile and refactor</span> it. Drag
-          the slider to compare the performance footprint of a legacy N+1 query
-          versus my optimized solution.
+          the slider to compare the performance footprint.
         </p>
+      </div>
+      <div className="flex flex-wrap gap-3 mb-10">
+        {optimizationCases.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => setSelectedCase(c)}
+            className={`px-4 py-2 rounded-lg border text-sm font-mono ${selectedCase.id === c.id
+              ? "bg-teal-500 text-black border-teal-400"
+              : "border-slate-700 text-slate-400 hover:border-teal-400"
+              }`}
+          >
+            {c.title}
+          </button>
+        ))}
       </div>
 
       {/* --- DESKTOP VIEW: VS Code Interactive Slider --- */}
@@ -215,23 +284,27 @@ export default function CodeComparison() {
         </div>
 
         {/* === RIGHT SIDE (OPTIMIZED CODE) === */}
-        <div className="absolute inset-0 bg-[#1e1e1e] pt-10">
+        <div className="absolute inset-0 bg-[#1e1e1e] pt-10 overflow-hidden z-0">
           {/* Green Metrics Badge */}
-          <div className="absolute top-14 right-6 z-10 flex flex-col items-end gap-2 pointer-events-none">
-            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-2 rounded-lg backdrop-blur-md shadow-xl flex items-center gap-3">
+          <div className="absolute top-14 right-6 bg-gradient-to-b z-10 flex flex-col items-end gap-2 pointer-events-none">
+            <div className="bg-emerald-500/5 backdrop-blur-md bg-opacity-30 border border-emerald-500/20 text-emerald-400 px-4 py-2 rounded-lg shadow-md flex items-center gap-3">
               <Zap size={18} className="fill-current" />
               <div className="text-right">
                 <div className="text-[10px] font-mono uppercase tracking-wider opacity-80">
                   Execution Time
                 </div>
                 <div className="font-bold font-mono text-lg leading-none">
-                  15ms
+                  {selectedCase.afterTime}
                 </div>
               </div>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-md text-xs font-mono flex items-center gap-2">
               <Database size={12} />
-              <span>1 Query Executed</span>
+              <span>{selectedCase.afterQuery}</span>
+            </div>
+            <div className="bg-slate-900/40 backdrop-blur-md bg-opacity-30 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-md text-xs font-mono flex items-center gap-2">
+              <Clock size={12} />
+              <span>{selectedCase.after}</span>
             </div>
           </div>
 
@@ -240,25 +313,29 @@ export default function CodeComparison() {
 
         {/* === LEFT SIDE (LEGACY CODE) === */}
         <div
-          className="absolute inset-0 bg-[#1e1e1e] pt-10 overflow-hidden border-r border-[#404040]"
+          className="absolute inset-0 bg-[#1e1e1e] pt-10 overflow-hidden border-r border-[#404040] z-10"
           style={{ width: `${sliderPosition}%` }}
         >
           {/* Red Metrics Badge */}
           <div className="absolute top-14 left-6 z-10 flex flex-col items-start gap-2 pointer-events-none">
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-2 rounded-lg backdrop-blur-md shadow-xl flex items-center gap-3">
+            <div className="bg-red-500/5 backdrop-blur-md bg-opacity-30 border border-red-500/20 text-red-400 px-4 py-2 rounded-lg shadow-md flex items-center gap-3">
               <AlertTriangle size={18} className="fill-current" />
               <div className="text-left">
                 <div className="text-[10px] font-mono uppercase tracking-wider opacity-80">
                   Execution Time
                 </div>
                 <div className="font-bold font-mono text-lg leading-none">
-                  480ms
+                  {selectedCase.beforeTime}
                 </div>
               </div>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 text-red-300 px-3 py-1.5 rounded-md text-xs font-mono flex items-center gap-2">
               <Database size={12} />
-              <span>101 Queries (N+1)</span>
+              <span>{selectedCase.beforeQuery}</span>
+            </div>
+            <div className="bg-slate-900/40 backdrop-blur-md bg-opacity-30 border border-slate-700 text-red-300 px-3 py-1.5 rounded-md text-xs font-mono flex items-center gap-2">
+              <Clock size={12} />
+              <span>{selectedCase.before}</span>
             </div>
           </div>
 
@@ -306,7 +383,7 @@ export default function CodeComparison() {
             <div className="flex items-center gap-2 text-red-400 text-xs font-bold uppercase tracking-wider">
               <AlertTriangle size={14} /> Legacy Implementation
             </div>
-            <span className="text-red-400 font-mono text-xs">480ms</span>
+            <span className="text-red-400 font-mono text-xs">{selectedCase.beforeTime}</span>
           </div>
           <HighlightedCode code={legacyCode} type="bad" />
         </div>
@@ -316,7 +393,7 @@ export default function CodeComparison() {
             <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
               <CheckCircle2 size={14} /> Optimized Solution
             </div>
-            <span className="text-emerald-400 font-mono text-xs">15ms</span>
+            <span className="text-emerald-400 font-mono text-xs">{selectedCase.afterTime}</span>
           </div>
           <HighlightedCode code={optimizedCode} type="good" />
         </div>

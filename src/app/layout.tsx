@@ -17,9 +17,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Anirudh Chandan | Software Engineer",
+  title: "Kulmeet Singh | Software Engineer",
   description:
-    "Portfolio of Anirudh Chandan, a Software Engineer specializing in scalable backend systems.",
+    "Portfolio of Kulmeet Singh, a Software Engineer specializing in scalable backend systems.",
 };
 
 export default function RootLayout({

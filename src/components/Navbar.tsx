@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { Home, User, Briefcase, Mail, Search } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const navItems = [

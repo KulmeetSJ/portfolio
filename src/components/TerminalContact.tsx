@@ -90,7 +90,7 @@ export default function TerminalContact() {
       >
         <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center justify-center gap-4 tracking-tight">
           <span className="text-teal-400 font-display font-black text-2xl">
-            10.
+            11.
           </span>{" "}
           Initialize Handshake
         </h2>
@@ -121,7 +121,7 @@ export default function TerminalContact() {
 
           <div className="text-slate-400 text-xs flex items-center gap-2 font-mono uppercase tracking-widest opacity-80">
             <Terminal size={12} />
-            <span>guest@anirudh.dev</span>
+            <span>guest@Kulmeet.dev</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export default function TerminalContact() {
           </div>
 
           <div className="text-slate-500 mb-4 select-none">
-            Welcome to Anirudh Interactive Shell v2.0.4
+            Welcome to Kulmeet Interactive Shell v2.0.4
             <br />
             Connection established via TLS 1.3
             <br />

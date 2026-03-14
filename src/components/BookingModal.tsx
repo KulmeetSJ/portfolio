@@ -6,7 +6,7 @@ import { useState } from "react";
 
 // REPLACE THIS WITH YOUR ACTUAL CALENDLY OR CAL.COM LINK
 // Example: "https://calendly.com/your-username" or "https://cal.com/your-username"
-const CALENDAR_URL = "https://calendly.com/anichandan124/30min";
+const CALENDAR_URL = "https://calendly.com/singhkulmeet3/30min";
 
 interface BookingModalProps {
   isOpen: boolean;
