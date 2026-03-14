@@ -25,7 +25,7 @@ const experiences = [
     company: "AnyaSoftek",
     role: "Full Stack Developer Intern",
     period: "May 2024 - Jun 2024",
-    type: "Fullstack Development",
+    type: "Full Stack Development",
     description:
       "Contributed to internal web platforms and client-facing portfolio builds, focusing on responsive frontend development and backend integration.",
     achievements: [
@@ -38,9 +38,9 @@ const experiences = [
   },
   {
     company: "Koders",
-    role: "FullStack Developer Intern",
+    role: "Full Stack Developer Intern",
     period: "Jan 2024 - Apr 2024",
-    type: "Fullstack Development",
+    type: "Full Stack Development",
     description:
       "Worked on fast-moving client projects across web development and automation, delivering full-stack features for real-world use cases.",
     achievements: [

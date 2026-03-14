@@ -17,36 +17,35 @@ import Projects from "@/components/Projects";
 import ServerMonitor from "@/components/ServerMonitor";
 import SpotlightCard from "@/components/SpotlightCard";
 import CertificationsCard from "@/components/CertificationsCard";
+// import EngineeringDecisions from "@/components/EngineeringDecisions";
+import Impact from "@/components/Impact";
+import Architecture from "@/components/Architecture";
 
 // --- CHANGED: Import TerminalContact instead of Contact ---
 import TerminalContact from "@/components/TerminalContact";
 
 // Dynamic Imports
-const Architecture = dynamic(() => import("@/components/Architecture"), {
-  ssr: false,
-});
 const CICDVisualizer = dynamic(
   () => import("@/components/CICDVisualizer"),
   { ssr: false },
 );
-const Impact = dynamic(() => import("@/components/Impact"), { ssr: true });
 const TerraformPlayground = dynamic(() => import("@/components/TerraformPlayground"), {
-  ssr: false,
+  ssr: false
 });
-const CodeComparison = dynamic(() => import("@/components/PerformanceEngineering"), {
-  ssr: false,
+const PerformanceEngineering = dynamic(() => import("@/components/PerformanceEngineering"), {
+  ssr: false
 });
 const IngestionDemo = dynamic(() => import("@/components/IngestionDemo"), {
-  ssr: false,
+  ssr: false
 });
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), {
-  ssr: true,
+  ssr: false
 });
 const AiChatbot = dynamic(() => import("@/components/AiChatbot"), {
-  ssr: true,
+  ssr: false
 });
 const EngineeringDecisions = dynamic(() => import("@/components/EngineeringDecisions"), {
-  ssr: false,
+  ssr: false
 });
 
 function PageContent() {
@@ -71,7 +70,7 @@ function PageContent() {
       <div className="relative z-10">
         <section
           id="home"
-          className="min-h-screen flex flex-col justify-center px-4 md:px-12 max-w-7xl mx-auto pt-32 md:pt-20 scroll-mt-32"
+          className="min-h-screen flex flex-col justify-center px-4 md:px-12 max-w-7xl mx-auto pt-32 md:pt-20 "
         >
           {/* THE BENTO BOX GRID */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 w-full">
@@ -179,7 +178,7 @@ function PageContent() {
           <Impact />
           <TerraformPlayground />
           <EngineeringDecisions />
-          <CodeComparison />
+          <PerformanceEngineering />
           <CICDVisualizer />
           <IngestionDemo />
           <TerminalContact />

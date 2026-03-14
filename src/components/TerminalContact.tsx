@@ -31,10 +31,10 @@ export default function TerminalContact() {
   }, [history, step]);
 
   // Focus management
-  useEffect(() => {
-    const timer = setTimeout(() => inputRef.current?.focus(), 100);
-    return () => clearTimeout(timer);
-  }, [step]);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => inputRef.current?.focus(), 100);
+  //   return () => clearTimeout(timer);
+  // }, [step]);
 
   const handleKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -80,7 +80,7 @@ export default function TerminalContact() {
   return (
     <section
       id="contact"
-      className="py-32 px-4 md:px-12 max-w-5xl mx-auto scroll-mt-32"
+      className="py-32 px-4 md:px-12 max-w-5xl mx-auto "
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}

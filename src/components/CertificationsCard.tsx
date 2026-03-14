@@ -13,6 +13,12 @@ const certifications = [
         verifyUrl: "https://www.credly.com/badges/498cdb19-b30a-45d1-9221-7d44ff636c66/public_url",
         logo: "/google-cloud.png",
         logoAlt: "Google Cloud",
+    },
+    {
+        issuer: "Wipro",
+        title: "Java Full Stack Certification",
+        credentialId: "",
+        verifyUrl: "",
     }
 ];
 
