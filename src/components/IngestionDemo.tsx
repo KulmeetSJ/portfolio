@@ -657,7 +657,6 @@ function MetricCard({
 }) {
     const toneMap = {
         blue: "border-blue-500/20 bg-blue-500/10 text-blue-400",
-        blue: "border-blue-500/20 bg-blue-500/10 text-blue-400",
         emerald: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
         amber: "border-amber-500/20 bg-amber-500/10 text-amber-400",
         red: "border-red-500/20 bg-red-500/10 text-red-400",
