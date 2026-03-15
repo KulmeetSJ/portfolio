@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Kulmeet Singh | Software Engineer",
   description:
-    "Portfolio of Kulmeet Singh, a Software Engineer specializing in scalable backend systems.",
+    "Portfolio of Kulmeet Singh, a Software Engineer building scalable backend systems, cloud-native platforms, and infrastructure automation.",
 };
 
 export default function RootLayout({
@@ -30,7 +30,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        /* Inject both font variables and set default to sans */
         className={`${inter.variable} ${spaceGrotesk.variable} font-sans relative bg-slate-950 text-slate-200 antialiased`}
       >
         <div className="bg-noise" />
