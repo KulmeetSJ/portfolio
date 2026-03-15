@@ -6,27 +6,39 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { email, message } = body as {
+        const { email, subject, message } = body as {
             email?: string;
+            subject?: string;
             message?: string;
         };
 
-        if (!email || !message) {
+        if (!email || !subject || !message) {
             return NextResponse.json(
-                { error: "Email and message are required." },
+                { error: "Email, subject, and message are required." },
                 { status: 400 },
             );
         }
 
+        const trimmedEmail = email.trim();
+        const trimmedSubject = subject.trim();
+        const trimmedMessage = message.trim();
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(trimmedEmail)) {
             return NextResponse.json(
                 { error: "Invalid email format." },
                 { status: 400 },
             );
         }
 
-        if (message.trim().length < 5) {
+        if (trimmedSubject.length < 3) {
+            return NextResponse.json(
+                { error: "Subject is too short." },
+                { status: 400 },
+            );
+        }
+
+        if (trimmedMessage.length < 5) {
             return NextResponse.json(
                 { error: "Message is too short." },
                 { status: 400 },
@@ -42,17 +54,18 @@ export async function POST(req: Request) {
         }
 
         const { error } = await resend.emails.send({
-            from: "Portfolio Contact <onboarding@kulmeet.dev>",
+            from: "Portfolio Contact <onboarding@resend.dev>",
             to,
-            replyTo: email,
-            subject: `New portfolio message from ${email}`,
+            replyTo: trimmedEmail,
+            subject: `Portfolio Contact: ${trimmedSubject}`,
             text: `
 You received a new message from your portfolio contact form.
 
-From: ${email}
+From: ${trimmedEmail}
+Subject: ${trimmedSubject}
 
 Message:
-${message}
+${trimmedMessage}
       `.trim(),
         });
 

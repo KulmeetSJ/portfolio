@@ -18,12 +18,9 @@ import ServerMonitor from "@/components/ServerMonitor";
 import SpotlightCard from "@/components/SpotlightCard";
 import CertificationsCard from "@/components/CertificationsCard";
 import EngineeringSnapshot from "@/components/EngineeringSnapshot";
-// import EngineeringDecisions from "@/components/EngineeringDecisions";
 import Impact from "@/components/Impact";
 import Architecture from "@/components/Architecture";
-
-// --- CHANGED: Import TerminalContact instead of Contact ---
-import TerminalContact from "@/components/TerminalContact";
+import MessageConsole from "@/components/MessageConsole";
 
 // Dynamic Imports
 const CICDVisualizer = dynamic(
@@ -188,7 +185,7 @@ function PageContent() {
           <PerformanceEngineering />
           <CICDVisualizer />
           <IngestionDemo />
-          <TerminalContact />
+          <MessageConsole />
           {/* <section className="px-4 md:px-12 max-w-7xl mx-auto w-full">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
