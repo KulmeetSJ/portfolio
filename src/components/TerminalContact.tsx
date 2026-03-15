@@ -5,11 +5,7 @@ import { motion } from "framer-motion";
 import {
   Terminal,
   CheckCircle2,
-  Loader2,
-  Wifi,
-  Minimize,
-  Maximize,
-  X,
+  Loader2
 } from "lucide-react";
 import { toast } from "./Toaster";
 
@@ -30,16 +26,60 @@ export default function TerminalContact() {
     }
   }, [history, step]);
 
-  // Focus management
-  // useEffect(() => {
-  //   const timer = setTimeout(() => inputRef.current?.focus(), 100);
-  //   return () => clearTimeout(timer);
-  // }, [step]);
+  const delay = (ms: number) =>
+    new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  const sendMessage = async () => {
+    setStep("sending");
+
+    setHistory((prev) => [...prev, "Initializing secure handshake..."]);
+    await delay(500);
+
+    setHistory((prev) => [...prev, "Encrypting payload (AES-256)..."]);
+    await delay(500);
+
+    setHistory((prev) => [...prev, "Routing through proxy nodes..."]);
+    await delay(700);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to send message.");
+      }
+
+      setHistory((prev) => [...prev, "Transmission acknowledged by host."]);
+      setStep("success");
+      toast.success("Transmission Received.");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to send message.";
+
+      setHistory((prev) => [
+        ...prev,
+        `❌ Error: ${errorMessage}`,
+      ]);
+      setStep("message");
+      toast.error("Transmission failed.");
+    }
+  };
 
   const handleKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       if (step === "email") {
-        if (!email.includes("@") || !email.includes(".")) {
+        const trimmedEmail = email.trim();
+        if (!trimmedEmail.includes("@") || !trimmedEmail.includes(".")) {
           setHistory((prev) => [
             ...prev,
             `> Enter email: ${email}`,
@@ -48,31 +88,17 @@ export default function TerminalContact() {
           setEmail("");
           return;
         }
-        setHistory((prev) => [...prev, `> Enter email: ${email}`]);
+        setHistory((prev) => [...prev, `> Enter email: ${trimmedEmail}`]);
+        setEmail(trimmedEmail);
         setStep("message");
       } else if (step === "message") {
-        if (!message.trim()) return;
+        const trimmedMessage = message.trim();
+        if (!trimmedMessage) return;
 
-        setHistory((prev) => [...prev, `> Enter message: ${message}`]);
-        setStep("sending");
+        setHistory((prev) => [...prev, `> Enter message: ${trimmedMessage}`]);
+        setMessage(trimmedMessage);
 
-        const delay = (ms: number) =>
-          new Promise<void>((resolve) => setTimeout(resolve, ms));
-
-        // Cinematic delay sequence
-        setHistory((prev) => [...prev, "Initializing secure handshake..."]);
-        await delay(800);
-
-        setHistory((prev) => [...prev, "Encrypting payload (AES-256)..."]);
-        await delay(800);
-
-        setHistory((prev) => [...prev, "Routing through proxy nodes..."]);
-        await delay(1200);
-
-        console.log("Packet Sent:", { email, message });
-
-        setStep("success");
-        toast.success("Transmission Received.");
+        await sendMessage();
       }
     }
   };
@@ -80,7 +106,7 @@ export default function TerminalContact() {
   return (
     <section
       id="contact"
-      className="py-32 px-4 md:px-12 max-w-5xl mx-auto "
+      className="py-24 px-4 md:px-12 max-w-5xl mx-auto "
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -224,12 +250,10 @@ export default function TerminalContact() {
                   Packet Successfully Delivered.
                 </span>
                 <span className="text-emerald-400/70 text-sm">
-                  The host has been notified. You will receive an acknowledgment
-                  at{" "}
+                  The host has been notified. Further communication will be routed to{" "}
                   <span className="font-mono text-emerald-300 border-b border-emerald-500/30">
                     {email}
-                  </span>{" "}
-                  shortly.
+                  </span>.
                 </span>
               </div>
             </motion.div>

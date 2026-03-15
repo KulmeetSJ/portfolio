@@ -137,8 +137,8 @@ export default function Architecture() {
   const details = selectedNode ? nodeDetails[selectedNode] : null;
 
   return (
-    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto h-[800px] relative" id="architecture">
-      <div className="mb-8">
+    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto relative" id="architecture">
+      <div className="mb-16">
         <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-6">
           <span className="text-teal-400 font-display font-black text-2xl">
             04.

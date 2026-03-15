@@ -91,7 +91,7 @@ export default function Impact() {
   return (
     <section
       id="impact"
-      className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32"
+      className="py-24 px-6 md:px-12 max-w-7xl mx-auto scroll-mt-32"
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}

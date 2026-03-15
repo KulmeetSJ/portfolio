@@ -101,6 +101,15 @@ This portfolio is built to communicate:
 - how I translate backend and cloud work into something visual and understandable
 - how technical decisions connect to developer experience and operational reliability
 
+## Environment Setup
+
+The contact form in the terminal section requires a Resend API key to send emails. Before running the project, create a `.env` file in the root directory:
+
+```env
+RESEND_API_KEY=your_resend_api_key
+CONTACT_TO_EMAIL=your_receiving_email@domain.com
+```
+
 ---
 
 ## Local Development

@@ -109,7 +109,7 @@ function PageContent() {
                     whileHover={{ scale: 0.97 }}
                     whileTap={{ scale: 0.93 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    href="/ks_resume.pdf"
+                    href="/Kulmeet_Singh_Resume.pdf"
                     target="_blank"
                     className="px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-lg hover:bg-teal-400 transition-colors font-mono flex items-center gap-2 text-sm shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_25px_rgba(45,212,191,0.5)]"
                   >

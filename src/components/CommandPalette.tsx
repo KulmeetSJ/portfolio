@@ -64,7 +64,7 @@ export default function CommandPalette() {
         category: "Documents",
         icon: <FileText size={16} />,
         perform: () =>
-          window.open("/ks_resume.pdf", "_blank"),
+          window.open("/Kulmeet_Singh_Resume.pdf", "_blank"),
       },
       // {
       //   id: "pydb",

@@ -44,15 +44,16 @@ public/
   file.svg
   globe.svg
   google-cloud.png
-  ks_resume.pdf
+  Kulmeet_Singh_Resume.pdf
   kulmeet.jpeg
-  Latest_Resume_5.pdf
   next.svg
   vercel.svg
   window.svg
 src/
   app/
     api/
+      contact/
+        route.ts
       health/
         route.ts
     favicon.ico
@@ -83,6 +84,7 @@ src/
   constants/
     consts.tsx
 .gitignore
+env.example
 eslint.config.mjs
 next.config.ts
 package.json
@@ -94,6 +96,89 @@ tsconfig.json
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="src/app/api/contact/route.ts">
+import { NextResponse } from "next/server";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+export async function POST(req: Request) {
+    try {
+        const body = await req.json();
+        const { email, message } = body as {
+            email?: string;
+            message?: string;
+        };
+
+        if (!email || !message) {
+            return NextResponse.json(
+                { error: "Email and message are required." },
+                { status: 400 },
+            );
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return NextResponse.json(
+                { error: "Invalid email format." },
+                { status: 400 },
+            );
+        }
+
+        if (message.trim().length < 5) {
+            return NextResponse.json(
+                { error: "Message is too short." },
+                { status: 400 },
+            );
+        }
+
+        const to = process.env.CONTACT_TO_EMAIL;
+        if (!to) {
+            return NextResponse.json(
+                { error: "Server misconfiguration: missing recipient email." },
+                { status: 500 },
+            );
+        }
+
+        const { error } = await resend.emails.send({
+            from: "Portfolio Contact <onboarding@kulmeet.dev>",
+            to,
+            replyTo: email,
+            subject: `New portfolio message from ${email}`,
+            text: `
+You received a new message from your portfolio contact form.
+
+From: ${email}
+
+Message:
+${message}
+      `.trim(),
+        });
+
+        if (error) {
+            console.error("Resend error:", error);
+            return NextResponse.json(
+                { error: "Failed to send email." },
+                { status: 500 },
+            );
+        }
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("API route error:", error);
+        return NextResponse.json(
+            { error: "Something went wrong." },
+            { status: 500 },
+        );
+    }
+}
+</file>
+
+<file path="env.example">
+RESEND_API_KEY=<api_key>
+CONTACT_TO_EMAIL=<email>
+</file>
 
 <file path="public/file.svg">
 <svg fill="none" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z" clip-rule="evenodd" fill="#666" fill-rule="evenodd"/></svg>
@@ -137,101 +222,689 @@ export async function GET(request: Request) {
 }
 </file>
 
-<file path="src/components/CertificationsCard.tsx">
+<file path="src/components/SystemContext.tsx">
 "use client";
 
-import { motion } from "framer-motion";
-import { Award, BadgeCheck, ExternalLink } from "lucide-react";
-import Image from "next/image";
-import SpotlightCard from "./SpotlightCard";
+import { createContext, useContext, useState, ReactNode } from "react";
+import { toast } from "./Toaster";
 
-const certifications = [
-    {
-        issuer: "Google Cloud",
-        title: "Professional Cloud Architect",
-        credentialId: "5f09da7209a24931a67cbc3881df84c4",
-        verifyUrl: "https://www.credly.com/badges/498cdb19-b30a-45d1-9221-7d44ff636c66/public_url",
-        logo: "/google-cloud.png",
-        logoAlt: "Google Cloud",
-    },
-    {
-        issuer: "Wipro",
-        title: "Java Full Stack Certification",
-        credentialId: "",
-        verifyUrl: "",
+interface SystemState {
+  status: "operational" | "degraded";
+  toggleChaos: () => void;
+}
+
+const SystemContext = createContext<SystemState | undefined>(undefined);
+
+export const SystemProvider = ({ children }: { children: ReactNode }) => {
+  const [status, setStatus] = useState<"operational" | "degraded">(
+    "operational",
+  );
+
+  const toggleChaos = () => {
+    if (status === "operational") {
+      setStatus("degraded");
+      toast.error("SYSTEM ALERT: Critical DB Latency Spike!");
+    } else {
+      setStatus("operational");
+      toast.success("Systems normalized.");
     }
+  };
+
+  return (
+    <SystemContext.Provider value={{ status, toggleChaos }}>
+      {children}
+    </SystemContext.Provider>
+  );
+};
+
+export const useSystem = () => {
+  const context = useContext(SystemContext);
+  if (!context) throw new Error("useSystem must be used within SystemProvider");
+  return context;
+};
+</file>
+
+<file path="src/components/TerraformPlayground.tsx">
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  Play,
+  Loader2,
+  Terminal,
+  CheckCircle,
+  Circle,
+} from "lucide-react";
+
+const pipelineSteps = [
+  {
+    title: "Terraform Plan",
+    log: "[INFO] Generating Terraform execution plan...\n[INFO] Parsing plan JSON...",
+  },
+  {
+    title: "Compliance Check",
+    log: "[CHECK] Validating IAM policies...\n✔ No restricted roles detected",
+  },
+  {
+    title: "Plan Summarization",
+    log:
+      "[SUMMARY]\nResources Added: 3\nResources Modified: 2\nResources Destroyed: 0",
+  },
+  {
+    title: "Deployment Validation",
+    log: "[SUCCESS] Infrastructure validation completed\nDeployment ready.",
+  },
 ];
 
-export default function CertificationsCard() {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-            className="col-span-1 md:col-span-6 lg:col-span-4 h-full"
-        >
-            <SpotlightCard className="p-6 h-full flex flex-col justify-center">
-                <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase mb-4">
-                    <Award size={14} className="text-teal-400" />
-                    Certifications
+export default function PipelinePlayground() {
+  const [stepIndex, setStepIndex] = useState(-1);
+  const [isRunning, setIsRunning] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const [logs, setLogs] = useState("");
+
+  const terminalRef = useRef<HTMLDivElement>(null);
+
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const streamLog = async (text: string) => {
+    for (let char of text) {
+      setLogs((prev) => prev + char);
+      await sleep(8);
+    }
+  };
+
+  const runPipeline = async () => {
+    setIsRunning(true);
+    setCompleted(false);
+    setLogs("");
+    setStepIndex(-1);
+
+    for (let i = 0; i < pipelineSteps.length; i++) {
+      setStepIndex(i);
+      await sleep(500);
+      await streamLog("\n\n" + pipelineSteps[i].log);
+      await sleep(600);
+    }
+
+    setCompleted(true);
+    setIsRunning(false);
+  };
+
+  // auto scroll terminal logs
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+  return (
+    <section
+      className="py-24 px-4 md:px-12 max-w-7xl mx-auto"
+      id="playground"
+    >
+      {/* HEADER */}
+      <div className="mb-16">
+        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
+          <span className="text-teal-400 font-black text-2xl">06.</span>
+          Terraform Pipeline Playground
+        </h2>
+
+        <p className="text-slate-400 max-w-2xl text-lg">
+          Simulate how the CI/CD pipeline validates Terraform infrastructure
+          changes and prevents compliance violations.
+        </p>
+      </div>
+
+      {/* GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+
+        {/* PIPELINE STAGES */}
+        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+          <h3 className="text-slate-300 font-semibold mb-6">
+            Pipeline Stages
+          </h3>
+
+          <div className="space-y-4">
+            {pipelineSteps.map((step, index) => {
+              const isActive = index === stepIndex && isRunning;
+              const isCompleted = completed || index < stepIndex;
+
+              return (
+                <motion.div
+                  key={index}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition flex-wrap ${isActive
+                    ? "border-teal-400 bg-teal-500/10"
+                    : isCompleted
+                      ? "border-green-500/30 bg-green-500/10"
+                      : "border-slate-700"
+                    }`}
+                >
+                  {isCompleted ? (
+                    <CheckCircle size={18} className="text-green-400" />
+                  ) : isActive ? (
+                    <Loader2
+                      size={18}
+                      className="text-teal-400 animate-spin"
+                    />
+                  ) : (
+                    <Circle size={18} className="text-slate-500" />
+                  )}
+
+                  <span className="text-slate-300 text-sm md:text-base">
+                    {step.title}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* RUN BUTTON */}
+          <button
+            onClick={runPipeline}
+            disabled={isRunning}
+            className="mt-8 px-6 py-2 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded flex items-center gap-2 disabled:opacity-50"
+          >
+            {isRunning ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <Play size={18} />
+            )}
+            Run Pipeline
+          </button>
+        </div>
+
+        {/* TERMINAL */}
+        <div className="bg-[#010409] border border-slate-800 rounded-xl p-6">
+          <div className="flex items-center gap-2 text-slate-400 text-sm mb-4">
+            <Terminal size={16} />
+            Pipeline Logs
+          </div>
+
+          <div
+            ref={terminalRef}
+            className="bg-black rounded-lg p-4 min-h-[220px] md:min-h-[300px] text-green-400 font-mono text-sm whitespace-pre-wrap overflow-y-auto"
+          >
+            {logs || (
+              <div className="text-slate-500">
+                Run the pipeline to see CI/CD logs appear here.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+</file>
+
+<file path="src/components/Toaster.tsx">
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle, AlertCircle, Info, X } from "lucide-react";
+
+type ToastType = "success" | "error" | "info";
+type ToastEvent = { message: string; type: ToastType; id: number };
+
+export const toast = {
+  success: (msg: string) => dispatch(msg, "success"),
+  error: (msg: string) => dispatch(msg, "error"),
+  info: (msg: string) => dispatch(msg, "info"),
+};
+
+const dispatch = (message: string, type: ToastType) => {
+  if (typeof window !== "undefined") {
+    const event = new CustomEvent<ToastEvent>("toast", {
+      detail: { message, type, id: Date.now() },
+    });
+    window.dispatchEvent(event);
+  }
+};
+
+export default function Toaster() {
+  const [toasts, setToasts] = useState<ToastEvent[]>([]);
+
+  useEffect(() => {
+    const handleToast = (e: Event) => {
+      const customEvent = e as CustomEvent<ToastEvent>;
+      setToasts((prev) => [...prev, customEvent.detail]);
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== customEvent.detail.id));
+      }, 3000);
+    };
+    window.addEventListener("toast", handleToast);
+    return () => window.removeEventListener("toast", handleToast);
+  }, []);
+
+  return (
+    <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+      <AnimatePresence>
+        {toasts.map((t) => (
+          <motion.div
+            key={t.id}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="pointer-events-auto bg-slate-900/95 backdrop-blur border border-slate-700 p-4 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]"
+          >
+            {t.type === "success" && (
+              <CheckCircle size={18} className="text-teal-400" />
+            )}
+            {t.type === "error" && (
+              <AlertCircle size={18} className="text-red-400" />
+            )}
+            <span className="text-sm font-mono text-slate-200">
+              {t.message}
+            </span>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+</file>
+
+<file path="src/constants/consts.tsx">
+export const EMAIL_ADDRESS = "singhkulmeet3@gmail.com"
+</file>
+
+<file path=".gitignore">
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+</file>
+
+<file path="eslint.config.mjs">
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+</file>
+
+<file path="next.config.ts">
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
+  reactCompiler: true,
+};
+
+export default nextConfig;
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+</file>
+
+<file path="src/components/AiChatbot.tsx">
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Send, Bot, User, Sparkles } from "lucide-react";
+import { EMAIL_ADDRESS } from "@/constants/consts";
+
+// 1. Define the Interface
+interface KnowledgeEntry {
+  keywords: string[];
+  text: string;
+}
+
+// 2. Type the Data
+const knowledgeBase: KnowledgeEntry[] = [
+  {
+    keywords: ["skills", "tech", "stack", "technologies"],
+    text: "Kulmeet works primarily on **Backend and Platform Engineering**. His core stack includes **Java, Python, Node.js, React, Terraform, Docker, and CI/CD systems**. He focuses on building scalable backend services and infrastructure automation.",
+  },
+  {
+    keywords: ["hsbc", "work", "experience", "job"],
+    text: "At **HSBC**, Kulmeet worked on internal engineering platforms. One key project was an **LLM-powered procurement system** that converts unstructured text into structured RFP documents, reducing manual drafting time by **80%**.",
+  },
+  {
+    keywords: ["terraform", "pipeline", "ci", "cicd", "infrastructure"],
+    text: "Kulmeet built a **Terraform CI/CD pipeline** that analyzes Terraform plan logs, summarizes infrastructure changes, and validates IAM policies before deployment. This helps engineers quickly understand infrastructure changes and ensures compliance.",
+  },
+  {
+    keywords: ["composer", "security", "devops", "scans"],
+    text: "Kulmeet also implemented a **secure CI/CD pipeline** integrating **SonarQube, Nexus IQ, and Checkmarx scans**, ensuring code quality and security before deployments.",
+  },
+  {
+    keywords: ["projects", "portfolio", "built"],
+    text: "Some of Kulmeet's featured projects include:\n\n• **Terraform Log Analyzer** for infrastructure change summaries\n• **LLM-powered RFP automation platform**\n• **Secure CI/CD pipelines with automated security scans**\n• **E-commerce platform built with React and MongoDB**",
+  },
+  {
+    keywords: ["contact", "email", "hire", "reach"],
+    text: `You can reach Kulmeet directly at **${EMAIL_ADDRESS}**. He is currently open to opportunities in **Backend Engineering, Platform Engineering, and Infrastructure Automation**.`,
+  },
+  {
+    keywords: ["hello", "hi", "hey"],
+    text: "Hello! I'm **KuliBot**, Kulmeet's portfolio assistant. I can tell you about his **projects, experience at HSBC, Terraform pipelines, CI/CD systems, and backend skills**.",
+  },
+  {
+    keywords: [
+      "certification", "certifications", "certificate", "google cloud", "gcp", "cloud architect", "wipro", "java certification",
+      "java fullstack"
+    ],
+    text: "Kulmeet holds the **Google Cloud Professional Cloud Architect Certification**, which validates expertise in designing scalable cloud architectures on **Google Cloud Platform**. He also completed the **Wipro Java Full Stack Certification**, covering backend development with **Java, Spring Boot, databases, and modern web technologies**."
+  },
+];
+
+// --- LOGIC ---
+const findBestMatch = (query: string): string => {
+  const lowerQuery = query.toLowerCase();
+
+  let bestMatch: KnowledgeEntry | null = null;
+  let maxScore = 0;
+
+  for (const entry of knowledgeBase) {
+    let score = 0;
+    entry.keywords.forEach((keyword) => {
+      if (lowerQuery.includes(keyword)) score++;
+    });
+    if (score > maxScore) {
+      maxScore = score;
+      bestMatch = entry;
+    }
+  }
+
+  if (maxScore > 0 && bestMatch) {
+    return bestMatch.text;
+  }
+
+  return "I'm not sure about that specific detail, but I can tell you about Kulmeet's **skills**, **work experience**, or **projects**. Try asking 'What are his skills?'";
+};
+
+interface Message {
+  id: number;
+  role: "user" | "bot";
+  text: string;
+}
+
+export default function AiChatbot() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      role: "bot",
+      text: "Hi! I'm KuliBot. Ask me anything about Kulmeet's work!",
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300); // Small delay to allow animation to finish before focusing
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    const userMessage: Message = { id: Date.now(), role: "user", text: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsTyping(true);
+
+    setTimeout(() => {
+      const answer = findBestMatch(userMessage.text);
+      const botMessage: Message = {
+        id: Date.now() + 1,
+        role: "bot",
+        text: answer,
+      };
+      setMessages((prev) => [...prev, botMessage]);
+      setIsTyping(false);
+    }, 600);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSend();
+  };
+
+  return (
+    <>
+      {/* FLOATING TOGGLE BUTTON - Increased Z-Index */}
+      <motion.button
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setIsOpen(true)}
+        className={`fixed bottom-8 right-8 z-[9999] p-4 rounded-full shadow-2xl transition-all duration-300 ${isOpen
+          ? "scale-0 opacity-0"
+          : "bg-teal-500 hover:bg-teal-400 text-slate-900"
+          }`}
+      >
+        <Sparkles size={28} fill="currentColor" />
+      </motion.button>
+
+      {/* CHAT WINDOW - Increased Z-Index */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-8 right-4 md:right-8 z-[9999] w-[90vw] md:w-[400px] h-[500px] bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+          >
+            {/* HEADER */}
+            <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-teal-500/20 rounded-lg">
+                  <Bot size={20} className="text-teal-400" />
                 </div>
-
-                <div className="space-y-4">
-                    {certifications.map((cert, index) => (
-                        <div
-                            key={index}
-                            className="rounded-xl border border-slate-800 bg-slate-900/40 p-4"
-                        >
-                            <div className="flex items-start gap-3">
-                                <div className="mt-0.5 text-teal-400 shrink-0">
-                                    {cert.logo ? (
-                                        <div className="relative h-8 w-8 overflow-hidden rounded-md bg-white/95 p-1">
-                                            <Image
-                                                src={cert.logo}
-                                                alt={cert.logoAlt}
-                                                fill
-                                                className="object-contain p-1"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <BadgeCheck size={18} />
-                                    )}
-                                </div>
-
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-slate-100 font-semibold text-sm md:text-base leading-snug">
-                                        {cert.title}
-                                    </p>
-
-                                    <p className="text-slate-500 text-xs md:text-sm mt-1 font-mono uppercase tracking-wide">
-                                        {cert.issuer}
-                                    </p>
-
-                                    {cert.credentialId && (
-                                        <p className="text-slate-400 text-xs mt-3 font-mono break-all">
-                                            Credential ID:{" "}
-                                            <span className="text-slate-300">{cert.credentialId}</span>
-                                        </p>
-                                    )}
-
-                                    {cert.verifyUrl && (
-                                        <a
-                                            href={cert.verifyUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="mt-3 inline-flex items-center gap-2 text-xs font-mono text-teal-400 hover:text-teal-300 transition-colors"
-                                        >
-                                            Verify Credential <ExternalLink size={12} />
-                                        </a>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                <div>
+                  <h3 className="font-bold text-slate-100 text-sm">
+                    KuliBot AI
+                  </h3>
+                  <span className="text-xs text-green-400 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                    Online
+                  </span>
                 </div>
-            </SpotlightCard>
-        </motion.div>
-    );
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* MESSAGES */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex items-start gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                >
+                  <div
+                    className={`p-2 rounded-full flex-shrink-0 ${msg.role === "user"
+                      ? "bg-slate-700 text-slate-300"
+                      : "bg-teal-500/20 text-teal-400"
+                      }`}
+                  >
+                    {msg.role === "user" ? (
+                      <User size={16} />
+                    ) : (
+                      <Bot size={16} />
+                    )}
+                  </div>
+                  <div
+                    className={`p-3 rounded-2xl text-sm leading-relaxed max-w-[80%] ${msg.role === "user"
+                      ? "bg-slate-700 text-slate-200 rounded-tr-none"
+                      : "bg-slate-800 text-slate-300 border border-slate-700 rounded-tl-none"
+                      }`}
+                  >
+                    {msg.text.split("**").map((part, i) =>
+                      i % 2 === 1 ? (
+                        <strong key={i} className="text-teal-400 font-normal">
+                          {part}
+                        </strong>
+                      ) : (
+                        part
+                      ),
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {isTyping && (
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-full bg-teal-500/20 text-teal-400">
+                    <Bot size={16} />
+                  </div>
+                  <div className="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex gap-1 items-center">
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+              {messages.length === 1 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {[
+                    "What projects has Kulmeet built?",
+                    "Tell me about the Terraform pipeline",
+                    "What technologies does he use?",
+                    "How can I contact him?",
+                  ].map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => setInput(prompt)}
+                      className="text-xs px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 hover:border-teal-400 hover:text-teal-400 transition"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* INPUT */}
+            <div className="p-4 bg-slate-800/50 border-t border-slate-700">
+              <div className="relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Ask about skills..."
+                  // Added pointer-events-auto to ensure it catches clicks
+                  className="w-full bg-slate-950 border border-slate-700 rounded-full py-3 px-5 text-sm text-slate-200 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all placeholder:text-slate-600 pointer-events-auto"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-teal-500 text-slate-950 rounded-full hover:bg-teal-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  <Send size={16} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
 }
 </file>
 
@@ -538,7 +1211,7 @@ export default function ComposerPipelineVisualizer() {
     }, [stepIndex, isRunning, completed, failed, rolledBack, activeRollback]);
 
     return (
-        <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
+        <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto" id="cicd">
             <div className="mb-12">
                 <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
                     <span className="text-teal-400 font-black text-2xl">09.</span>
@@ -985,7 +1658,7 @@ export default function EngineeringDecisions() {
     const [active, setActive] = useState<string | null>(null);
 
     return (
-        <section className="py-24 px-6 md:px-12 max-w-5xl mx-auto scroll-mt-32">
+        <section className="py-24 px-6 md:px-12 max-w-5xl mx-auto scroll-mt-32" id="engineering-decisions">
             <div className="mb-16">
                 <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
                     <span className="text-teal-400 font-black text-2xl">07.</span>
@@ -1394,7 +2067,7 @@ export default function RealtimeIngestionVisualizer() {
     );
 
     return (
-        <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto scroll-mt-32">
+        <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto scroll-mt-32" id="ingestion-visualizer">
             <div className="mb-12">
                 <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
                     <span className="text-teal-400 font-display font-black text-2xl">
@@ -2057,13 +2730,13 @@ export default function CodeComparison() {
   }, [isDragging]);
 
   return (
-    <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto scroll-mt-32">
+    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32 overflow-x-hidden" id="performance-engineering">
       <div className="mb-16">
-        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
+        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 tracking-tight">
           <span className="text-teal-400 font-display font-black text-2xl">
             08.
-          </span>{" "}
-          Performance Engineering
+          </span>
+          <span>Performance Engineering</span>
         </h2>
         <p className="text-slate-400 max-w-2xl text-lg">
           I do not just write code; I{" "}
@@ -2202,8 +2875,8 @@ export default function CodeComparison() {
       </div>
 
       {/* --- MOBILE VIEW: Stacked for Usability --- */}
-      <div className="md:hidden flex flex-col gap-6">
-        <div className="bg-[#1e1e1e] border border-red-500/30 rounded-xl overflow-hidden shadow-lg">
+      <div className="md:hidden flex flex-col gap-6 w-full max-w-full overflow-hidden">
+        <div className="bg-[#1e1e1e] border border-red-500/30 rounded-xl overflow-hidden shadow-lg w-full">
           <div className="bg-[#252526] p-3 flex items-center justify-between border-b border-red-500/10">
             <div className="flex items-center gap-2 text-red-400 text-xs font-bold uppercase tracking-wider">
               <AlertTriangle size={14} /> Legacy Implementation
@@ -2213,7 +2886,7 @@ export default function CodeComparison() {
           <HighlightedCode code={legacyCode} type="bad" />
         </div>
 
-        <div className="bg-[#1e1e1e] border border-emerald-500/30 rounded-xl overflow-hidden shadow-lg">
+        <div className="bg-[#1e1e1e] border border-emerald-500/30 rounded-xl overflow-hidden shadow-lg w-full">
           <div className="bg-[#252526] p-3 flex items-center justify-between border-b border-emerald-500/10">
             <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
               <CheckCircle2 size={14} /> Optimized Solution
@@ -2224,998 +2897,6 @@ export default function CodeComparison() {
         </div>
       </div>
     </section>
-  );
-}
-</file>
-
-<file path="src/components/SystemContext.tsx">
-"use client";
-
-import { createContext, useContext, useState, ReactNode } from "react";
-import { toast } from "./Toaster";
-
-interface SystemState {
-  status: "operational" | "degraded";
-  toggleChaos: () => void;
-}
-
-const SystemContext = createContext<SystemState | undefined>(undefined);
-
-export const SystemProvider = ({ children }: { children: ReactNode }) => {
-  const [status, setStatus] = useState<"operational" | "degraded">(
-    "operational",
-  );
-
-  const toggleChaos = () => {
-    if (status === "operational") {
-      setStatus("degraded");
-      toast.error("SYSTEM ALERT: Critical DB Latency Spike!");
-    } else {
-      setStatus("operational");
-      toast.success("Systems normalized.");
-    }
-  };
-
-  return (
-    <SystemContext.Provider value={{ status, toggleChaos }}>
-      {children}
-    </SystemContext.Provider>
-  );
-};
-
-export const useSystem = () => {
-  const context = useContext(SystemContext);
-  if (!context) throw new Error("useSystem must be used within SystemProvider");
-  return context;
-};
-</file>
-
-<file path="src/components/TerraformPlayground.tsx">
-"use client";
-
-import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import {
-  Play,
-  Loader2,
-  Terminal,
-  CheckCircle,
-  Circle,
-} from "lucide-react";
-
-const pipelineSteps = [
-  {
-    title: "Terraform Plan",
-    log: "[INFO] Generating Terraform execution plan...\n[INFO] Parsing plan JSON...",
-  },
-  {
-    title: "Compliance Check",
-    log: "[CHECK] Validating IAM policies...\n✔ No restricted roles detected",
-  },
-  {
-    title: "Plan Summarization",
-    log:
-      "[SUMMARY]\nResources Added: 3\nResources Modified: 2\nResources Destroyed: 0",
-  },
-  {
-    title: "Deployment Validation",
-    log: "[SUCCESS] Infrastructure validation completed\nDeployment ready.",
-  },
-];
-
-export default function PipelinePlayground() {
-  const [stepIndex, setStepIndex] = useState(-1);
-  const [isRunning, setIsRunning] = useState(false);
-  const [completed, setCompleted] = useState(false);
-  const [logs, setLogs] = useState("");
-
-  const terminalRef = useRef<HTMLDivElement>(null);
-
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-  const streamLog = async (text: string) => {
-    for (let char of text) {
-      setLogs((prev) => prev + char);
-      await sleep(8);
-    }
-  };
-
-  const runPipeline = async () => {
-    setIsRunning(true);
-    setCompleted(false);
-    setLogs("");
-    setStepIndex(-1);
-
-    for (let i = 0; i < pipelineSteps.length; i++) {
-      setStepIndex(i);
-      await sleep(500);
-      await streamLog("\n\n" + pipelineSteps[i].log);
-      await sleep(600);
-    }
-
-    setCompleted(true);
-    setIsRunning(false);
-  };
-
-  // auto scroll terminal logs
-  useEffect(() => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-    }
-  }, [logs]);
-
-  return (
-    <section
-      className="py-24 px-4 md:px-12 max-w-7xl mx-auto"
-      id="playground"
-    >
-      {/* HEADER */}
-      <div className="mb-16">
-        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
-          <span className="text-teal-400 font-black text-2xl">06.</span>
-          Terraform Pipeline Playground
-        </h2>
-
-        <p className="text-slate-400 max-w-2xl text-lg">
-          Simulate how the CI/CD pipeline validates Terraform infrastructure
-          changes and prevents compliance violations.
-        </p>
-      </div>
-
-      {/* GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-
-        {/* PIPELINE STAGES */}
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
-          <h3 className="text-slate-300 font-semibold mb-6">
-            Pipeline Stages
-          </h3>
-
-          <div className="space-y-4">
-            {pipelineSteps.map((step, index) => {
-              const isActive = index === stepIndex && isRunning;
-              const isCompleted = completed || index < stepIndex;
-
-              return (
-                <motion.div
-                  key={index}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition flex-wrap ${isActive
-                    ? "border-teal-400 bg-teal-500/10"
-                    : isCompleted
-                      ? "border-green-500/30 bg-green-500/10"
-                      : "border-slate-700"
-                    }`}
-                >
-                  {isCompleted ? (
-                    <CheckCircle size={18} className="text-green-400" />
-                  ) : isActive ? (
-                    <Loader2
-                      size={18}
-                      className="text-teal-400 animate-spin"
-                    />
-                  ) : (
-                    <Circle size={18} className="text-slate-500" />
-                  )}
-
-                  <span className="text-slate-300 text-sm md:text-base">
-                    {step.title}
-                  </span>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* RUN BUTTON */}
-          <button
-            onClick={runPipeline}
-            disabled={isRunning}
-            className="mt-8 px-6 py-2 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded flex items-center gap-2 disabled:opacity-50"
-          >
-            {isRunning ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <Play size={18} />
-            )}
-            Run Pipeline
-          </button>
-        </div>
-
-        {/* TERMINAL */}
-        <div className="bg-[#010409] border border-slate-800 rounded-xl p-6">
-          <div className="flex items-center gap-2 text-slate-400 text-sm mb-4">
-            <Terminal size={16} />
-            Pipeline Logs
-          </div>
-
-          <div
-            ref={terminalRef}
-            className="bg-black rounded-lg p-4 min-h-[220px] md:min-h-[300px] text-green-400 font-mono text-sm whitespace-pre-wrap overflow-y-auto"
-          >
-            {logs || (
-              <div className="text-slate-500">
-                Run the pipeline to see CI/CD logs appear here.
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-</file>
-
-<file path="src/components/Toaster.tsx">
-"use client";
-
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, AlertCircle, Info, X } from "lucide-react";
-
-type ToastType = "success" | "error" | "info";
-type ToastEvent = { message: string; type: ToastType; id: number };
-
-export const toast = {
-  success: (msg: string) => dispatch(msg, "success"),
-  error: (msg: string) => dispatch(msg, "error"),
-  info: (msg: string) => dispatch(msg, "info"),
-};
-
-const dispatch = (message: string, type: ToastType) => {
-  if (typeof window !== "undefined") {
-    const event = new CustomEvent<ToastEvent>("toast", {
-      detail: { message, type, id: Date.now() },
-    });
-    window.dispatchEvent(event);
-  }
-};
-
-export default function Toaster() {
-  const [toasts, setToasts] = useState<ToastEvent[]>([]);
-
-  useEffect(() => {
-    const handleToast = (e: Event) => {
-      const customEvent = e as CustomEvent<ToastEvent>;
-      setToasts((prev) => [...prev, customEvent.detail]);
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== customEvent.detail.id));
-      }, 3000);
-    };
-    window.addEventListener("toast", handleToast);
-    return () => window.removeEventListener("toast", handleToast);
-  }, []);
-
-  return (
-    <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
-      <AnimatePresence>
-        {toasts.map((t) => (
-          <motion.div
-            key={t.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="pointer-events-auto bg-slate-900/95 backdrop-blur border border-slate-700 p-4 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]"
-          >
-            {t.type === "success" && (
-              <CheckCircle size={18} className="text-teal-400" />
-            )}
-            {t.type === "error" && (
-              <AlertCircle size={18} className="text-red-400" />
-            )}
-            <span className="text-sm font-mono text-slate-200">
-              {t.message}
-            </span>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
-}
-</file>
-
-<file path="src/constants/consts.tsx">
-export const EMAIL_ADDRESS = "singhkulmeet3@gmail.com"
-</file>
-
-<file path=".gitignore">
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-</file>
-
-<file path="eslint.config.mjs">
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
-
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
-
-export default eslintConfig;
-</file>
-
-<file path="next.config.ts">
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
-};
-
-export default nextConfig;
-</file>
-
-<file path="README.md">
-# Kulmeet Singh — Cloud & Data Engineering Portfolio
-
-A modern portfolio built with Next.js, TypeScript, and interactive system visualizations to showcase cloud infrastructure, CI/CD automation, Terraform workflows, and data engineering projects.
-
-This site is designed to present engineering work the way I actually think about it: not just screenshots and bullet points, but systems, tradeoffs, deployment flow, and operational impact.
-
-## Live Demo
-
-Add your deployed URL here:
-
-**Portfolio:** `https://your-domain.com`
-
----
-
-## About the Project
-
-This portfolio highlights my work across:
-
-- Cloud infrastructure automation
-- Terraform-based workflows
-- CI/CD systems and deployment visualization
-- Data ingestion and processing pipelines
-- Architecture storytelling for real engineering projects
-
-Instead of presenting projects as static cards only, the site uses interactive sections to explain:
-
-- how systems are structured
-- why certain technical decisions were made
-- how delivery and validation flows work
-- what operational improvements those systems create
-
----
-
-## Tech Stack
-
-### Frontend
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-
-### Visualization / UI
-- Recharts
-- React Flow
-- Lucide Icons
-
-### Engineering Focus Represented
-- Terraform
-- Jenkins
-- Google Cloud Platform
-- Apache Beam
-- Pub/Sub
-- BigQuery
-- Cloud Composer / Airflow
-
----
-
-## Features
-
-- Responsive portfolio built with the App Router
-- Interactive architecture visualization
-- Terraform and CI/CD themed project storytelling
-- Engineering decisions section for design rationale
-- Impact section for operational outcomes
-- Data ingestion demo for distributed pipeline concepts
-- Terminal-style contact experience
-- AI chatbot integration
-
----
-
-## Project Structure
-
-```bash
-app/
-  layout.tsx
-  page.tsx
-
-components/
-  Navbar.tsx
-  Experience.tsx
-  Projects.tsx
-  Architecture.tsx
-  EngineeringDecisions.tsx
-  Impact.tsx
-  IngestionDemo.tsx
-  CICDVisualizer.tsx
-  TerminalContact.tsx
-  AiChatbot.tsx
-```
-
----
-
-## Why I Built It This Way
-
-A lot of engineering portfolios feel generic: a hero section, a grid of cards, and some links.
-
-I wanted this one to do more than list technologies.
-
-This portfolio is built to communicate:
-- how I think about systems
-- how I approach infra and automation
-- how I translate backend and cloud work into something visual and understandable
-- how technical decisions connect to developer experience and operational reliability
-
----
-
-## Local Development
-
-Clone the repo and install dependencies:
-
-```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
-npm install
-```
-
-Run the development server:
-
-```bash
-npm run dev
-```
-
-Open:
-
-```bash
-http://localhost:3000
-```
-
----
-
-## Available Scripts
-
-```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
-```
-
----
-
-## Deployment
-
-This project is optimized for deployment on Vercel.
-
-To deploy:
-
-1. Push the repository to GitHub
-2. Import the repo into Vercel
-3. Configure any required environment variables
-4. Deploy
-
----
-
-## Customization
-
-To personalize this portfolio for your own updates, edit:
-
-- `app/page.tsx` for homepage structure
-- `components/Projects.tsx` for featured work
-- `components/Experience.tsx` for role history
-- `components/Architecture.tsx` for system storytelling
-- `components/TerminalContact.tsx` for contact details
-- metadata and social preview settings for SEO and sharing
-
----
-
-## Highlights
-
-Some themes this portfolio emphasizes:
-
-- Terraform-driven infrastructure workflows
-- CI/CD automation and deployment safety
-- Data pipeline design and orchestration
-- Cloud-native engineering
-- balancing technical depth with accessible storytelling
-
----
-
-## Future Improvements
-
-- performance audit for client-heavy interactive sections
-- reduce unnecessary `ssr: false` usage
-- improve accessibility labels and keyboard navigation
-- add richer project case-study pages
-- refine mobile animations and section density
-
----
-
-## Contact
-
-- LinkedIn: `https://linkedin.com/in/kulmeet-singh`
-- GitHub: `https://github.com/KulmeetSJ`
-- Email: `singhkulmeet3@gmail.com`
-
----
-
-## License
-
-This project is open for inspiration and learning.
-
-If you reuse parts of the design or structure, please adapt it to reflect your own work and story.
-</file>
-
-<file path="tsconfig.json">
-{
-  "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-  ],
-  "exclude": ["node_modules"]
-}
-</file>
-
-<file path="src/components/AiChatbot.tsx">
-"use client";
-
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Bot, User, Sparkles } from "lucide-react";
-import { EMAIL_ADDRESS } from "@/constants/consts";
-
-// 1. Define the Interface
-interface KnowledgeEntry {
-  keywords: string[];
-  text: string;
-}
-
-// 2. Type the Data
-const knowledgeBase: KnowledgeEntry[] = [
-  {
-    keywords: ["skills", "tech", "stack", "technologies"],
-    text: "Kulmeet works primarily on **Backend and Platform Engineering**. His core stack includes **Java, Python, Node.js, React, Terraform, Docker, and CI/CD systems**. He focuses on building scalable backend services and infrastructure automation.",
-  },
-  {
-    keywords: ["hsbc", "work", "experience", "job"],
-    text: "At **HSBC**, Kulmeet worked on internal engineering platforms. One key project was an **LLM-powered procurement system** that converts unstructured text into structured RFP documents, reducing manual drafting time by **80%**.",
-  },
-  {
-    keywords: ["terraform", "pipeline", "ci", "cicd", "infrastructure"],
-    text: "Kulmeet built a **Terraform CI/CD pipeline** that analyzes Terraform plan logs, summarizes infrastructure changes, and validates IAM policies before deployment. This helps engineers quickly understand infrastructure changes and ensures compliance.",
-  },
-  {
-    keywords: ["composer", "security", "devops", "scans"],
-    text: "Kulmeet also implemented a **secure CI/CD pipeline** integrating **SonarQube, Nexus IQ, and Checkmarx scans**, ensuring code quality and security before deployments.",
-  },
-  {
-    keywords: ["projects", "portfolio", "built"],
-    text: "Some of Kulmeet's featured projects include:\n\n• **Terraform Log Analyzer** for infrastructure change summaries\n• **LLM-powered RFP automation platform**\n• **Secure CI/CD pipelines with automated security scans**\n• **E-commerce platform built with React and MongoDB**",
-  },
-  {
-    keywords: ["contact", "email", "hire", "reach"],
-    text: `You can reach Kulmeet directly at **${EMAIL_ADDRESS}**. He is currently open to opportunities in **Backend Engineering, Platform Engineering, and Infrastructure Automation**.`,
-  },
-  {
-    keywords: ["hello", "hi", "hey"],
-    text: "Hello! I'm **KuliBot**, Kulmeet's portfolio assistant. I can tell you about his **projects, experience at HSBC, Terraform pipelines, CI/CD systems, and backend skills**.",
-  },
-  {
-    keywords: [
-      "certification", "certifications", "certificate", "google cloud", "gcp", "cloud architect", "wipro", "java certification",
-      "java fullstack"
-    ],
-    text: "Kulmeet holds the **Google Cloud Professional Cloud Architect Certification**, which validates expertise in designing scalable cloud architectures on **Google Cloud Platform**. He also completed the **Wipro Java Full Stack Certification**, covering backend development with **Java, Spring Boot, databases, and modern web technologies**."
-  },
-];
-
-// --- LOGIC ---
-const findBestMatch = (query: string): string => {
-  const lowerQuery = query.toLowerCase();
-
-  let bestMatch: KnowledgeEntry | null = null;
-  let maxScore = 0;
-
-  for (const entry of knowledgeBase) {
-    let score = 0;
-    entry.keywords.forEach((keyword) => {
-      if (lowerQuery.includes(keyword)) score++;
-    });
-    if (score > maxScore) {
-      maxScore = score;
-      bestMatch = entry;
-    }
-  }
-
-  if (maxScore > 0 && bestMatch) {
-    return bestMatch.text;
-  }
-
-  return "I'm not sure about that specific detail, but I can tell you about Kulmeet's **skills**, **work experience**, or **projects**. Try asking 'What are his skills?'";
-};
-
-interface Message {
-  id: number;
-  role: "user" | "bot";
-  text: string;
-}
-
-export default function AiChatbot() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      role: "bot",
-      text: "Hi! I'm KuliBot. Ask me anything about Kulmeet's work!",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 300); // Small delay to allow animation to finish before focusing
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const userMessage: Message = { id: Date.now(), role: "user", text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsTyping(true);
-
-    setTimeout(() => {
-      const answer = findBestMatch(userMessage.text);
-      const botMessage: Message = {
-        id: Date.now() + 1,
-        role: "bot",
-        text: answer,
-      };
-      setMessages((prev) => [...prev, botMessage]);
-      setIsTyping(false);
-    }, 600);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleSend();
-  };
-
-  return (
-    <>
-      {/* FLOATING TOGGLE BUTTON - Increased Z-Index */}
-      <motion.button
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setIsOpen(true)}
-        className={`fixed bottom-8 right-8 z-[9999] p-4 rounded-full shadow-2xl transition-all duration-300 ${isOpen
-          ? "scale-0 opacity-0"
-          : "bg-teal-500 hover:bg-teal-400 text-slate-900"
-          }`}
-      >
-        <Sparkles size={28} fill="currentColor" />
-      </motion.button>
-
-      {/* CHAT WINDOW - Increased Z-Index */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className="fixed bottom-8 right-4 md:right-8 z-[9999] w-[90vw] md:w-[400px] h-[500px] bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-          >
-            {/* HEADER */}
-            <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-teal-500/20 rounded-lg">
-                  <Bot size={20} className="text-teal-400" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-100 text-sm">
-                    KuliBot AI
-                  </h3>
-                  <span className="text-xs text-green-400 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
-                    Online
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-white transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* MESSAGES */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex items-start gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
-                >
-                  <div
-                    className={`p-2 rounded-full flex-shrink-0 ${msg.role === "user"
-                      ? "bg-slate-700 text-slate-300"
-                      : "bg-teal-500/20 text-teal-400"
-                      }`}
-                  >
-                    {msg.role === "user" ? (
-                      <User size={16} />
-                    ) : (
-                      <Bot size={16} />
-                    )}
-                  </div>
-                  <div
-                    className={`p-3 rounded-2xl text-sm leading-relaxed max-w-[80%] ${msg.role === "user"
-                      ? "bg-slate-700 text-slate-200 rounded-tr-none"
-                      : "bg-slate-800 text-slate-300 border border-slate-700 rounded-tl-none"
-                      }`}
-                  >
-                    {msg.text.split("**").map((part, i) =>
-                      i % 2 === 1 ? (
-                        <strong key={i} className="text-teal-400 font-normal">
-                          {part}
-                        </strong>
-                      ) : (
-                        part
-                      ),
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {isTyping && (
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-teal-500/20 text-teal-400">
-                    <Bot size={16} />
-                  </div>
-                  <div className="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex gap-1 items-center">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-              {messages.length === 1 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {[
-                    "What projects has Kulmeet built?",
-                    "Tell me about the Terraform pipeline",
-                    "What technologies does he use?",
-                    "How can I contact him?",
-                  ].map((prompt) => (
-                    <button
-                      key={prompt}
-                      onClick={() => setInput(prompt)}
-                      className="text-xs px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 hover:border-teal-400 hover:text-teal-400 transition"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* INPUT */}
-            <div className="p-4 bg-slate-800/50 border-t border-slate-700">
-              <div className="relative">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Ask about skills..."
-                  // Added pointer-events-auto to ensure it catches clicks
-                  className="w-full bg-slate-950 border border-slate-700 rounded-full py-3 px-5 text-sm text-slate-200 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all placeholder:text-slate-600 pointer-events-auto"
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim()}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-teal-500 text-slate-950 rounded-full hover:bg-teal-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                  <Send size={16} />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-</file>
-
-<file path="src/components/BookingModal.tsx">
-"use client";
-
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Loader2, ShieldCheck } from "lucide-react";
-import { useState } from "react";
-
-// REPLACE THIS WITH YOUR ACTUAL CALENDLY OR CAL.COM LINK
-// Example: "https://calendly.com/your-username" or "https://cal.com/your-username"
-const CALENDAR_URL = "https://calendly.com/singhkulmeet3/30min";
-
-interface BookingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
-  const [isLoading, setIsLoading] = useState(true);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 z-[200] bg-slate-950/80 backdrop-blur-sm"
-          />
-
-          {/* Modal Container */}
-          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 md:p-8 pointer-events-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-5xl h-[85vh] bg-[#0d1117] border border-slate-700 rounded-xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col relative"
-            >
-              {/* Window Header */}
-              <div className="h-12 bg-slate-900 border-b border-white/5 flex items-center justify-between px-4 shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={onClose}
-                      className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors"
-                    />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                  </div>
-                  <div className="h-4 w-px bg-white/10 mx-1" />
-                  <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-                    <ShieldCheck size={12} className="text-teal-400" />
-                    <span className="uppercase tracking-wider">
-                      Secure Uplink :: Scheduling Protocol
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={onClose}
-                  className="p-1.5 hover:bg-white/5 rounded-md text-slate-500 hover:text-white transition-colors"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-
-              {/* Iframe Container */}
-              <div className="flex-1 relative bg-white">
-                {/* Loading Spinner overlay */}
-                {isLoading && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0d1117] z-10 text-teal-500 gap-4">
-                    <Loader2 size={40} className="animate-spin" />
-                    <span className="font-mono text-sm tracking-widest animate-pulse">
-                      ESTABLISHING CONNECTION...
-                    </span>
-                  </div>
-                )}
-
-                <iframe
-                  src={CALENDAR_URL}
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  onLoad={() => setIsLoading(false)}
-                  title="Schedule Interview"
-                  className="w-full h-full"
-                ></iframe>
-              </div>
-            </motion.div>
-          </div>
-        </>
-      )}
-    </AnimatePresence>
   );
 }
 </file>
@@ -3397,8 +3078,8 @@ export default function Architecture() {
   const details = selectedNode ? nodeDetails[selectedNode] : null;
 
   return (
-    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto h-[800px] relative" id="architecture">
-      <div className="mb-8">
+    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto relative" id="architecture">
+      <div className="mb-16">
         <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-6">
           <span className="text-teal-400 font-display font-black text-2xl">
             04.
@@ -3544,6 +3225,316 @@ export default function BackgroundGrid() {
 }
 </file>
 
+<file path="src/components/BookingModal.tsx">
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Calendar, Loader2, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+
+// REPLACE THIS WITH YOUR ACTUAL CALENDLY OR CAL.COM LINK
+// Example: "https://calendly.com/your-username" or "https://cal.com/your-username"
+const CALENDAR_URL = "https://calendly.com/singhkulmeet3/30min";
+
+interface BookingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 z-[200] bg-slate-950/80 backdrop-blur-sm"
+          />
+
+          {/* Modal Container */}
+          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 md:p-8 pointer-events-none" id="booking">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="w-full max-w-5xl h-[85vh] bg-[#0d1117] border border-slate-700 rounded-xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col relative"
+            >
+              {/* Window Header */}
+              <div className="h-12 bg-slate-900 border-b border-white/5 flex items-center justify-between px-4 shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={onClose}
+                      className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors"
+                    />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <div className="h-4 w-px bg-white/10 mx-1" />
+                  <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+                    <ShieldCheck size={12} className="text-teal-400" />
+                    <span className="uppercase tracking-wider">
+                      Secure Uplink :: Scheduling Protocol
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={onClose}
+                  className="p-1.5 hover:bg-white/5 rounded-md text-slate-500 hover:text-white transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Iframe Container */}
+              <div className="flex-1 relative bg-white">
+                {/* Loading Spinner overlay */}
+                {isLoading && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0d1117] z-10 text-teal-500 gap-4">
+                    <Loader2 size={40} className="animate-spin" />
+                    <span className="font-mono text-sm tracking-widest animate-pulse">
+                      ESTABLISHING CONNECTION...
+                    </span>
+                  </div>
+                )}
+
+                <iframe
+                  src={CALENDAR_URL}
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  onLoad={() => setIsLoading(false)}
+                  title="Schedule Interview"
+                  className="w-full h-full"
+                ></iframe>
+              </div>
+            </motion.div>
+          </div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+</file>
+
+<file path="src/components/CertificationsCard.tsx">
+"use client";
+
+import { motion } from "framer-motion";
+import { Award, BadgeCheck, ExternalLink } from "lucide-react";
+import Image from "next/image";
+import SpotlightCard from "./SpotlightCard";
+
+const certifications = [
+    {
+        issuer: "Google Cloud",
+        title: "Professional Cloud Architect",
+        credentialId: "5f09da7209a24931a67cbc3881df84c4",
+        verifyUrl: "https://www.credly.com/badges/498cdb19-b30a-45d1-9221-7d44ff636c66/public_url",
+        logo: "/google-cloud.png",
+        logoAlt: "Google Cloud",
+    },
+    {
+        issuer: "Wipro",
+        title: "Java Full Stack Certification",
+        credentialId: "",
+        verifyUrl: "",
+    }
+];
+
+export default function CertificationsCard() {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="col-span-1 md:col-span-6 lg:col-span-4 h-full"
+        >
+            <SpotlightCard className="p-6 h-full flex flex-col justify-center">
+                <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase mb-4" id="certifications">
+                    <Award size={14} className="text-teal-400" />
+                    Certifications
+                </div>
+
+                <div className="space-y-4">
+                    {certifications.map((cert, index) => (
+                        <div
+                            key={index}
+                            className="rounded-xl border border-slate-800 bg-slate-900/40 p-4"
+                        >
+                            <div className="flex items-start gap-3">
+                                <div className="mt-0.5 text-teal-400 shrink-0">
+                                    {cert.logo ? (
+                                        <div className="relative h-8 w-8 overflow-hidden rounded-md bg-white/95 p-1">
+                                            <Image
+                                                src={cert.logo}
+                                                alt={cert.logoAlt}
+                                                fill
+                                                className="object-contain p-1"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <BadgeCheck size={18} />
+                                    )}
+                                </div>
+
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-slate-100 font-semibold text-sm md:text-base leading-snug">
+                                        {cert.title}
+                                    </p>
+
+                                    <p className="text-slate-500 text-xs md:text-sm mt-1 font-mono uppercase tracking-wide">
+                                        {cert.issuer}
+                                    </p>
+
+                                    {cert.credentialId && (
+                                        <p className="text-slate-400 text-xs mt-3 font-mono break-all">
+                                            Credential ID:{" "}
+                                            <span className="text-slate-300">{cert.credentialId}</span>
+                                        </p>
+                                    )}
+
+                                    {cert.verifyUrl && (
+                                        <a
+                                            href={cert.verifyUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="mt-3 inline-flex items-center gap-2 text-xs font-mono text-teal-400 hover:text-teal-300 transition-colors"
+                                        >
+                                            Verify Credential <ExternalLink size={12} />
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </SpotlightCard>
+        </motion.div>
+    );
+}
+</file>
+
+<file path="src/components/SpotlightCard.tsx">
+"use client";
+
+import { useRef, useState, ReactNode, useEffect } from "react";
+import { motion } from "framer-motion";
+
+interface SpotlightCardProps {
+  children: ReactNode;
+  className?: string;
+  spotlightColor?: string;
+}
+
+export default function SpotlightCard({
+  children,
+  className = "",
+  spotlightColor = "rgba(45, 212, 191, 0.08)",
+}: SpotlightCardProps) {
+  const divRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+  const requestRef = useRef<number | null>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!divRef.current) return;
+
+    const div = divRef.current;
+    const rect = div.getBoundingClientRect();
+    const targetX = e.clientX - rect.left;
+    const targetY = e.clientY - rect.top;
+
+    if (requestRef.current) cancelAnimationFrame(requestRef.current);
+
+    requestRef.current = requestAnimationFrame(() => {
+      setPosition({ x: targetX, y: targetY });
+    });
+  };
+
+  const handleMouseEnter = () => setOpacity(1);
+  const handleMouseLeave = () => setOpacity(0);
+
+  useEffect(() => {
+    return () => {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      ref={divRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      /* TACTICAL PHYSICS: Scale down slightly on hover, further on click */
+      whileHover={{ scale: 0.985 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      /* Changed transition-all to transition-colors so it doesn't fight Framer's transform */
+      className={`relative overflow-hidden rounded-2xl bg-slate-900/40 backdrop-blur-md shadow-2xl transition-colors duration-300 hover:bg-slate-900/60 shadow-black/50 cursor-pointer ${className}`}
+    >
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent z-10"></div>
+      <div className="absolute inset-0 rounded-2xl border border-white/5 pointer-events-none"></div>
+
+      <div
+        className="pointer-events-none absolute -inset-px transition duration-500"
+        style={{
+          opacity,
+          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 40%)`,
+        }}
+      />
+      <div className="relative h-full z-20">{children}</div>
+    </motion.div>
+  );
+}
+</file>
+
+<file path="package.json">
+{
+  "name": "portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "framer-motion": "^12.33.0",
+    "lucide-react": "^0.563.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "reactflow": "^11.11.4",
+    "recharts": "^3.7.0",
+    "resend": "^6.9.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.24",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
+</file>
+
 <file path="src/components/CommandPalette.tsx">
 "use client";
 
@@ -3611,7 +3602,7 @@ export default function CommandPalette() {
         category: "Documents",
         icon: <FileText size={16} />,
         perform: () =>
-          window.open("/ks_resume.pdf", "_blank"),
+          window.open("/Kulmeet_Singh_Resume.pdf", "_blank"),
       },
       // {
       //   id: "pydb",
@@ -3770,7 +3761,7 @@ export default function CommandPalette() {
               className="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-sm"
             />
 
-            <div className="fixed inset-0 z-[101] flex items-start justify-center pt-[15vh] px-4 pointer-events-none">
+            <div className="fixed inset-0 z-[101] flex items-start justify-center pt-[15vh] px-4 pointer-events-none" id="command-palette">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: -20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -3921,7 +3912,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
+    <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4" id="navbar">
       <motion.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -4026,7 +4017,7 @@ export default function ServerMonitor() {
         className="col-span-1 md:col-span-6 lg:col-span-3 h-full"
       >
         <SpotlightCard className="p-6 h-full flex flex-col justify-center">
-          <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase mb-3">
+          <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase mb-3" id="server-monitor">
             <Activity size={14} className="text-teal-400" />
             System Status
           </div>
@@ -4116,81 +4107,6 @@ export default function ServerMonitor() {
 }
 </file>
 
-<file path="src/components/SpotlightCard.tsx">
-"use client";
-
-import { useRef, useState, ReactNode, useEffect } from "react";
-import { motion } from "framer-motion";
-
-interface SpotlightCardProps {
-  children: ReactNode;
-  className?: string;
-  spotlightColor?: string;
-}
-
-export default function SpotlightCard({
-  children,
-  className = "",
-  spotlightColor = "rgba(45, 212, 191, 0.08)",
-}: SpotlightCardProps) {
-  const divRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
-  const requestRef = useRef<number | null>(null);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!divRef.current) return;
-
-    const div = divRef.current;
-    const rect = div.getBoundingClientRect();
-    const targetX = e.clientX - rect.left;
-    const targetY = e.clientY - rect.top;
-
-    if (requestRef.current) cancelAnimationFrame(requestRef.current);
-
-    requestRef.current = requestAnimationFrame(() => {
-      setPosition({ x: targetX, y: targetY });
-    });
-  };
-
-  const handleMouseEnter = () => setOpacity(1);
-  const handleMouseLeave = () => setOpacity(0);
-
-  useEffect(() => {
-    return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
-    };
-  }, []);
-
-  return (
-    <motion.div
-      ref={divRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      /* TACTICAL PHYSICS: Scale down slightly on hover, further on click */
-      whileHover={{ scale: 0.985 }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      /* Changed transition-all to transition-colors so it doesn't fight Framer's transform */
-      className={`relative overflow-hidden rounded-2xl bg-slate-900/40 backdrop-blur-md shadow-2xl transition-colors duration-300 hover:bg-slate-900/60 shadow-black/50 cursor-pointer ${className}`}
-    >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent z-10"></div>
-      <div className="absolute inset-0 rounded-2xl border border-white/5 pointer-events-none"></div>
-
-      <div
-        className="pointer-events-none absolute -inset-px transition duration-500"
-        style={{
-          opacity,
-          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 40%)`,
-        }}
-      />
-      <div className="relative h-full z-20">{children}</div>
-    </motion.div>
-  );
-}
-</file>
-
 <file path="src/components/TerminalContact.tsx">
 "use client";
 
@@ -4199,11 +4115,7 @@ import { motion } from "framer-motion";
 import {
   Terminal,
   CheckCircle2,
-  Loader2,
-  Wifi,
-  Minimize,
-  Maximize,
-  X,
+  Loader2
 } from "lucide-react";
 import { toast } from "./Toaster";
 
@@ -4224,16 +4136,60 @@ export default function TerminalContact() {
     }
   }, [history, step]);
 
-  // Focus management
-  // useEffect(() => {
-  //   const timer = setTimeout(() => inputRef.current?.focus(), 100);
-  //   return () => clearTimeout(timer);
-  // }, [step]);
+  const delay = (ms: number) =>
+    new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  const sendMessage = async () => {
+    setStep("sending");
+
+    setHistory((prev) => [...prev, "Initializing secure handshake..."]);
+    await delay(500);
+
+    setHistory((prev) => [...prev, "Encrypting payload (AES-256)..."]);
+    await delay(500);
+
+    setHistory((prev) => [...prev, "Routing through proxy nodes..."]);
+    await delay(700);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to send message.");
+      }
+
+      setHistory((prev) => [...prev, "Transmission acknowledged by host."]);
+      setStep("success");
+      toast.success("Transmission Received.");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to send message.";
+
+      setHistory((prev) => [
+        ...prev,
+        `❌ Error: ${errorMessage}`,
+      ]);
+      setStep("message");
+      toast.error("Transmission failed.");
+    }
+  };
 
   const handleKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       if (step === "email") {
-        if (!email.includes("@") || !email.includes(".")) {
+        const trimmedEmail = email.trim();
+        if (!trimmedEmail.includes("@") || !trimmedEmail.includes(".")) {
           setHistory((prev) => [
             ...prev,
             `> Enter email: ${email}`,
@@ -4242,31 +4198,17 @@ export default function TerminalContact() {
           setEmail("");
           return;
         }
-        setHistory((prev) => [...prev, `> Enter email: ${email}`]);
+        setHistory((prev) => [...prev, `> Enter email: ${trimmedEmail}`]);
+        setEmail(trimmedEmail);
         setStep("message");
       } else if (step === "message") {
-        if (!message.trim()) return;
+        const trimmedMessage = message.trim();
+        if (!trimmedMessage) return;
 
-        setHistory((prev) => [...prev, `> Enter message: ${message}`]);
-        setStep("sending");
+        setHistory((prev) => [...prev, `> Enter message: ${trimmedMessage}`]);
+        setMessage(trimmedMessage);
 
-        const delay = (ms: number) =>
-          new Promise<void>((resolve) => setTimeout(resolve, ms));
-
-        // Cinematic delay sequence
-        setHistory((prev) => [...prev, "Initializing secure handshake..."]);
-        await delay(800);
-
-        setHistory((prev) => [...prev, "Encrypting payload (AES-256)..."]);
-        await delay(800);
-
-        setHistory((prev) => [...prev, "Routing through proxy nodes..."]);
-        await delay(1200);
-
-        console.log("Packet Sent:", { email, message });
-
-        setStep("success");
-        toast.success("Transmission Received.");
+        await sendMessage();
       }
     }
   };
@@ -4274,7 +4216,7 @@ export default function TerminalContact() {
   return (
     <section
       id="contact"
-      className="py-32 px-4 md:px-12 max-w-5xl mx-auto "
+      className="py-24 px-4 md:px-12 max-w-5xl mx-auto "
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -4418,12 +4360,10 @@ export default function TerminalContact() {
                   Packet Successfully Delivered.
                 </span>
                 <span className="text-emerald-400/70 text-sm">
-                  The host has been notified. You will receive an acknowledgment
-                  at{" "}
+                  The host has been notified. Further communication will be routed to{" "}
                   <span className="font-mono text-emerald-300 border-b border-emerald-500/30">
                     {email}
-                  </span>{" "}
-                  shortly.
+                  </span>.
                 </span>
               </div>
             </motion.div>
@@ -4437,42 +4377,6 @@ export default function TerminalContact() {
       </motion.div>
     </section>
   );
-}
-</file>
-
-<file path="package.json">
-{
-  "name": "portfolio",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "framer-motion": "^12.33.0",
-    "lucide-react": "^0.563.0",
-    "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "reactflow": "^11.11.4",
-    "recharts": "^3.7.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.24",
-    "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.6",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
-  }
 }
 </file>
 
@@ -4712,7 +4616,7 @@ export default function Impact() {
   return (
     <section
       id="impact"
-      className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32"
+      className="py-24 px-6 md:px-12 max-w-7xl mx-auto scroll-mt-32"
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -5006,6 +4910,219 @@ export default function Impact() {
     </section>
   );
 }
+</file>
+
+<file path="README.md">
+# Kulmeet Singh — Cloud & Data Engineering Portfolio
+
+A modern portfolio built with Next.js, TypeScript, and interactive system visualizations to showcase cloud infrastructure, CI/CD automation, Terraform workflows, and data engineering projects.
+
+This site is designed to present engineering work the way I actually think about it: not just screenshots and bullet points, but systems, tradeoffs, deployment flow, and operational impact.
+
+## Live Demo
+
+**Portfolio:** [Kulmeet Singh](https://portfolio-one-ashen-c8e7anc8i0.vercel.app/)
+
+---
+
+## About the Project
+
+This portfolio highlights my work across:
+
+- Cloud infrastructure automation
+- Terraform-based workflows
+- CI/CD systems and deployment visualization
+- Data ingestion and processing pipelines
+- Architecture storytelling for real engineering projects
+
+Instead of presenting projects as static cards only, the site uses interactive sections to explain:
+
+- how systems are structured
+- why certain technical decisions were made
+- how delivery and validation flows work
+- what operational improvements those systems create
+
+---
+
+## Tech Stack
+
+### Frontend
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+
+### Visualization / UI
+- Recharts
+- React Flow
+- Lucide Icons
+
+### Engineering Focus Represented
+- Terraform
+- Jenkins
+- Google Cloud Platform
+- Apache Beam
+- Pub/Sub
+- BigQuery
+- Cloud Composer / Airflow
+
+---
+
+## Features
+
+- Responsive portfolio built with the App Router
+- Interactive architecture visualization
+- Terraform and CI/CD themed project storytelling
+- Engineering decisions section for design rationale
+- Impact section for operational outcomes
+- Data ingestion demo for distributed pipeline concepts
+- Terminal-style contact experience
+- AI chatbot integration
+
+---
+
+## Project Structure
+
+```bash
+app/
+  layout.tsx
+  page.tsx
+
+components/
+  Navbar.tsx
+  Experience.tsx
+  Projects.tsx
+  Architecture.tsx
+  EngineeringDecisions.tsx
+  Impact.tsx
+  IngestionDemo.tsx
+  CICDVisualizer.tsx
+  TerminalContact.tsx
+  AiChatbot.tsx
+```
+
+---
+
+## Why I Built It This Way
+
+A lot of engineering portfolios feel generic: a hero section, a grid of cards, and some links.
+
+I wanted this one to do more than list technologies.
+
+This portfolio is built to communicate:
+- how I think about systems
+- how I approach infra and automation
+- how I translate backend and cloud work into something visual and understandable
+- how technical decisions connect to developer experience and operational reliability
+
+## Environment Setup
+
+The contact form in the terminal section requires a Resend API key to send emails. Before running the project, create a `.env` file in the root directory:
+
+```env
+RESEND_API_KEY=your_resend_api_key
+CONTACT_TO_EMAIL=your_receiving_email@domain.com
+```
+
+---
+
+## Local Development
+
+Clone the repo and install dependencies:
+
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+npm install
+```
+
+Run the development server:
+
+```bash
+npm run dev
+```
+
+Open:
+
+```bash
+http://localhost:3000
+```
+
+---
+
+## Available Scripts
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
+
+---
+
+## Deployment
+
+This project is optimized for deployment on Vercel.
+
+To deploy:
+
+1. Push the repository to GitHub
+2. Import the repo into Vercel
+3. Configure any required environment variables
+4. Deploy
+
+---
+
+## Customization
+
+To personalize this portfolio for your own updates, edit:
+
+- `app/page.tsx` for homepage structure
+- `components/Projects.tsx` for featured work
+- `components/Experience.tsx` for role history
+- `components/Architecture.tsx` for system storytelling
+- `components/TerminalContact.tsx` for contact details
+- metadata and social preview settings for SEO and sharing
+
+---
+
+## Highlights
+
+Some themes this portfolio emphasizes:
+
+- Terraform-driven infrastructure workflows
+- CI/CD automation and deployment safety
+- Data pipeline design and orchestration
+- Cloud-native engineering
+- balancing technical depth with accessible storytelling
+
+---
+
+## Future Improvements
+
+- performance audit for client-heavy interactive sections
+- reduce unnecessary `ssr: false` usage
+- improve accessibility labels and keyboard navigation
+- add richer project case-study pages
+- refine mobile animations and section density
+
+---
+
+## Contact
+
+- LinkedIn: `https://linkedin.com/in/kulmeet-singh`
+- GitHub: `https://github.com/KulmeetSJ`
+- Email: `singhkulmeet3@gmail.com`
+
+---
+
+## License
+
+This project is open for inspiration and learning.
+
+If you reuse parts of the design or structure, please adapt it to reflect your own work and story.
 </file>
 
 <file path="src/components/Experience.tsx">
@@ -5687,7 +5804,7 @@ function PageContent() {
                     whileHover={{ scale: 0.97 }}
                     whileTap={{ scale: 0.93 }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    href="/ks_resume.pdf"
+                    href="/Kulmeet_Singh_Resume.pdf"
                     target="_blank"
                     className="px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-lg hover:bg-teal-400 transition-colors font-mono flex items-center gap-2 text-sm shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:shadow-[0_0_25px_rgba(45,212,191,0.5)]"
                   >

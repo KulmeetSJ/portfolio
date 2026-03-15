@@ -232,13 +232,13 @@ export default function CodeComparison() {
   }, [isDragging]);
 
   return (
-    <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto scroll-mt-32" id="performance-engineering">
+    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32 overflow-x-hidden" id="performance-engineering">
       <div className="mb-16">
-        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
+        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 tracking-tight">
           <span className="text-teal-400 font-display font-black text-2xl">
             08.
-          </span>{" "}
-          Performance Engineering
+          </span>
+          <span>Performance Engineering</span>
         </h2>
         <p className="text-slate-400 max-w-2xl text-lg">
           I do not just write code; I{" "}
@@ -377,8 +377,8 @@ export default function CodeComparison() {
       </div>
 
       {/* --- MOBILE VIEW: Stacked for Usability --- */}
-      <div className="md:hidden flex flex-col gap-6">
-        <div className="bg-[#1e1e1e] border border-red-500/30 rounded-xl overflow-hidden shadow-lg">
+      <div className="md:hidden flex flex-col gap-6 w-full max-w-full overflow-hidden">
+        <div className="bg-[#1e1e1e] border border-red-500/30 rounded-xl overflow-hidden shadow-lg w-full">
           <div className="bg-[#252526] p-3 flex items-center justify-between border-b border-red-500/10">
             <div className="flex items-center gap-2 text-red-400 text-xs font-bold uppercase tracking-wider">
               <AlertTriangle size={14} /> Legacy Implementation
@@ -388,7 +388,7 @@ export default function CodeComparison() {
           <HighlightedCode code={legacyCode} type="bad" />
         </div>
 
-        <div className="bg-[#1e1e1e] border border-emerald-500/30 rounded-xl overflow-hidden shadow-lg">
+        <div className="bg-[#1e1e1e] border border-emerald-500/30 rounded-xl overflow-hidden shadow-lg w-full">
           <div className="bg-[#252526] p-3 flex items-center justify-between border-b border-emerald-500/10">
             <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
               <CheckCircle2 size={14} /> Optimized Solution
