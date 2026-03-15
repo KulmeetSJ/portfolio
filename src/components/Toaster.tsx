@@ -49,7 +49,7 @@ export default function Toaster() {
             className="pointer-events-auto bg-slate-900/95 backdrop-blur border border-slate-700 p-4 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]"
           >
             {t.type === "success" && (
-              <CheckCircle size={18} className="text-teal-400" />
+              <CheckCircle size={18} className="text-blue-400" />
             )}
             {t.type === "error" && (
               <AlertCircle size={18} className="text-red-400" />

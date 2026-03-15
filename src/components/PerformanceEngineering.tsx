@@ -145,7 +145,7 @@ const HighlightedCode = ({
                   "var",
                 ].includes(token)
               )
-                color = "text-[#569cd6]"; // Blue keywords
+                color = "text-[#569cd6]"; // blue keywords
               if (
                 [
                   "User",
@@ -156,7 +156,7 @@ const HighlightedCode = ({
                   "posts",
                 ].includes(token.replace(/\./g, ""))
               )
-                color = "text-[#4ec9b0]"; // Teal classes/vars
+                color = "text-[#4ec9b0]"; // blue classes/vars
               if (
                 token.includes("findAll") ||
                 token.includes("push") ||
@@ -235,14 +235,14 @@ export default function CodeComparison() {
     <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32 overflow-x-hidden" id="performance-engineering">
       <div className="mb-16">
         <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 tracking-tight">
-          <span className="text-teal-400 font-display font-black text-2xl">
+          <span className="text-blue-400 font-display font-black text-2xl">
             08.
           </span>
           <span>Performance Engineering</span>
         </h2>
         <p className="text-slate-400 max-w-2xl text-lg">
           I do not just write code; I{" "}
-          <span className="text-teal-400">profile and refactor</span> it. Drag
+          <span className="text-blue-400">profile and refactor</span> it. Drag
           the slider to compare the performance footprint.
         </p>
       </div>
@@ -252,8 +252,8 @@ export default function CodeComparison() {
             key={c.id}
             onClick={() => setSelectedCase(c)}
             className={`px-4 py-2 rounded-lg border text-sm font-mono ${selectedCase.id === c.id
-              ? "bg-teal-500 text-black border-teal-400"
-              : "border-slate-700 text-slate-400 hover:border-teal-400"
+              ? "bg-blue-500 text-black border-blue-400"
+              : "border-slate-700 text-slate-400 hover:border-blue-400"
               }`}
           >
             {c.title}
@@ -348,10 +348,10 @@ export default function CodeComparison() {
 
         {/* SLIDER HANDLE */}
         <div
-          className="absolute top-0 bottom-0 w-1 bg-teal-400 cursor-ew-resize z-40 flex items-center justify-center hover:shadow-[0_0_15px_rgba(45,212,191,0.6)] transition-shadow"
+          className="absolute top-0 bottom-0 w-1 bg-blue-400 cursor-ew-resize z-40 flex items-center justify-center hover:shadow-[0_0_15px_rgba(45,212,191,0.6)] transition-shadow"
           style={{ left: `${sliderPosition}%` }}
         >
-          <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center shadow-lg transform -translate-x-0.5 border-2 border-[#1e1e1e]">
+          <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center shadow-lg transform -translate-x-0.5 border-2 border-[#1e1e1e]">
             <MoveHorizontal size={16} className="text-[#1e1e1e]" />
           </div>
         </div>

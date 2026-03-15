@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 248, 250, 252; /* Slate 50 */
-  --background-start-rgb: 2, 6, 23; /* Slate 950 */
+  --foreground-rgb: 248, 250, 252;
+  /* Slate 50 */
+  --background-start-rgb: 2, 6, 23;
+  /* Slate 950 */
   --background-end-rgb: 2, 6, 23;
 }
 
@@ -14,7 +16,9 @@ body {
   font-family: sans-serif;
   overflow-x: hidden;
   /* Subtle radial gradient to give depth behind the Aurora blobs */
-  background-image: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 70%);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.9) 0%, rgba(2, 6, 23, 1) 62%),
+    linear-gradient(to bottom, #020617, #020617);
 }
 
 /* --- UTILITIES --- */
@@ -34,23 +38,28 @@ body {
 
 /* Custom Text Selection Color */
 ::selection {
-  background: rgba(45, 212, 191, 0.2); /* Teal 400 with opacity */
-  color: #2dd4bf;
+  background: rgba(59, 130, 246, 0.22);
+  color: #60a5fa;
 }
 
 /* --- SCROLLBAR CUSTOMIZATION --- */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #334155; /* Slate 700 */
+  background: #334155;
+  /* Slate 700 */
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569; /* Slate 600 */
+  background: #475569;
+  /* Slate 600 */
 }
 
 /* --- REACT FLOW OVERRIDES (Architecture Diagram) --- */
@@ -60,14 +69,18 @@ body {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
+
 .react-flow__controls-button {
-  background-color: #0f172a !important; /* Slate 900 */
+  background-color: #0f172a !important;
+  /* Slate 900 */
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  fill: #94a3b8 !important; /* Slate 400 */
+  fill: #94a3b8 !important;
+  /* Slate 400 */
 }
+
 .react-flow__controls-button:hover {
-  background-color: #1e293b !important; /* Slate 800 */
-  fill: #2dd4bf !important; /* Teal 400 hover */
+  background-color: #1e293b !important;
+  fill: #60a5fa !important;
 }
 
 /* --- INFINITE MARQUEE ANIMATION --- */
@@ -76,6 +89,7 @@ body {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }

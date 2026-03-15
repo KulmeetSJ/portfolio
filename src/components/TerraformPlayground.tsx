@@ -79,7 +79,7 @@ export default function PipelinePlayground() {
       {/* HEADER */}
       <div className="mb-16">
         <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
-          <span className="text-teal-400 font-black text-2xl">06.</span>
+          <span className="text-blue-400 font-black text-2xl">06.</span>
           Terraform Pipeline Playground
         </h2>
 
@@ -107,7 +107,7 @@ export default function PipelinePlayground() {
                 <motion.div
                   key={index}
                   className={`flex items-center gap-3 p-3 rounded-lg border transition flex-wrap ${isActive
-                    ? "border-teal-400 bg-teal-500/10"
+                    ? "border-blue-400 bg-blue-500/10"
                     : isCompleted
                       ? "border-green-500/30 bg-green-500/10"
                       : "border-slate-700"
@@ -118,7 +118,7 @@ export default function PipelinePlayground() {
                   ) : isActive ? (
                     <Loader2
                       size={18}
-                      className="text-teal-400 animate-spin"
+                      className="text-blue-400 animate-spin"
                     />
                   ) : (
                     <Circle size={18} className="text-slate-500" />
@@ -136,7 +136,7 @@ export default function PipelinePlayground() {
           <button
             onClick={runPipeline}
             disabled={isRunning}
-            className="mt-8 px-6 py-2 bg-teal-500 hover:bg-teal-400 text-black font-bold rounded flex items-center gap-2 disabled:opacity-50"
+            className="mt-8 px-6 py-2 bg-blue-500 hover:bg-blue-400 text-black font-bold rounded flex items-center gap-2 disabled:opacity-50"
           >
             {isRunning ? (
               <Loader2 size={18} className="animate-spin" />

@@ -282,7 +282,7 @@ export default function RealtimeIngestionVisualizer() {
                 label: "Source Throughput",
                 value: `${sourceRate}`,
                 suffix: "evt/s",
-                tone: "teal",
+                tone: "blue",
             },
             {
                 label: "Consumer Lag",
@@ -310,7 +310,7 @@ export default function RealtimeIngestionVisualizer() {
         <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto scroll-mt-32" id="ingestion-visualizer">
             <div className="mb-12">
                 <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
-                    <span className="text-teal-400 font-display font-black text-2xl">
+                    <span className="text-blue-400 font-display font-black text-2xl">
                         10.
                     </span>
                     Real-Time Ingestion Visualizer
@@ -332,7 +332,7 @@ export default function RealtimeIngestionVisualizer() {
                             <button
                                 onClick={startSimulation}
                                 disabled={isRunning}
-                                className="px-5 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                className="px-5 py-3 rounded-lg bg-blue-500 text-slate-950 font-bold hover:bg-blue-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
                                 <Play size={18} />
                                 {isRunning ? "Streaming..." : "Start Ingestion"}
@@ -351,7 +351,7 @@ export default function RealtimeIngestionVisualizer() {
                             <button
                                 onClick={() => !isRunning && setMode("healthy")}
                                 className={`px-4 py-2 rounded-lg text-sm font-mono transition ${mode === "healthy"
-                                    ? "bg-slate-800 text-teal-400"
+                                    ? "bg-slate-800 text-blue-400"
                                     : "text-slate-500 hover:text-slate-300"
                                     }`}
                             >
@@ -376,7 +376,7 @@ export default function RealtimeIngestionVisualizer() {
                                 label={metric.label}
                                 value={metric.value}
                                 suffix={metric.suffix}
-                                tone={metric.tone as "teal" | "blue" | "emerald" | "amber" | "red"}
+                                tone={metric.tone as "blue" | "blue" | "emerald" | "amber" | "red"}
                             />
                         ))}
                     </div>
@@ -385,7 +385,7 @@ export default function RealtimeIngestionVisualizer() {
                         <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 md:p-5 overflow-hidden">
                             <div className="flex items-center justify-between mb-5">
                                 <div className="flex items-center gap-2 text-slate-300 font-mono text-sm">
-                                    <Workflow size={16} className="text-teal-400" />
+                                    <Workflow size={16} className="text-blue-400" />
                                     Event Flow Topology
                                 </div>
                                 <div className="text-[11px] uppercase tracking-widest font-mono text-slate-500">
@@ -441,7 +441,7 @@ export default function RealtimeIngestionVisualizer() {
                         <div className="rounded-2xl border border-slate-800 bg-black min-h-[520px] overflow-hidden flex flex-col">
                             <div className="px-4 py-3 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-slate-300 font-mono text-sm">
-                                    <Activity size={16} className="text-teal-400" />
+                                    <Activity size={16} className="text-blue-400" />
                                     Stream Console
                                 </div>
                                 <div className="text-[11px] uppercase tracking-widest font-mono text-slate-500">
@@ -467,7 +467,7 @@ export default function RealtimeIngestionVisualizer() {
                                     <span className="text-slate-500">Current Mode</span>
                                     <span
                                         className={
-                                            mode === "healthy" ? "text-teal-400" : "text-amber-400"
+                                            mode === "healthy" ? "text-blue-400" : "text-amber-400"
                                         }
                                     >
                                         {mode === "healthy" ? "HEALTHY" : "DEGRADED"}
@@ -476,7 +476,7 @@ export default function RealtimeIngestionVisualizer() {
 
                                 <div className="mt-3 h-2 w-full rounded-full bg-slate-800 overflow-hidden">
                                     <motion.div
-                                        className={mode === "healthy" ? "h-full bg-teal-500" : "h-full bg-amber-500"}
+                                        className={mode === "healthy" ? "h-full bg-blue-500" : "h-full bg-amber-500"}
                                         animate={{
                                             width:
                                                 mode === "healthy"
@@ -549,7 +549,7 @@ function StageNode({
 
     const statusMap = {
         idle: "border-slate-800 bg-slate-900/60 text-slate-400",
-        active: "border-teal-500/30 bg-teal-500/10 text-teal-300",
+        active: "border-blue-500/30 bg-blue-500/10 text-blue-300",
         warning: "border-amber-500/30 bg-amber-500/10 text-amber-300",
         success: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
     };
@@ -591,7 +591,7 @@ function StageNode({
                         : stage.status === "success"
                             ? "bg-emerald-400"
                             : stage.status === "active"
-                                ? "bg-teal-400"
+                                ? "bg-blue-400"
                                 : "bg-slate-600"
                         }`}
                 />
@@ -637,7 +637,7 @@ function PacketTrail({
             exit={{ opacity: 0 }}
             transition={{ duration: 2.4, ease: "linear" }}
             className={`pointer-events-none absolute left-2 z-30 h-2.5 w-2.5 rounded-full shadow-[0_0_12px_currentColor] ${mode === "healthy"
-                ? "bg-teal-400 text-teal-400"
+                ? "bg-blue-400 text-blue-400"
                 : "bg-amber-400 text-amber-400"
                 }`}
         />
@@ -653,10 +653,10 @@ function MetricCard({
     label: string;
     value: string;
     suffix: string;
-    tone: "teal" | "blue" | "emerald" | "amber" | "red";
+    tone: "blue" | "blue" | "emerald" | "amber" | "red";
 }) {
     const toneMap = {
-        teal: "border-teal-500/20 bg-teal-500/10 text-teal-400",
+        blue: "border-blue-500/20 bg-blue-500/10 text-blue-400",
         blue: "border-blue-500/20 bg-blue-500/10 text-blue-400",
         emerald: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
         amber: "border-amber-500/20 bg-amber-500/10 text-amber-400",

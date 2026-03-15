@@ -232,7 +232,7 @@ export default function CommandPalette() {
                 className="w-full max-w-2xl bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden pointer-events-auto shadow-black/50"
               >
                 <div className="flex items-center px-4 py-4 border-b border-white/5">
-                  <Search size={20} className="text-teal-400 mr-3 shrink-0" />
+                  <Search size={20} className="text-blue-400 mr-3 shrink-0" />
                   <input
                     ref={inputRef}
                     value={query}
@@ -272,13 +272,13 @@ export default function CommandPalette() {
                               }
                             }}
                             className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ${isSelected
-                              ? "bg-teal-500/10 border border-teal-500/20 shadow-[inset_0_0_15px_rgba(45,212,191,0.05)]"
+                              ? "bg-blue-500/10 border border-blue-500/20 shadow-[inset_0_0_15px_rgba(45,212,191,0.05)]"
                               : "bg-transparent border border-transparent hover:bg-white/5"
                               }`}
                           >
                             <div className="flex items-center gap-3">
                               <div
-                                className={`p-2 rounded-lg ${isSelected ? "bg-teal-500/20 text-teal-400" : "bg-slate-800 text-slate-400"}`}
+                                className={`p-2 rounded-lg ${isSelected ? "bg-blue-500/20 text-blue-400" : "bg-slate-800 text-slate-400"}`}
                               >
                                 {action.icon}
                               </div>
@@ -294,7 +294,7 @@ export default function CommandPalette() {
                               </div>
                             </div>
                             {isSelected && (
-                              <span className="text-teal-400 text-xs font-mono hidden md:flex items-center gap-1">
+                              <span className="text-blue-400 text-xs font-mono hidden md:flex items-center gap-1">
                                 Return <ChevronRight size={14} />
                               </span>
                             )}

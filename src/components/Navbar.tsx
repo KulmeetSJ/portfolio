@@ -38,11 +38,11 @@ export default function Navbar() {
             whileHover={{ scale: 0.95 }}
             whileTap={{ scale: 0.9 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="relative px-4 py-2 text-sm font-mono text-slate-400 hover:text-teal-400 transition-colors rounded-full hover:bg-white/5 flex items-center gap-2 group"
+            className="relative px-4 py-2 text-sm font-mono text-slate-400 hover:text-blue-400 transition-colors rounded-full hover:bg-white/5 flex items-center gap-2 group"
           >
             <item.icon size={16} />
             <span className="hidden sm:block">{item.name}</span>
-            <span className="absolute inset-0 rounded-full bg-teal-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="absolute inset-0 rounded-full bg-blue-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           </motion.a>
         ))}
 
@@ -55,13 +55,13 @@ export default function Navbar() {
           whileHover={{ scale: 0.95 }}
           whileTap={{ scale: 0.9 }}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          className="relative px-3 py-1.5 ml-1 text-sm font-mono text-slate-400 hover:text-teal-400 transition-colors rounded-full bg-slate-900 border border-white/5 flex items-center gap-2 group hover:border-teal-500/30"
+          className="relative px-3 py-1.5 ml-1 text-sm font-mono text-slate-400 hover:text-blue-400 transition-colors rounded-full bg-slate-900 border border-white/5 flex items-center gap-2 group hover:border-blue-500/30"
         >
           <Search
             size={14}
-            className="text-slate-500 group-hover:text-teal-400 transition-colors"
+            className="text-slate-500 group-hover:text-blue-400 transition-colors"
           />
-          <span className="hidden sm:block text-xs text-slate-500 group-hover:text-teal-400">
+          <span className="hidden sm:block text-xs text-slate-500 group-hover:text-blue-400">
             {isMac ? "⌘K" : "Ctrl K"}
           </span>
         </motion.button>

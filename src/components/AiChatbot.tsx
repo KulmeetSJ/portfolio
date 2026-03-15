@@ -142,7 +142,7 @@ export default function AiChatbot() {
         onClick={() => setIsOpen(true)}
         className={`fixed bottom-8 right-8 z-[9999] p-4 rounded-full shadow-2xl transition-all duration-300 ${isOpen
           ? "scale-0 opacity-0"
-          : "bg-teal-500 hover:bg-teal-400 text-slate-900"
+          : "bg-blue-500 hover:bg-blue-400 text-slate-900"
           }`}
       >
         <Sparkles size={28} fill="currentColor" />
@@ -160,8 +160,8 @@ export default function AiChatbot() {
             {/* HEADER */}
             <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-teal-500/20 rounded-lg">
-                  <Bot size={20} className="text-teal-400" />
+                <div className="p-2 bg-blue-500/20 rounded-lg">
+                  <Bot size={20} className="text-blue-400" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-100 text-sm">
@@ -191,7 +191,7 @@ export default function AiChatbot() {
                   <div
                     className={`p-2 rounded-full flex-shrink-0 ${msg.role === "user"
                       ? "bg-slate-700 text-slate-300"
-                      : "bg-teal-500/20 text-teal-400"
+                      : "bg-blue-500/20 text-blue-400"
                       }`}
                   >
                     {msg.role === "user" ? (
@@ -208,7 +208,7 @@ export default function AiChatbot() {
                   >
                     {msg.text.split("**").map((part, i) =>
                       i % 2 === 1 ? (
-                        <strong key={i} className="text-teal-400 font-normal">
+                        <strong key={i} className="text-blue-400 font-normal">
                           {part}
                         </strong>
                       ) : (
@@ -221,7 +221,7 @@ export default function AiChatbot() {
 
               {isTyping && (
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-teal-500/20 text-teal-400">
+                  <div className="p-2 rounded-full bg-blue-500/20 text-blue-400">
                     <Bot size={16} />
                   </div>
                   <div className="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex gap-1 items-center">
@@ -243,7 +243,7 @@ export default function AiChatbot() {
                     <button
                       key={prompt}
                       onClick={() => setInput(prompt)}
-                      className="text-xs px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 hover:border-teal-400 hover:text-teal-400 transition"
+                      className="text-xs px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 hover:border-blue-400 hover:text-blue-400 transition"
                     >
                       {prompt}
                     </button>
@@ -263,12 +263,12 @@ export default function AiChatbot() {
                   onKeyDown={handleKeyPress}
                   placeholder="Ask about skills..."
                   // Added pointer-events-auto to ensure it catches clicks
-                  className="w-full bg-slate-950 border border-slate-700 rounded-full py-3 px-5 text-sm text-slate-200 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all placeholder:text-slate-600 pointer-events-auto"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-full py-3 px-5 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600 pointer-events-auto"
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim()}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-teal-500 text-slate-950 rounded-full hover:bg-teal-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-500 text-slate-950 rounded-full hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <Send size={16} />
                 </button>

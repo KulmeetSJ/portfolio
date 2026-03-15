@@ -51,7 +51,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                   </div>
                   <div className="h-4 w-px bg-white/10 mx-1" />
                   <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-                    <ShieldCheck size={12} className="text-teal-400" />
+                    <ShieldCheck size={12} className="text-blue-400" />
                     <span className="uppercase tracking-wider">
                       Secure Uplink :: Scheduling Protocol
                     </span>
@@ -70,7 +70,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
               <div className="flex-1 relative bg-white">
                 {/* Loading Spinner overlay */}
                 {isLoading && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0d1117] z-10 text-teal-500 gap-4">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0d1117] z-10 text-blue-500 gap-4">
                     <Loader2 size={40} className="animate-spin" />
                     <span className="font-mono text-sm tracking-widest animate-pulse">
                       ESTABLISHING CONNECTION...

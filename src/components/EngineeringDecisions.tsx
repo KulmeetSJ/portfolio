@@ -73,7 +73,7 @@ export default function EngineeringDecisions() {
         <section className="py-24 px-6 md:px-12 max-w-5xl mx-auto scroll-mt-32" id="engineering-decisions">
             <div className="mb-16">
                 <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
-                    <span className="text-teal-400 font-black text-2xl">07.</span>
+                    <span className="text-blue-400 font-black text-2xl">07.</span>
                     Engineering Decisions
                 </h2>
 
@@ -99,7 +99,7 @@ export default function EngineeringDecisions() {
                                 className="w-full flex items-center justify-between p-6 text-left"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="bg-teal-500/10 p-2 rounded-lg text-teal-400">
+                                    <div className="bg-blue-500/10 p-2 rounded-lg text-blue-400">
                                         <Icon size={20} />
                                     </div>
                                     <span className="text-slate-200 font-semibold">
@@ -108,7 +108,7 @@ export default function EngineeringDecisions() {
                                 </div>
 
                                 <ChevronDown
-                                    className={`transition-transform ${isOpen ? "rotate-180 text-teal-400" : "text-slate-500"
+                                    className={`transition-transform ${isOpen ? "rotate-180 text-blue-400" : "text-slate-500"
                                         }`}
                                 />
                             </button>

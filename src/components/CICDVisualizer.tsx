@@ -303,7 +303,7 @@ export default function ComposerPipelineVisualizer() {
         <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto" id="cicd">
             <div className="mb-12">
                 <h2 className="text-3xl md:text-5xl font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
-                    <span className="text-teal-400 font-black text-2xl">09.</span>
+                    <span className="text-blue-400 font-black text-2xl">09.</span>
                     Composer CI/CD Visualizer
                 </h2>
 
@@ -321,7 +321,7 @@ export default function ComposerPipelineVisualizer() {
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                             <div>
                                 <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase tracking-[0.2em] mb-2">
-                                    <TerminalSquare size={14} className="text-teal-400" />
+                                    <TerminalSquare size={14} className="text-blue-400" />
                                     Pipeline Stages
                                 </div>
                                 <h3 className="text-slate-100 text-xl md:text-2xl font-bold">
@@ -333,7 +333,7 @@ export default function ComposerPipelineVisualizer() {
                                 <button
                                     onClick={runPipeline}
                                     disabled={isRunning}
-                                    className="px-4 py-2 rounded-lg bg-teal-500 text-slate-950 font-bold text-sm flex items-center gap-2 hover:bg-teal-400 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                                    className="px-4 py-2 rounded-lg bg-blue-500 text-slate-950 font-bold text-sm flex items-center gap-2 hover:bg-blue-400 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                                 >
                                     {isRunning ? (
                                         <Loader2 size={16} className="animate-spin" />
@@ -366,8 +366,8 @@ export default function ComposerPipelineVisualizer() {
                                         }}
                                         disabled={isRunning}
                                         className={`px-3 py-2 rounded-lg border text-xs font-mono uppercase tracking-wider transition-all ${environment === env
-                                            ? "bg-teal-500 text-slate-950 border-teal-400"
-                                            : "border-slate-700 text-slate-300 hover:border-teal-400"
+                                            ? "bg-blue-500 text-slate-950 border-blue-400"
+                                            : "border-slate-700 text-slate-300 hover:border-blue-400"
                                             } disabled:opacity-50`}
                                     >
                                         {env}
@@ -381,7 +381,7 @@ export default function ComposerPipelineVisualizer() {
                                     checked={forceFailure}
                                     onChange={(e) => setForceFailure(e.target.checked)}
                                     disabled={isRunning}
-                                    className="accent-teal-500"
+                                    className="accent-blue-500"
                                 />
                                 Force failure simulation
                             </label>
@@ -399,7 +399,7 @@ export default function ComposerPipelineVisualizer() {
                                     initial={{ opacity: 0, y: 12 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className={`rounded-2xl border p-4 md:p-5 transition-all ${step.status === "running"
-                                        ? "border-teal-500/40 bg-teal-500/10 shadow-[0_0_25px_rgba(45,212,191,0.08)]"
+                                        ? "border-blue-500/40 bg-blue-500/10 shadow-[0_0_25px_rgba(45,212,191,0.08)]"
                                         : step.status === "done"
                                             ? "border-emerald-500/20 bg-emerald-500/5"
                                             : step.status === "failed"
@@ -410,7 +410,7 @@ export default function ComposerPipelineVisualizer() {
                                     <div className="flex items-start gap-4">
                                         <div
                                             className={`mt-0.5 p-2.5 rounded-xl border ${step.status === "running"
-                                                ? "border-teal-500/30 bg-teal-500/10 text-teal-400"
+                                                ? "border-blue-500/30 bg-blue-500/10 text-blue-400"
                                                 : step.status === "done"
                                                     ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
                                                     : step.status === "failed"
@@ -437,7 +437,7 @@ export default function ComposerPipelineVisualizer() {
 
                                                 <span
                                                     className={`text-[10px] px-2.5 py-1 rounded-full font-mono uppercase tracking-wider w-fit ${step.status === "running"
-                                                        ? "bg-teal-500/10 text-teal-400 border border-teal-500/20"
+                                                        ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                                                         : step.status === "done"
                                                             ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                                                             : step.status === "failed"
@@ -493,7 +493,7 @@ export default function ComposerPipelineVisualizer() {
                                             : failed
                                                 ? "text-red-400"
                                                 : isRunning
-                                                    ? "text-teal-400 animate-pulse"
+                                                    ? "text-blue-400 animate-pulse"
                                                     : rolledBack
                                                         ? "text-amber-400"
                                                         : "text-slate-500"
@@ -506,7 +506,7 @@ export default function ComposerPipelineVisualizer() {
                                             : failed
                                                 ? "text-red-400"
                                                 : isRunning
-                                                    ? "text-teal-400"
+                                                    ? "text-blue-400"
                                                     : rolledBack
                                                         ? "text-amber-400"
                                                         : "text-slate-500"
@@ -566,7 +566,7 @@ export default function ComposerPipelineVisualizer() {
                                 <div className="text-slate-500 text-[10px] font-mono uppercase tracking-widest mb-2">
                                     Environment
                                 </div>
-                                <div className="text-teal-400 font-semibold text-sm md:text-base">
+                                <div className="text-blue-400 font-semibold text-sm md:text-base">
                                     {metrics.env}
                                 </div>
                             </div>
@@ -607,7 +607,7 @@ export default function ComposerPipelineVisualizer() {
                         spotlightColor="rgba(45, 212, 191, 0.12)"
                     >
                         <div className="flex items-center gap-2 mb-4">
-                            <TerminalSquare size={16} className="text-teal-400" />
+                            <TerminalSquare size={16} className="text-blue-400" />
                             <h3 className="text-slate-100 font-bold text-lg">Execution Log</h3>
                         </div>
 

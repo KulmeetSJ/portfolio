@@ -5,7 +5,7 @@ import { useSyncExternalStore } from "react";
 
 // --- COMPILER COMPLIANT HYDRATION FIX ---
 // This safely detects if we are on the client side without triggering cascading setState errors
-const emptySubscribe = () => () => {};
+const emptySubscribe = () => () => { };
 
 function useIsMounted() {
   return useSyncExternalStore(
@@ -32,7 +32,7 @@ export default function BackgroundGrid() {
       */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900/40 via-slate-950 to-slate-950"></div>
 
-      {/* 1. Purple/Blue Blob (Top Left) 
+      {/* 1. Purple/blue Blob (Top Left) 
         Hardware accelerated via framer-motion transforms
       */}
       <motion.div
@@ -45,7 +45,7 @@ export default function BackgroundGrid() {
         className="absolute -top-[10%] -left-[10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] bg-purple-600/15 rounded-full blur-[120px] will-change-transform"
       />
 
-      {/* 2. Vibrant Teal Blob (Center Right) 
+      {/* 2. Vibrant blue Blob (Center Right) 
         Moves in counter-phase to the purple blob to create an interlocking fluid effect
       */}
       <motion.div
@@ -55,10 +55,10 @@ export default function BackgroundGrid() {
           scale: [1, 1.2, 1],
         }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[30%] -right-[10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-teal-500/15 rounded-full blur-[120px] will-change-transform"
+        className="absolute top-[30%] -right-[10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-blue-500/15 rounded-full blur-[120px] will-change-transform"
       />
 
-      {/* 3. Dark Blue Deep Anchor (Bottom Center) 
+      {/* 3. Dark blue Deep Anchor (Bottom Center) 
         Provides a heavy base color so the bottom of the page doesn't feel empty
       */}
       <motion.div

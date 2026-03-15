@@ -115,10 +115,10 @@ export default function TerminalContact() {
         className="mb-16 text-center"
       >
         <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center justify-center gap-4 tracking-tight">
-          <span className="text-teal-400 font-display font-black text-2xl">
+          <span className="text-blue-400 font-display font-black text-2xl">
             11.
           </span>{" "}
-          Initialize Handshake
+          Get in Touch
         </h2>
         <p className="text-slate-400 max-w-2xl mx-auto text-lg">
           Establish a direct communication link.
@@ -151,9 +151,9 @@ export default function TerminalContact() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-teal-500/10 border border-teal-500/20">
-              <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-              <span className="text-[10px] text-teal-400 font-bold tracking-wider">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              <span className="text-[10px] text-blue-400 font-bold tracking-wider">
                 SECURE
               </span>
             </div>
@@ -189,7 +189,7 @@ export default function TerminalContact() {
           {history.map((line, i) => (
             <div
               key={i}
-              className={`${line.startsWith("❌") ? "text-red-400" : line.startsWith(">") ? "text-slate-400" : "text-teal-400/80"}`}
+              className={`${line.startsWith("❌") ? "text-red-400" : line.startsWith(">") ? "text-slate-400" : "text-blue-400/80"}`}
             >
               {line}
             </div>
@@ -197,7 +197,7 @@ export default function TerminalContact() {
 
           {/* Active Input Line - Email */}
           {step === "email" && (
-            <div className="flex items-center gap-2 text-teal-400 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]">
+            <div className="flex items-center gap-2 text-blue-400 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]">
               <span className="shrink-0">{"> Enter email:"}</span>
               <input
                 ref={inputRef}
@@ -205,7 +205,7 @@ export default function TerminalContact() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="bg-transparent border-none outline-none text-teal-50 flex-1 caret-teal-400 font-bold placeholder:text-slate-700"
+                className="bg-transparent border-none outline-none text-blue-50 flex-1 caret-blue-400 font-bold placeholder:text-slate-700"
                 autoComplete="off"
                 spellCheck={false}
               />
@@ -214,7 +214,7 @@ export default function TerminalContact() {
 
           {/* Active Input Line - Message */}
           {step === "message" && (
-            <div className="flex items-center gap-2 text-teal-400 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]">
+            <div className="flex items-center gap-2 text-blue-400 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]">
               <span className="shrink-0">{"> Enter message:"}</span>
               <input
                 ref={inputRef}
@@ -222,7 +222,7 @@ export default function TerminalContact() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="bg-transparent border-none outline-none text-teal-50 flex-1 caret-teal-400 font-bold"
+                className="bg-transparent border-none outline-none text-blue-50 flex-1 caret-blue-400 font-bold"
                 autoComplete="off"
                 spellCheck={false}
               />
@@ -231,7 +231,7 @@ export default function TerminalContact() {
 
           {/* Loading State */}
           {step === "sending" && (
-            <div className="flex items-center gap-2 text-teal-400 animate-pulse">
+            <div className="flex items-center gap-2 text-blue-400 animate-pulse">
               <Loader2 size={16} className="animate-spin" />
               <span>Processing transmission...</span>
             </div>
@@ -261,7 +261,7 @@ export default function TerminalContact() {
 
           {/* Flashing Block Cursor */}
           {step !== "sending" && step !== "success" && (
-            <div className="w-2.5 h-5 bg-teal-500/50 animate-pulse mt-1 shadow-[0_0_10px_rgba(45,212,191,0.5)]" />
+            <div className="w-2.5 h-5 bg-blue-500/50 animate-pulse mt-1 shadow-[0_0_10px_rgba(45,212,191,0.5)]" />
           )}
         </div>
       </motion.div>

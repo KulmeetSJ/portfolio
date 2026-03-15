@@ -32,7 +32,7 @@ export default function CertificationsCard() {
         >
             <SpotlightCard className="p-6 h-full flex flex-col justify-center">
                 <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase mb-4" id="certifications">
-                    <Award size={14} className="text-teal-400" />
+                    <Award size={14} className="text-blue-400" />
                     Certifications
                 </div>
 
@@ -43,7 +43,7 @@ export default function CertificationsCard() {
                             className="rounded-xl border border-slate-800 bg-slate-900/40 p-4"
                         >
                             <div className="flex items-start gap-3">
-                                <div className="mt-0.5 text-teal-400 shrink-0">
+                                <div className="mt-0.5 text-blue-400 shrink-0">
                                     {cert.logo ? (
                                         <div className="relative h-8 w-8 overflow-hidden rounded-md bg-white/95 p-1">
                                             <Image
@@ -79,7 +79,7 @@ export default function CertificationsCard() {
                                             href={cert.verifyUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="mt-3 inline-flex items-center gap-2 text-xs font-mono text-teal-400 hover:text-teal-300 transition-colors"
+                                            className="mt-3 inline-flex items-center gap-2 text-xs font-mono text-blue-400 hover:text-blue-300 transition-colors"
                                         >
                                             Verify Credential <ExternalLink size={12} />
                                         </a>
