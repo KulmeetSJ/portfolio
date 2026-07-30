@@ -30,7 +30,7 @@ const heroProject = {
 const otherProjects = [
   {
     title: "GuruGranthi — Sikh Services Marketplace",
-    category: "Production-ready marketplace platform with provider onboarding, verification, bookings, multilingual support, and an admin management system.",
+    category: "Full-Stack Gurudwara Related Services Marketplace",
     description:
       "Production full-stack marketplace connecting families with verified Sikh religious service providers. Features PostgreSQL Row Level Security (RLS) for Aadhaar verification documents, progressive provider onboarding, multi-language UI (English, Hindi, Punjabi), and an event-driven transactional notification engine via Resend.",
     tech: [
