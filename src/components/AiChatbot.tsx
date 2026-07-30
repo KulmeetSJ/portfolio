@@ -30,8 +30,12 @@ const knowledgeBase: KnowledgeEntry[] = [
     text: "Kulmeet also implemented a **secure CI/CD pipeline** integrating **SonarQube, Nexus IQ, and Checkmarx scans**, ensuring code quality and security before deployments.",
   },
   {
+    keywords: ["gurugranthi", "marketplace", "sikh", "supabase", "resend", "aadhaar", "rls"],
+    text: "**GuruGranthi — Sikh Services Marketplace** is a live, full-stack production marketplace connecting families with verified religious service providers (Granthis, Ragis, Pathis).\n\nKey architecture features:\n• **Security**: PostgreSQL Row Level Security (RLS) & private Supabase storage for Aadhaar identity docs\n• **Onboarding**: Progressive profile completion engine tracking verification milestones\n• **Notifications**: Event-driven localized transactional email system (EN/HI/PA) via Resend & React Email\n• **Tech Stack**: Next.js App Router, React, TypeScript, Tailwind CSS, Supabase, PostgreSQL",
+  },
+  {
     keywords: ["projects", "portfolio", "built"],
-    text: "Some of Kulmeet's featured projects include:\n\n• **Terraform Log Analyzer** for infrastructure change summaries\n• **LLM-powered RFP automation platform**\n• **Secure CI/CD pipelines with automated security scans**\n• **E-commerce platform built with React and MongoDB**",
+    text: "Some of Kulmeet's featured projects include:\n\n• **GuruGranthi — Sikh Services Marketplace** (Next.js, Supabase, PostgreSQL, RLS, Resend)\n• **Terraform Log Analyzer** for infrastructure change summaries\n• **LLM-powered RFP automation platform**\n• **Secure CI/CD pipelines with automated security scans**\n• **E-commerce platform built with React and MongoDB**",
   },
   {
     keywords: ["contact", "email", "hire", "reach"],
