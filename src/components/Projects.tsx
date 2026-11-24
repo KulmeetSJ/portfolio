@@ -3,417 +3,368 @@
 import { motion } from "framer-motion";
 import {
   Github,
+  ExternalLink,
+  FlaskConical,
   Folder,
-  FileText,
-  Terminal,
-  Sparkles,
-  ShieldCheck,
-  Clock3,
-  BadgeCheck
+  ChevronRight,
+  Gauge,
 } from "lucide-react";
 import SpotlightCard from "./SpotlightCard";
 
-const heroProject = {
-  title: "Terraform Log Summarizer and Compliance Checker",
-  eyebrow: "Flagship Internal Build",
-  description:
-    "Built a CI/CD enhancement for GCP deployments with a Python-based shift-left compliance checker that blocks unauthorized IAM role assignments before release. Also developed a Terraform plan summarizer that highlights critical infrastructure changes—such as schema updates, service account bindings, and resource modifications—directly inside Jenkins logs for faster review.",
-  tech: ["Python", "Groovy", "Terraform", "Jenkins", "GCP"],
-  github: "",
-  highlights: [
-    "Shift-left IAM policy validation",
-    "Terraform plan change summarization",
-    "Faster deployment review in Jenkins",
-  ],
+type Link = { label: string; href: string; kind: "github" | "results" | "live" };
+
+type Project = {
+  title: string;
+  kind: string; // e.g. "Personal project", "HSBC work"
+  status?: string; // e.g. "In progress", "Live"
+  problem: string;
+  built: string[];
+  results: string[];
+  resultsLabel: string; // honest scope label for the numbers
+  tech: string[];
+  links: Link[];
+  featured?: boolean;
 };
 
-const otherProjects = [
+// Every fact below comes from master_resume_evidence_bank.yaml (v1.9h).
+// Personal-project numbers are benchmarks and are labelled as such.
+const projects: Project[] = [
   {
-    title: "GuruGranthi — Sikh Services Marketplace",
-    category: "Full-Stack Gurudwara Related Services Marketplace",
-    description:
-      "Production full-stack marketplace connecting families with verified Sikh religious service providers. Features PostgreSQL Row Level Security (RLS) for Aadhaar verification documents, progressive provider onboarding, multi-language UI (English, Hindi, Punjabi), and an event-driven transactional notification engine via Resend.",
+    title: "PayFlow Sim",
+    kind: "Personal project",
+    status: "In progress",
+    featured: true,
+    problem:
+      "A payment must be accepted once, applied once and in order per account, and failures must be visible, even when clients retry and consumers crash or rebalance.",
+    built: [
+      "Event-driven payments simulator: a Spring Boot gateway (POST /payments with an Idempotency-Key, 202 only after acks=all) publishes to Kafka; a consumer group writes the payment, a double-entry ledger and balances to PostgreSQL in one transaction.",
+      "Idempotent processing (dedupe key derived from the Idempotency-Key; offsets committed only after the DB commit) and per-account ordering by keying events on the sending account.",
+      "Two-layer retries: blocking retries, then retry topics (1 s / 2 s / 4 s), then a dead-letter topic with an inspector and idempotent replay.",
+      "OpenTelemetry tracing across HTTP, Kafka and JDBC into Tempo, logs in Loki, Prometheus metrics and Grafana; two SLOs with multi-window burn-rate alerts routed by Alertmanager, tested with promtool in CI.",
+    ],
+    results: [
+      "6,000 / 6,000 payments reached a final state with a balanced ledger (net 0.00) during a 1 → 3 → 6 → 7 → 3 consumer-scaling run.",
+    ],
+    resultsLabel: "Personal benchmark · laptop (Docker Compose) · synthetic data",
     tech: [
-      "Next.js",
-      "React",
-      "TypeScript",
-      "Tailwind CSS",
-      "Supabase",
+      "Java 21",
+      "Spring Boot",
+      "Apache Kafka",
       "PostgreSQL",
-      "Resend",
+      "OpenTelemetry",
+      "Prometheus",
+      "Grafana",
+      "Tempo",
+      "Loki",
+      "Alertmanager",
+      "Testcontainers",
+      "Docker Compose",
+      "GitHub Actions",
     ],
-    github: "https://github.com/KulmeetSJ/GuruGranthi",
+    links: [
+      { label: "GitHub", href: "https://github.com/KulmeetSJ/payflow-sim", kind: "github" },
+      { label: "Results", href: "https://github.com/KulmeetSJ/payflow-sim#readme", kind: "results" },
+    ],
   },
   {
-    title: "CI/CD Pipeline for Cloud Composer",
-    category: "Internal Platform",
-    description:
-      "Built a secure CI/CD pipeline for Cloud Composer DAG deployments, replacing VM-based scheduling workflows with managed orchestration. Integrated Sonar, Nexus, and Checkmarx to improve release safety and standardize deployment quality.",
+    title: "GitOps Delivery Platform",
+    kind: "Personal project",
+    featured: true,
+    problem:
+      "Releases should reach production only through Git, be judged on live metrics rather than health probes, and roll back without a human. Non-compliant workloads should never be admitted.",
+    built: [
+      "GitHub Actions CI for a Spring Boot service: tests (including Testcontainers), a Trivy gate on fixable HIGH/CRITICAL findings, an SPDX SBOM, and images pushed to GHCR tagged by commit SHA.",
+      "Pull-based delivery with Argo CD across dev, staging and prod; CI holds no cluster credentials, and prod promotion needs a required reviewer.",
+      "Argo Rollouts canary (10% → 25% → 50% → 100%) judged by the canary pods' own Prometheus success rate and p95 latency.",
+      "Kyverno admission policies in Enforce mode, tested in CI; per-environment secrets with Sealed Secrets.",
+    ],
+    results: [
+      "Commit to prod in a median of ~17 min, excluding the human approval wait.",
+      "Automatic canary rollback 30 s after the first failed metric-analysis check (5/5 drills).",
+      "7/7 non-compliant manifests blocked at admission.",
+    ],
+    resultsLabel: "Personal benchmark · local kind cluster",
     tech: [
-      "Python",
-      "Jenkins",
-      "Cloud Composer",
-      "GCP",
-      "Sonar",
-      "Nexus",
-      "Checkmarx",
+      "Argo CD",
+      "Argo Rollouts",
+      "Kyverno",
+      "GitHub Actions",
+      "Helm",
+      "Prometheus",
+      "Trivy",
+      "Sealed Secrets",
+      "Kubernetes (kind)",
+      "Java",
+      "Spring Boot",
+      "PostgreSQL",
     ],
-    github: "",
+    links: [
+      { label: "App repo", href: "https://github.com/KulmeetSJ/gitops-demo-app", kind: "github" },
+      { label: "Platform repo", href: "https://github.com/KulmeetSJ/gitops-demo-platform", kind: "github" },
+      {
+        label: "RESULTS.md",
+        href: "https://github.com/KulmeetSJ/gitops-demo-platform/blob/main/RESULTS.md",
+        kind: "results",
+      },
+    ],
   },
   {
-    title: "Data Storage Cost Optimization",
-    category: "Internal Optimization",
-    description:
-      "Built a proof-of-concept storage optimization workflow across BigQuery and GCS, including Parquet conversion for large datasets and automated storage-class transitions based on access patterns.",
-    tech: ["Python", "Google Cloud", "BigQuery", "Cloud Functions"],
-    github: "",
+    title: "Terraform Drift Detector",
+    kind: "Personal project",
+    featured: true,
+    problem:
+      "Console changes and IAM grants that Terraform doesn't manage silently pull a GCP project away from its code, and a plain terraform plan can't see all of it.",
+    built: [
+      "Scheduled drift detection for GCP in GitHub Actions, using keyless Workload Identity Federation (a policy forbids service account keys).",
+      "Separates real drift (plan -refresh-only) from code not yet applied (normal plan), and diffs the live IAM policy to catch grants Terraform doesn't manage.",
+      "Conftest/Rego policy-as-code on plan JSON; the same policies run on pull requests before merge.",
+      "Keeps one GitHub issue that opens, updates, and closes itself once drift is restored.",
+    ],
+    results: [
+      "Detected 7/7 console-style changes, with a median of 26 s from change to issue on a manual run (the schedule runs every 6 h).",
+      "Blocked a PR making a BigQuery dataset public before merge.",
+    ],
+    resultsLabel: "Personal benchmark · sandbox GCP project",
+    tech: [
+      "Terraform",
+      "GCP",
+      "GitHub Actions",
+      "Conftest",
+      "Rego",
+      "Workload Identity Federation",
+      "Python",
+      "BigQuery",
+      "IAM",
+      "Bash",
+    ],
+    links: [
+      { label: "GitHub", href: "https://github.com/KulmeetSJ/tf-drift-detector", kind: "github" },
+      {
+        label: "RESULTS.md",
+        href: "https://github.com/KulmeetSJ/tf-drift-detector/blob/main/RESULTS.md",
+        kind: "results",
+      },
+    ],
+  },
+  {
+    title: "GuruGranthi",
+    kind: "Personal project",
+    status: "Live",
+    problem:
+      "Families looking for Sikh service providers such as Ragi, Pathi and Granthi need one place to find them and request a booking.",
+    built: [
+      "Full-stack services marketplace and booking platform with Next.js, React, TypeScript, Tailwind CSS and Supabase.",
+      "Provider application flow, provider listings, booking requests and an admin portal.",
+      "Supabase authentication, role-based access control and PostgreSQL Row Level Security policies.",
+    ],
+    results: ["Built and launched publicly."],
+    resultsLabel: "Personal project",
+    tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Supabase", "PostgreSQL"],
+    links: [],
   },
   {
     title: "AI-Powered RFP Management System",
-    category: "AI Product",
-    description:
-      "Built an end-to-end AI platform that transforms unstructured procurement text into structured RFPs, reducing manual drafting time by 80%. Designed scalable APIs for proposal parsing, scoring, and vendor workflow automation.",
-    tech: [
-      "Next.js",
-      "Node.js",
-      "TypeScript",
-      "PostgreSQL",
-      "Prisma",
-      "Ollama LLM",
+    kind: "Personal project",
+    problem: "Turning unstructured procurement text into a structured RFP is slow, manual work.",
+    built: [
+      "Platform that transforms unstructured procurement text into structured RFPs using LLM APIs (Ollama).",
+      "Vendor-management and proposal-parsing APIs.",
     ],
-    github: "https://github.com/KulmeetSJ/rfp-management-system",
+    results: ["~80% reduction in RFP drafting time."],
+    resultsLabel: "Personal project",
+    tech: ["Next.js", "Node.js", "PostgreSQL", "LLM APIs", "Ollama"],
+    links: [
+      { label: "GitHub", href: "https://github.com/KulmeetSJ/rfp-management-system", kind: "github" },
+    ],
   },
   {
-    title: "E-Commerce Platform",
-    category: "Full Stack Product",
-    description:
-      "Developed a full-stack e-commerce application with product discovery, wishlist, cart, authentication, Razorpay payments, automated order confirmation emails, and an admin dashboard for inventory and user management.",
-    tech: ["React.js", "Node.js", "MongoDB", "Razorpay", "Nodemailer"],
-    github: "",
+    title: "Parquet Converter / Smart Data Storage",
+    kind: "Engineering project",
+    problem: "Keep large BigQuery datasets in an open, columnar format in Cloud Storage.",
+    built: [
+      "Converted BigQuery tables to Parquet with Python and stored the output in GCS.",
+      "Tiered files to the Coldline storage class.",
+    ],
+    results: [
+      "1TB+ of BigQuery data converted to Parquet.",
+      "55% query-performance improvement.",
+      "50K+ files tiered to Coldline.",
+    ],
+    resultsLabel: "Engineering project",
+    tech: ["Python", "BigQuery", "GCS", "Parquet"],
+    links: [],
   },
   {
-    title: "Conversational Fashion Recommendation System",
-    category: "Applied AI",
-    description:
-      "Engineered an AI recommendation system supporting intent classification, dialog routing, and dynamic image generation. Integrated LLM-backed APIs, fine-tuned models for personalized outfit suggestions, and built natural conversational flows.",
-    tech: ["React.js", "Python", "Falcon-7b", "Diffusion AI", "DialoGPT", "RASA"],
-    github: "https://github.com/yodhaDevelopers/flipfashion",
+    title: "Terraform Log Summarizer + Compliance Checker",
+    kind: "HSBC work",
+    problem: "Large Terraform plans make risky changes, especially IAM grants, easy to miss in review.",
+    built: [
+      "Python tool that parses Terraform plan JSON and summarizes the planned infrastructure changes.",
+      "Compliance checks, including non-privileged AD groups receiving OWNER/WRITER-level roles.",
+    ],
+    results: [
+      "~60% faster infrastructure provisioning.",
+      "12+ critical misconfigurations caught.",
+    ],
+    resultsLabel: "HSBC work",
+    tech: ["Python", "Terraform plan JSON", "GCP", "IAM"],
+    links: [],
   },
 ];
 
-export default function Projects() {
+function LinkButton({ link }: { link: Link }) {
+  const Icon = link.kind === "github" ? Github : link.kind === "results" ? Gauge : ExternalLink;
   return (
-    <section
-      id="projects"
-      className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32"
+    <a
+      href={link.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-slate-900/70 px-3 py-2 text-xs font-mono text-slate-300 hover:border-blue-400/40 hover:text-blue-300 transition-colors"
     >
+      <Icon size={14} />
+      {link.label}
+    </a>
+  );
+}
+
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const featured = project.featured;
+  const isHsbc = project.kind === "HSBC work";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.45, delay: 0.05 * index }}
+      className={featured ? "" : "h-full"}
+    >
+      <SpotlightCard className="p-6 md:p-8 h-full flex flex-col border border-white/5">
+        {/* Header */}
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+            {featured ? <FlaskConical size={18} /> : <Folder size={18} />}
+          </div>
+          <span
+            className={`text-[10px] font-mono uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border ${isHsbc
+              ? "text-amber-300 bg-amber-500/10 border-amber-400/20"
+              : "text-slate-300 bg-slate-900 border-white/10"
+              }`}
+          >
+            {project.kind}
+          </span>
+          {project.status && (
+            <span
+              className={`text-[10px] font-mono uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border ${project.status === "Live"
+                ? "text-emerald-300 bg-emerald-500/10 border-emerald-400/20"
+                : "text-yellow-300 bg-yellow-500/10 border-yellow-400/20"
+                }`}
+            >
+              {project.status}
+            </span>
+          )}
+        </div>
+
+        <h3
+          className={`font-display font-bold text-slate-100 tracking-tight leading-tight mb-3 ${featured ? "text-2xl md:text-4xl" : "text-xl md:text-2xl"
+            }`}
+        >
+          {project.title}
+        </h3>
+
+        <div className={featured ? "grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-10" : "flex flex-col gap-5 flex-grow"}>
+          {/* Problem + built */}
+          <div className={featured ? "xl:col-span-7" : ""}>
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-1">Problem</p>
+            <p className="text-slate-300 text-sm md:text-base leading-relaxed mb-5">{project.problem}</p>
+
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-2">
+              What I built
+            </p>
+            <ul className="space-y-2">
+              {project.built.map((item, i) => (
+                <li key={i} className="flex items-start gap-2 text-slate-400 text-sm leading-relaxed">
+                  <ChevronRight size={16} className="text-blue-500 mt-0.5 shrink-0" />
+                  <span className="break-words min-w-0">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Results + tech + links */}
+          <div className={`flex flex-col gap-5 ${featured ? "xl:col-span-5" : "mt-auto"}`}>
+            <div className="rounded-xl border border-blue-400/15 bg-blue-500/5 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-blue-300">Results</p>
+                <span className="text-[10px] font-mono text-slate-400">{project.resultsLabel}</span>
+              </div>
+              <ul className="space-y-1.5">
+                {project.results.map((r, i) => (
+                  <li key={i} className="text-slate-200 text-sm leading-relaxed">
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {project.tech.map((t) => (
+                <span
+                  key={t}
+                  className="text-[10px] font-mono text-slate-300 bg-slate-900 px-2.5 py-1.5 rounded-full border border-white/5 uppercase tracking-wider"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+
+            {project.links.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {project.links.map((l) => (
+                  <LinkButton key={l.href} link={l} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </SpotlightCard>
+    </motion.div>
+  );
+}
+
+export default function Projects() {
+  const featured = projects.filter((p) => p.featured);
+  const others = projects.filter((p) => !p.featured);
+
+  return (
+    <section id="projects" className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="mb-16 text-center"
+        className="mb-12 text-center"
       >
         <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 tracking-tight">
-          <span className="text-blue-400 font-display font-black text-2xl md:text-3xl mr-3">
-            03.
-          </span>
-          Featured Work
+          <span className="text-blue-400 font-display font-black text-2xl md:text-3xl mr-3">04.</span>
+          Projects
         </h2>
         <p className="text-slate-400 max-w-3xl mx-auto text-lg leading-relaxed">
-          A mix of{" "}
-          <span className="text-blue-400">
-            internal platform engineering, cloud automation, and product builds
-          </span>{" "}
-          focused on developer productivity, reliability, and scale.
+          Personal projects in{" "}
+          <span className="text-blue-400">reliability, delivery and infrastructure</span>, plus
+          selected builds. Numbers from personal projects are benchmarks on a laptop, a local
+          cluster or a sandbox GCP project, never production results.
         </p>
       </motion.div>
 
       <div className="flex flex-col gap-8">
-        {/* HERO PROJECT */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <SpotlightCard className="p-0 overflow-hidden group border border-white/5">
-            <div className="grid grid-cols-1 xl:grid-cols-12">
-              {/* LEFT */}
-              <div className="xl:col-span-7 p-8 md:p-10 xl:p-12 flex flex-col justify-center">
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 border border-blue-500/20">
-                      <FileText size={26} />
-                    </div>
-                    <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-blue-300 bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-400/20">
-                      {heroProject.eyebrow}
-                    </span>
-                  </div>
+        {featured.map((p, i) => (
+          <ProjectCard key={p.title} project={p} index={i} />
+        ))}
 
-                  {heroProject.github && (
-                    <a
-                      href={heroProject.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-slate-400 hover:text-blue-400 transition-colors"
-                    >
-                      <Github size={22} />
-                    </a>
-                  )}
-                </div>
-
-                <h3 className="text-3xl md:text-4xl xl:text-5xl font-display font-bold text-slate-100 mb-5 tracking-tight leading-tight group-hover:text-blue-400 transition-colors">
-                  {heroProject.title}
-                </h3>
-
-                <p className="text-slate-400 text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
-                  {heroProject.description}
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-                  {heroProject.highlights.map((item, i) => (
-                    <div
-                      key={i}
-                      className="rounded-xl border border-white/5 bg-slate-900/60 px-4 py-3"
-                    >
-                      <div className="flex items-start gap-2">
-                        <BadgeCheck size={16} className="text-blue-400 mt-0.5 shrink-0" />
-                        <span className="text-sm text-slate-300 leading-relaxed">
-                          {item}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap gap-2 mt-auto">
-                  {heroProject.tech.map((t, i) => (
-                    <span
-                      key={i}
-                      className="text-[11px] font-mono text-blue-300 bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-400/20 uppercase tracking-wider"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* RIGHT */}
-              <div className="xl:col-span-5 bg-[#080b11] border-t xl:border-t-0 xl:border-l border-slate-800 relative p-6 md:p-8 overflow-hidden">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
-
-                <div className="relative z-10 w-full max-w-md mx-auto space-y-4">
-                  <div className="flex items-center justify-between px-1">
-                    <div className="flex items-center gap-2 text-slate-500 font-mono text-[10px] uppercase tracking-widest">
-                      <Terminal size={14} className="text-blue-400" />
-                      <span>Terraform Analysis Pipeline</span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
-                      </span>
-                      <span className="text-[10px] text-blue-400 font-mono uppercase">
-                        Running
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#020408] border border-slate-800 rounded-2xl p-4 shadow-inner">
-                    <div className="space-y-3">
-                      {[
-                        {
-                          label: "terraform plan",
-                          status: "done",
-                          icon: <FileText size={14} />,
-                        },
-                        {
-                          label: "policy validation",
-                          status: "done",
-                          icon: <ShieldCheck size={14} />,
-                        },
-                        {
-                          label: "change summarization",
-                          status: "active",
-                          icon: <Sparkles size={14} />,
-                        },
-                        {
-                          label: "deployment review",
-                          status: "pending",
-                          icon: <Clock3 size={14} />,
-                        },
-                      ].map((step, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0.4, y: 6 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.15 * i, duration: 0.35 }}
-                          className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2.5"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <div
-                              className={`p-1.5 rounded-md border ${step.status === "done"
-                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                : step.status === "active"
-                                  ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
-                                  : "bg-slate-800 border-slate-700 text-slate-500"
-                                }`}
-                            >
-                              {step.icon}
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <div
-                                className={`h-2.5 w-2.5 rounded-full ${step.status === "done"
-                                  ? "bg-emerald-400"
-                                  : step.status === "active"
-                                    ? "bg-yellow-400 animate-pulse"
-                                    : "bg-slate-600"
-                                  }`}
-                              />
-                              <span className="text-sm font-mono text-slate-300">
-                                {step.label}
-                              </span>
-                            </div>
-                          </div>
-
-                          <span
-                            className={`text-[10px] font-mono uppercase tracking-wider ${step.status === "done"
-                              ? "text-emerald-400"
-                              : step.status === "active"
-                                ? "text-yellow-400"
-                                : "text-slate-500"
-                              }`}
-                          >
-                            {step.status}
-                          </span>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <motion.div
-                      initial={{ opacity: 0.5, scale: 0.96 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4"
-                    >
-                      <div className="text-[10px] uppercase tracking-widest font-mono text-emerald-400/80 mb-1">
-                        Added
-                      </div>
-                      <div className="text-2xl font-bold font-display text-emerald-400">
-                        +3
-                      </div>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ opacity: 0.5, scale: 0.96 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.15 }}
-                      className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4"
-                    >
-                      <div className="text-[10px] uppercase tracking-widest font-mono text-amber-400/80 mb-1">
-                        Changed
-                      </div>
-                      <div className="text-2xl font-bold font-display text-amber-400">
-                        ~2
-                      </div>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ opacity: 0.5, scale: 0.96 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="rounded-xl border border-red-500/20 bg-red-500/10 p-4"
-                    >
-                      <div className="text-[10px] uppercase tracking-widest font-mono text-red-400/80 mb-1">
-                        Destroyed
-                      </div>
-                      <div className="text-2xl font-bold font-display text-red-400">
-                        0
-                      </div>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ opacity: 0.5, scale: 0.96 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.25 }}
-                      className="rounded-xl border border-blue-500/20 bg-blue-500/10 p-4"
-                    >
-                      <div className="text-[10px] uppercase tracking-widest font-mono text-blue-400/80 mb-1">
-                        Compliance
-                      </div>
-                      <div className="text-lg font-bold font-display text-blue-400">
-                        PASS
-                      </div>
-                    </motion.div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </SpotlightCard>
-        </motion.div>
-
-        {/* OTHER PROJECTS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {otherProjects.map((project, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.45, delay: 0.15 + index * 0.08 }}
-              className="h-full"
-            >
-              <SpotlightCard className="p-7 h-full flex flex-col group border border-white/5">
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <div className="space-y-4">
-                    <div className="p-3 w-fit bg-slate-800/60 rounded-xl text-blue-400 group-hover:text-white group-hover:bg-slate-700 transition-colors border border-white/5">
-                      <Folder size={22} />
-                    </div>
-
-                    <span className="inline-flex w-fit text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 bg-slate-900 px-3 py-1.5 rounded-full border border-white/5">
-                      {project.category}
-                    </span>
-                  </div>
-
-                  {project.github && (
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-slate-400 hover:text-blue-400 transition-colors z-20"
-                    >
-                      <Github size={20} />
-                    </a>
-                  )}
-                </div>
-
-                <h3 className="text-2xl font-display font-bold text-slate-100 mb-3 group-hover:text-blue-400 transition-colors tracking-tight leading-snug">
-                  {project.title}
-                </h3>
-
-                <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
-                  {project.description}
-                </p>
-
-                <div className="mt-auto pt-5 border-t border-white/5">
-                  <div className="flex flex-wrap gap-2">
-                    {project.tech.map((t, i) => (
-                      <span
-                        key={i}
-                        className="text-[10px] font-mono text-slate-300 bg-slate-900 px-2.5 py-1.5 rounded-full border border-white/5 uppercase tracking-wider"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </SpotlightCard>
-            </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {others.map((p, i) => (
+            <ProjectCard key={p.title} project={p} index={i} />
           ))}
         </div>
       </div>
