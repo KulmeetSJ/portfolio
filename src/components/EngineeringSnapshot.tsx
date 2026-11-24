@@ -23,7 +23,7 @@ const focusAreas = [
         title: "Reliability",
         value: "Monitoring · Alerting · SLOs",
         description:
-            "Cloud Monitoring alerting at HSBC; SLOs, burn-rate alerts and canary rollbacks in personal projects.",
+            "Cloud Monitoring alerting at HSBC; SLOs, chaos tests, a postmortem and canary rollbacks in personal projects.",
         icon: GitBranch,
     },
     {

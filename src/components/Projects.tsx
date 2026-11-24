@@ -26,18 +26,22 @@ const projects: Project[] = [
   {
     title: "PayFlow Sim",
     kind: "Personal project",
-    status: "In progress",
     featured: true,
     problem:
-      "A payment must be accepted once, applied once and in order per account, and failures must be visible, even when clients retry and consumers crash or rebalance.",
+      "A payment must be accepted once, applied once and in order per account, and failures must be visible, even when clients retry, consumers crash or rebalance, and dependencies slow down.",
     built: [
       "Event-driven payments simulator: a Spring Boot gateway (POST /payments with an Idempotency-Key, 202 only after acks=all) publishes to Kafka; a consumer group writes the payment, a double-entry ledger and balances to PostgreSQL in one transaction.",
       "Idempotent processing (dedupe key derived from the Idempotency-Key; offsets committed only after the DB commit) and per-account ordering by keying events on the sending account.",
       "Two-layer retries: blocking retries, then retry topics (1 s / 2 s / 4 s), then a dead-letter topic with an inspector and idempotent replay.",
       "OpenTelemetry tracing across HTTP, Kafka and JDBC into Tempo, logs in Loki, Prometheus metrics and Grafana; two SLOs with multi-window burn-rate alerts routed by Alertmanager, tested with promtool in CI.",
+      "k6 load test to find the knee, and chaos experiments (kill a broker, kill a consumer, +500 ms PostgreSQL latency via Toxiproxy), each followed by an automated reconcile of every accepted payment against the ledger.",
+      "Blameless postmortem of the induced DB-latency fault: the latency SLI counted completed payments, which hid the stall. I switched it to accepted payments, cut DB round trips per payment from 8 to 4, added the stall case as a promtool test, and re-measured.",
     ],
     results: [
       "6,000 / 6,000 payments reached a final state with a balanced ledger (net 0.00) during a 1 → 3 → 6 → 7 → 3 consumer-scaling run.",
+      "0 accepted payments lost in all three chaos runs: broker kill (0 of 11,631; 72 requests were refused with 503, never acknowledged), consumer kill (0 of 12,000), +500 ms DB latency (0 of 92,097).",
+      "Postmortem fixes, re-measured: time to page ~51 min → 11.3 min; committed throughput under the fault 0.74 → 1.50 payments/s.",
+      "Load knee 750–1,000 payments/s with 3 processors. The laptop's CPU is the limit, so this is a relative number, not capacity.",
     ],
     resultsLabel: "Personal benchmark · laptop (Docker Compose) · synthetic data",
     tech: [
@@ -52,12 +56,23 @@ const projects: Project[] = [
       "Loki",
       "Alertmanager",
       "Testcontainers",
+      "k6",
+      "Toxiproxy",
       "Docker Compose",
       "GitHub Actions",
     ],
     links: [
       { label: "GitHub", href: "https://github.com/KulmeetSJ/payflow-sim", kind: "github" },
-      { label: "Results", href: "https://github.com/KulmeetSJ/payflow-sim#readme", kind: "results" },
+      {
+        label: "RESULTS.md",
+        href: "https://github.com/KulmeetSJ/payflow-sim/blob/main/RESULTS.md",
+        kind: "results",
+      },
+      {
+        label: "Postmortem",
+        href: "https://github.com/KulmeetSJ/payflow-sim/blob/main/postmortems/2026-11-20-db-latency.md",
+        kind: "results",
+      },
     ],
   },
   {

@@ -77,7 +77,8 @@ function PageContent() {
               I build Apache Beam/Dataflow pipelines handling 10M+ daily payment transactions,
               manage GCP infrastructure with Terraform, and configure Cloud Monitoring alerting.
               In personal projects I go deeper into reliability: SLOs with burn-rate alerts,
-              metric-driven canary rollbacks, and Terraform drift detection.
+              load and chaos testing with a blameless postmortem, metric-driven canary
+              rollbacks, and Terraform drift detection.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 mb-8">

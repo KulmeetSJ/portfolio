@@ -30,16 +30,16 @@ const knowledgeBase: KnowledgeEntry[] = [
     text: "At HSBC he built **MCP (Model Context Protocol) diagnostic servers in Python** that connect AI clients to GCP, platform and payment-data diagnostics, reducing manual troubleshooting by **~70%**. He also contributes to the internal Payments AI Platform (React/TypeScript frontend, GKE manifests, SSO). This is integration work, not model training.",
   },
   {
-    keywords: ["monitoring", "alerting", "alerts", "reliability", "sre", "slo", "slos", "observability", "incident", "oncall", "on-call", "postmortem"],
-    text: "**At HSBC:** he configured GCP Cloud Monitoring alerting policies (~40% better incident detection/MTTR in the monitoring and incident-response workflow) and investigates production issues in his own workstreams. He does **not** claim on-call, postmortems or SLOs at HSBC.\n**In personal projects:** PayFlow Sim defines two SLOs with multi-window burn-rate alerts (tested with promtool), and the GitOps Delivery Platform rolls canaries back on failed metric analysis.",
+    keywords: ["monitoring", "alerting", "alerts", "reliability", "sre", "slo", "slos", "observability", "incident", "oncall", "on-call", "postmortem", "postmortems", "chaos"],
+    text: "**At HSBC:** he configured GCP Cloud Monitoring alerting policies (~40% better incident detection/MTTR in the monitoring and incident-response workflow) and investigates production issues in his own workstreams. He does **not** claim on-call, postmortems or SLOs at HSBC.\n**In personal projects:** PayFlow Sim defines two SLOs with multi-window burn-rate alerts (tested with promtool), survived chaos experiments with 0 accepted payments lost, and has a blameless postmortem of an induced DB-latency fault (time to page ~51 min → 11.3 min). The GitOps Delivery Platform rolls canaries back on failed metric analysis.",
   },
   {
     keywords: ["composer", "airflow", "cicd", "ci/cd", "jenkins", "sonarqube", "checkmarx", "nexus", "deployments"],
     text: "At HSBC he worked on **CI/CD for Cloud Composer (Airflow) DAG deployments**, replacing a VM-scheduler-based workflow and supporting **100+ DAG deployments**, and integrated **SonarQube, Checkmarx and Nexus** scans into that pipeline.",
   },
   {
-    keywords: ["payflow", "payments simulator", "simulator", "kafka", "idempotency", "idempotent", "dlt", "dead-letter", "opentelemetry"],
-    text: "**PayFlow Sim** (in progress) is an event-driven payments simulator: Java 21, Spring Boot, Kafka and PostgreSQL, with idempotent processing, per-account ordering, retry topics and a dead-letter topic with replay, plus OpenTelemetry tracing and SLO burn-rate alerts. In a consumer-scaling run, **6,000/6,000 payments reached a final state with a balanced ledger**. Laptop benchmark on synthetic data. " + PERSONAL + "\nAt HSBC, his Kafka work is limited to configuring CDC feed topics and mapping them to Pub/Sub.",
+    keywords: ["payflow", "payments simulator", "simulator", "kafka", "idempotency", "idempotent", "dlt", "dead-letter", "opentelemetry", "chaos", "k6", "load"],
+    text: "**PayFlow Sim** (complete) is an event-driven payments simulator: Java 21, Spring Boot, Kafka and PostgreSQL, with idempotent processing, per-account ordering, retry topics and a dead-letter topic with replay, plus OpenTelemetry tracing and SLO burn-rate alerts. In a consumer-scaling run, **6,000/6,000 payments reached a final state with a balanced ledger**. He load-tested it with k6 (knee 750–1,000 payments/s, laptop-bound) and ran chaos experiments (broker kill, consumer kill, +500 ms DB latency) with **0 accepted payments lost**. His blameless postmortem of the induced DB-latency fault cut time-to-page from **~51 min to 11.3 min**. Laptop benchmarks on synthetic data. " + PERSONAL + "\nAt HSBC, his Kafka work is limited to configuring CDC feed topics and mapping them to Pub/Sub.",
   },
   {
     keywords: ["gitops", "argo", "argocd", "canary", "rollouts", "kyverno", "kubernetes", "delivery"],
@@ -76,7 +76,7 @@ const knowledgeBase: KnowledgeEntry[] = [
   },
   {
     keywords: ["projects", "project", "built", "portfolio"],
-    text: "Featured projects:\n• **PayFlow Sim** (in progress): event-driven payments simulator with SLOs\n• **GitOps Delivery Platform**: Argo CD and metric-driven canary rollbacks\n• **Terraform Drift Detector**: drift detection and policy-as-code for GCP\n• **GuruGranthi**: live marketplace\n• **AI-Powered RFP Management System**\n• HSBC work: **Parquet Converter** and **Terraform Log Summarizer + Compliance Checker**",
+    text: "Featured projects:\n• **PayFlow Sim**: event-driven payments simulator with SLOs, chaos tests and a postmortem\n• **GitOps Delivery Platform**: Argo CD and metric-driven canary rollbacks\n• **Terraform Drift Detector**: drift detection and policy-as-code for GCP\n• **GuruGranthi**: live marketplace\n• **AI-Powered RFP Management System**\n• HSBC work: **Parquet Converter** and **Terraform Log Summarizer + Compliance Checker**",
   },
   {
     keywords: ["skills", "tech", "stack", "technologies", "languages"],

@@ -11,6 +11,7 @@ import {
     GitBranch,
     Activity,
     FileSearch,
+    Gauge,
     ExternalLink,
 } from "lucide-react";
 import SectionHeader from "./SectionHeader";
@@ -18,6 +19,7 @@ import SectionHeader from "./SectionHeader";
 // Sourced from the public READMEs and ADRs of my personal projects.
 // Each card links to the document it summarizes.
 const PF = "https://github.com/KulmeetSJ/payflow-sim#readme";
+const PM = "https://github.com/KulmeetSJ/payflow-sim/blob/main/postmortems/2026-11-20-db-latency.md";
 const ADR = "https://github.com/KulmeetSJ/gitops-demo-platform/tree/main/docs/adr";
 const TF = "https://github.com/KulmeetSJ/tf-drift-detector#readme";
 
@@ -76,6 +78,26 @@ const decisions = [
         impact: [
             "Short blips keep per-account order; longer failures don't stall the partition",
             "Trade-off: a payment on the retry topics may be applied after later payments from the same account",
+        ],
+    },
+    {
+        id: "sli",
+        project: "PayFlow Sim · postmortem",
+        source: PM,
+        title: "Count the SLI against accepted payments, not completed ones",
+        icon: Gauge,
+        problem:
+            "In an induced +500 ms database-latency fault, the latency SLI used completed payments as its denominator. Stalled payments never completed, so the error ratio barely moved until the backlog drained. With a normal hour of history, the page would have taken ~51 minutes.",
+        options: [
+            "Keep the completions-based SLI (correct only in steady state, where accepted = completed)",
+            "Add a lag-based page on the age of the oldest unprocessed payment (recorded as a follow-up, not done yet)",
+            "Change the SLI denominator to accepted payments, and reduce how often each payment pays the DB latency",
+        ],
+        decision:
+            "Measure the SLI against accepted payments (payments_accepted_total) so a stall counts as bad, cut DB round trips per payment from 8 to 4 with data-modifying CTEs, and add the stall case as a promtool test in CI.",
+        impact: [
+            "Benchmark, re-measured: time to page ~51 min → 11.3 min; committed throughput under the fault 0.74 → 1.50/s",
+            "Trade-off: the round-trip fix did not move the load knee, because the laptop's CPU, not PostgreSQL, is the limit",
         ],
     },
     {
