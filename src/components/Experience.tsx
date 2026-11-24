@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Briefcase, ChevronRight } from "lucide-react";
 import SpotlightCard from "./SpotlightCard";
 
-// Source: master_resume_evidence_bank.yaml v1.9h (HSBC, KODERS).
+// Source: master_resume_evidence_bank.yaml v1.9j (HSBC, ANYASOFTEK, KODERS).
 // Each metric stays attached to its own HSBC workstream.
 const experiences = [
   {
@@ -52,6 +52,22 @@ const experiences = [
     currentRole: true,
   },
   {
+    company: "AnyaSoftek",
+    role: "Full Stack Developer Intern",
+    location: "Remote",
+    period: "May 2024 – Jun 2024",
+    type: "Internship",
+    description: "Short internship building websites.",
+    achievements: [
+      "Built a portfolio website for one of the company's clients.",
+      "Rebuilt the AnyaSoftek company website.",
+      "Worked on one further website.",
+    ],
+    tech: ["Next.js", "TailwindCSS", "MongoDB"],
+    impact: [] as string[],
+    currentRole: false,
+  },
+  {
     company: "Koders",
     role: "Software Development Engineer Intern",
     location: "Dehradun, India",
@@ -94,7 +110,7 @@ export default function Experience() {
           <span className="text-blue-400">
             Software Engineer on GCP data and platform engineering
           </span>
-          {" "}at HSBC (2.5+ years including internship).
+          {" "}at HSBC (2.5+ years including internships).
         </p>
       </motion.div>
 

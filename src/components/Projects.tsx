@@ -26,7 +26,7 @@ type Project = {
   featured?: boolean;
 };
 
-// Every fact below comes from master_resume_evidence_bank.yaml (v1.9h).
+// Every fact below comes from master_resume_evidence_bank.yaml (v1.9j).
 // Personal-project numbers are benchmarks and are labelled as such.
 const projects: Project[] = [
   {
@@ -160,7 +160,7 @@ const projects: Project[] = [
     results: ["Built and launched publicly."],
     resultsLabel: "Personal project",
     tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Supabase", "PostgreSQL"],
-    links: [],
+    links: [{ label: "Live site", href: "https://gurugranthisewa.com/", kind: "live" }],
   },
   {
     title: "AI-Powered RFP Management System",
@@ -179,18 +179,17 @@ const projects: Project[] = [
   },
   {
     title: "Parquet Converter / Smart Data Storage",
-    kind: "Engineering project",
+    kind: "HSBC work",
     problem: "Keep large BigQuery datasets in an open, columnar format in Cloud Storage.",
     built: [
-      "Converted BigQuery tables to Parquet with Python and stored the output in GCS.",
-      "Tiered files to the Coldline storage class.",
+      "Python script (Sept 2024, one of my first tasks on the team) that converts BigQuery tables to Parquet and stores the output in GCS.",
     ],
     results: [
       "1TB+ of BigQuery data converted to Parquet.",
       "55% query-performance improvement.",
       "50K+ files tiered to Coldline.",
     ],
-    resultsLabel: "Engineering project",
+    resultsLabel: "HSBC work",
     tech: ["Python", "BigQuery", "GCS", "Parquet"],
     links: [],
   },

@@ -1,17 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Award, ExternalLink } from "lucide-react";
+import { Award, BadgeCheck, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import SpotlightCard from "./SpotlightCard";
 
-// The only certification in the evidence bank.
+// Certifications from the evidence bank (v1.9j). Professional Cloud Architect is primary and always first.
 const cert = {
     issuer: "Google Cloud",
     title: "Google Cloud Certified Professional Cloud Architect",
     credentialId: "5f09da7209a24931a67cbc3881df84c4",
     verifyUrl: "https://www.credly.com/badges/498cdb19-b30a-45d1-9221-7d44ff636c66/public_url",
 };
+
+// No credential ID, link or date is recorded for this one, so none is shown.
+const secondary = { title: "Wipro Java Full Stack Certification", issuer: "Wipro" };
 
 export default function CertificationsCard() {
     return (
@@ -33,7 +36,7 @@ export default function CertificationsCard() {
                     <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 text-slate-400 text-xs font-mono uppercase mb-1">
                             <Award size={14} className="text-blue-400" />
-                            Certification
+                            Certifications
                         </div>
                         <p className="text-slate-100 font-display font-bold text-lg md:text-xl leading-snug">
                             {cert.title}
@@ -51,6 +54,14 @@ export default function CertificationsCard() {
                     >
                         Verify on Credly <ExternalLink size={12} />
                     </a>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-3 text-sm text-slate-400">
+                    <BadgeCheck size={16} className="text-slate-500 shrink-0" />
+                    <span>
+                        {secondary.title}{" "}
+                        <span className="text-slate-600 font-mono text-xs uppercase">· {secondary.issuer}</span>
+                    </span>
                 </div>
             </SpotlightCard>
         </motion.div>
