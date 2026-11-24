@@ -1,13 +1,9 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useState } from "react";
 import ReactFlow, {
   Background,
   Controls,
-  addEdge,
-  useNodesState,
-  useEdgesState,
-  Connection,
   Edge,
   Node,
   Handle,
@@ -19,269 +15,215 @@ import "reactflow/dist/style.css";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
-  GitBranch,
+  Send,
   Server,
+  Layers,
   Cpu,
-  ShieldCheck,
   Database,
-  ArrowRight,
+  RotateCcw,
+  AlertOctagon,
+  Activity,
   Sparkles,
+  Github,
+  LucideIcon,
 } from "lucide-react";
 
+// Source: public README of github.com/KulmeetSJ/payflow-sim (personal project,
+// synthetic data). Nothing here describes HSBC systems.
 interface NodeDetail {
   title: string;
   desc: string;
-  metrics: string;
-  icon: any;
+  key: string;
+  icon: LucideIcon;
   accent: string;
 }
 
 const nodeDetails: Record<string, NodeDetail> = {
-  "1": {
-    title: "Developer Commit",
-    desc: "Infrastructure changes begin in Git. Engineers update Terraform modules, deployment logic, or platform configuration, which then triggers the CI workflow automatically.",
-    metrics: "Version controlled infrastructure changes",
-    icon: GitBranch,
+  client: {
+    title: "Client / load generator",
+    desc: "Sends POST /payments with an Idempotency-Key. A generator script produces synthetic payments, about 2% of them deliberately invalid.",
+    key: "Synthetic data only",
+    icon: Send,
     accent: "text-cyan-400",
   },
-  "2": {
-    title: "Jenkins CI Pipeline",
-    desc: "Jenkins coordinates validation stages, executes the Terraform workflow, and acts as the control plane for policy and deployment review.",
-    metrics: "Centralized CI orchestration",
+  gateway: {
+    title: "payment-gateway (Spring Boot)",
+    desc: "Validates the request and publishes the event to Kafka with an idempotent producer. It answers 202 Accepted only after acks=all, with min.insync.replicas=2.",
+    key: "202 means durably stored",
     icon: Server,
     accent: "text-blue-400",
   },
-  "3": {
-    title: "Terraform Plan Stage",
-    desc: "Terraform generates an execution plan that previews upcoming changes across IAM bindings, cloud resources, datasets, and infrastructure dependencies.",
-    metrics: "Preview before infrastructure apply",
+  kafka: {
+    title: "Kafka: payments.initiated",
+    desc: "3-broker KRaft cluster; 6 partitions, replication factor 3. Events are keyed by the sending account, so one account always maps to one partition.",
+    key: "Per-account ordering",
+    icon: Layers,
+    accent: "text-violet-400",
+  },
+  processor: {
+    title: "payment-processor (consumer group)",
+    desc: "Writes dedupe record, payment, double-entry ledger and balances in one DB transaction, then commits the offset. Uses the cooperative-sticky assignor; parallelism is capped by partition count.",
+    key: "At-least-once delivery, idempotent effect",
     icon: Cpu,
     accent: "text-emerald-400",
   },
-  "4": {
-    title: "Compliance Checker",
-    desc: "A Python-based shift-left validation layer scans the Terraform plan for restricted IAM roles, unsafe permissions, or policy violations before release approval.",
-    metrics: "Prevents risky changes before deployment",
-    icon: ShieldCheck,
-    accent: "text-violet-400",
-  },
-  "5": {
-    title: "Plan JSON Summarizer",
-    desc: "Custom parsing logic extracts critical resource changes from plan JSON and produces human-readable summaries directly inside Jenkins logs for faster engineering review.",
-    metrics: "Faster review with actionable summaries",
+  postgres: {
+    title: "PostgreSQL",
+    desc: "processed_events primary key turns retries and redeliveries into no-ops. Account rows are locked in a fixed order to avoid deadlocks; balance >= 0 is a DB constraint.",
+    key: "Ledger always balances",
     icon: Database,
+    accent: "text-sky-400",
+  },
+  retry: {
+    title: "Retry topics",
+    desc: "Transient errors: 2 blocking retries in place, then non-blocking retry topics at 1 s, 2 s and 4 s. Trade-off: a retried payment may be applied after later payments from the same account.",
+    key: "The partition keeps flowing",
+    icon: RotateCcw,
+    accent: "text-amber-400",
+  },
+  dlt: {
+    title: "Dead-letter topic + replay",
+    desc: "Poison messages go straight to the DLT; exhausted retries follow. Each dead letter is indexed in a table with an inspector and an idempotent replay endpoint.",
+    key: "Failures are visible, not lost silently",
+    icon: AlertOctagon,
     accent: "text-rose-400",
+  },
+  observability: {
+    title: "Observability & SLOs",
+    desc: "OpenTelemetry Java agent traces across HTTP, Kafka and JDBC into Tempo; logs to Loki; Prometheus metrics and consumer lag; Grafana. Two SLOs with multi-window burn-rate alerts via Alertmanager, tested with promtool in CI.",
+    key: "SLOs + burn-rate alerts",
+    icon: Activity,
+    accent: "text-pink-400",
   },
 };
 
-function PipelineNode({ id, data, selected }: NodeProps) {
+function PipelineNode({ id, selected }: NodeProps) {
   const detail = nodeDetails[id];
   const Icon = detail.icon;
 
   return (
     <div
-      className={`relative min-w-[220px] rounded-2xl border transition-all duration-300 backdrop-blur-xl ${selected
-          ? "border-blue-400/50 bg-slate-900 shadow-[0_0_30px_rgba(59,130,246,0.18)]"
-          : "border-white/8 bg-slate-900/90 hover:border-white/15"
+      className={`relative w-[210px] rounded-2xl border transition-all duration-300 ${selected
+        ? "border-blue-400/50 bg-slate-900 shadow-[0_0_30px_rgba(59,130,246,0.18)]"
+        : "border-white/10 bg-slate-900/90 hover:border-white/20"
         }`}
     >
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="!h-3 !w-3 !border-0 !bg-slate-500"
-      />
-
-      <div className="p-4">
-        <div className="flex items-start gap-3 mb-3">
-          <div className="rounded-xl border border-white/10 bg-slate-800/80 p-2.5">
-            <Icon size={18} className={detail.accent} />
+      <Handle type="target" position={Position.Top} className="!h-2 !w-2 !border-0 !bg-slate-500" />
+      <div className="p-3.5">
+        <div className="flex items-start gap-2.5 mb-2">
+          <div className="rounded-lg border border-white/10 bg-slate-800/80 p-2">
+            <Icon size={16} className={detail.accent} />
           </div>
-
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500 font-mono mb-1">
-              Pipeline Node
-            </p>
-            <h3 className="text-sm font-semibold text-slate-100 leading-snug">
-              {data.label}
-            </h3>
-          </div>
+          <h3 className="text-[13px] font-semibold text-slate-100 leading-snug">{detail.title}</h3>
         </div>
-
-        <p className="text-xs text-slate-400 leading-relaxed">
-          {detail.metrics}
-        </p>
+        <p className="text-[11px] text-slate-400 leading-relaxed">{detail.key}</p>
       </div>
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!h-3 !w-3 !border-0 !bg-slate-500"
-      />
+      <Handle type="source" position={Position.Bottom} className="!h-2 !w-2 !border-0 !bg-slate-500" />
     </div>
   );
 }
 
-const nodeTypes = {
-  pipelineNode: PipelineNode,
-};
+const nodeTypes = { pipelineNode: PipelineNode };
 
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "pipelineNode",
-    position: { x: 280, y: 40 },
-    data: { label: "Developer Commit" },
-  },
-  {
-    id: "2",
-    type: "pipelineNode",
-    position: { x: 280, y: 180 },
-    data: { label: "Jenkins CI Pipeline" },
-  },
-  {
-    id: "3",
-    type: "pipelineNode",
-    position: { x: 280, y: 320 },
-    data: { label: "Terraform Plan Stage" },
-  },
-  {
-    id: "4",
-    type: "pipelineNode",
-    position: { x: 60, y: 470 },
-    data: { label: "Compliance Checker" },
-  },
-  {
-    id: "5",
-    type: "pipelineNode",
-    position: { x: 500, y: 470 },
-    data: { label: "Plan JSON Summarizer" },
-  },
+const n = (id: string, x: number, y: number): Node => ({
+  id,
+  type: "pipelineNode",
+  position: { x, y },
+  data: {},
+});
+
+const nodes: Node[] = [
+  n("client", 260, 0),
+  n("gateway", 260, 130),
+  n("kafka", 260, 260),
+  n("processor", 260, 390),
+  n("postgres", 0, 540),
+  n("retry", 260, 540),
+  n("dlt", 520, 540),
+  n("observability", 0, 260),
 ];
 
-const initialEdges: Edge[] = [
-  {
-    id: "e1-2",
-    source: "1",
-    target: "2",
-    animated: true,
-    style: { stroke: "#334155", strokeWidth: 1.5 },
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#475569" },
-  },
-  {
-    id: "e2-3",
-    source: "2",
-    target: "3",
-    animated: true,
-    style: { stroke: "#334155", strokeWidth: 1.5 },
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#475569" },
-  },
-  {
-    id: "e3-4",
-    source: "3",
-    target: "4",
-    animated: true,
-    label: "Policy Check",
-    labelStyle: { fill: "#94a3b8", fontSize: 11 },
-    style: { stroke: "#6366f1", strokeWidth: 1.5 },
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#6366f1" },
-  },
-  {
-    id: "e3-5",
-    source: "3",
-    target: "5",
-    animated: true,
-    label: "Plan Parsing",
-    labelStyle: { fill: "#94a3b8", fontSize: 11 },
-    style: { stroke: "#f43f5e", strokeWidth: 1.5 },
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#f43f5e" },
-  },
+const edge = (
+  id: string,
+  source: string,
+  target: string,
+  label?: string,
+  color = "#475569",
+  dashed = false,
+): Edge => ({
+  id,
+  source,
+  target,
+  label,
+  animated: !dashed,
+  labelStyle: { fill: "#94a3b8", fontSize: 10 },
+  labelBgStyle: { fill: "#0f172a" },
+  style: { stroke: color, strokeWidth: 1.5, strokeDasharray: dashed ? "5 4" : undefined },
+  markerEnd: { type: MarkerType.ArrowClosed, color },
+});
+
+const edges: Edge[] = [
+  edge("c-g", "client", "gateway", "POST /payments"),
+  edge("g-k", "gateway", "kafka", "acks=all, key = fromAccount"),
+  edge("k-p", "kafka", "processor"),
+  edge("p-db", "processor", "postgres", "one transaction", "#38bdf8"),
+  edge("p-r", "processor", "retry", "transient error", "#f59e0b"),
+  edge("r-p", "retry", "processor", "1 s / 2 s / 4 s", "#f59e0b", true),
+  edge("p-d", "processor", "dlt", "poison / exhausted", "#f43f5e"),
+  edge("d-k", "dlt", "kafka", "replay", "#f43f5e", true),
+  edge("g-o", "gateway", "observability", "traces, metrics", "#ec4899", true),
 ];
 
 export default function Architecture() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-
-  const onConnect = useCallback(
-    (params: Connection) =>
-      setEdges((eds) =>
-        addEdge(
-          {
-            ...params,
-            animated: true,
-            markerEnd: { type: MarkerType.ArrowClosed, color: "#475569" },
-            style: { stroke: "#475569", strokeWidth: 1.5 },
-          },
-          eds,
-        ),
-      ),
-    [setEdges],
-  );
-
-  const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    setSelectedNode(node.id);
-  };
-
   const details = selectedNode ? nodeDetails[selectedNode] : null;
 
-  const summaryCards = useMemo(
-    () => [
-      { label: "Primary Flow", value: "Git → Jenkins → Terraform" },
-      { label: "Validation Layer", value: "Policy + Plan Analysis" },
-      { label: "Outcome", value: "Safer infra releases" },
-    ],
-    [],
-  );
+  const summaryCards = [
+    { label: "Flow", value: "Gateway → Kafka → consumer group → PostgreSQL" },
+    { label: "Failure handling", value: "Retry topics → dead-letter topic → replay" },
+    { label: "Scope", value: "Personal project · synthetic data · laptop" },
+  ];
 
   return (
-    <section
-      className="py-24 px-4 md:px-12 max-w-7xl mx-auto relative scroll-mt-32"
-      id="architecture"
-    >
-      <div className="mb-16">
+    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto relative scroll-mt-32" id="architecture">
+      <div className="mb-12">
         <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 tracking-tight">
-          <span className="text-blue-400 font-display font-black text-2xl">
-            04.
-          </span>{" "}
-          System Architecture
+          <span className="text-blue-400 font-display font-black text-2xl">05.</span> Architecture:
+          PayFlow Sim
         </h2>
-
         <p className="text-slate-400 max-w-3xl text-lg leading-relaxed">
-          An interactive view of the{" "}
-          <span className="text-slate-200 font-medium">
-            Terraform Compliance and Plan Analysis Pipeline
-          </span>
-          , showing how infrastructure changes move through validation,
-          summarization, and release review before deployment.
-          <span className="text-blue-400"> Click a node</span> to inspect its role.
+          How my event-driven payments simulator accepts, orders, retries and dead-letters payments,
+          and how it is observed.{" "}
+          <span className="text-blue-400">Click a node</span> for the design detail. Personal
+          project on synthetic data; it is not a production payment system.
         </p>
+        <a
+          href="https://github.com/KulmeetSJ/payflow-sim#readme"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-2 text-sm font-mono text-blue-400 hover:text-blue-300"
+        >
+          <Github size={16} /> Read the full design on GitHub
+        </a>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {summaryCards.map((item, index) => (
-          <motion.div
+        {summaryCards.map((item) => (
+          <div
             key={item.label}
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: index * 0.08 }}
-            className="rounded-2xl border border-white/5 bg-slate-900/60 backdrop-blur-xl p-4"
+            className="rounded-2xl border border-white/5 bg-slate-900/60 p-4"
           >
-            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-2">
-              {item.label}
-            </p>
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-2">{item.label}</p>
             <p className="text-sm md:text-base text-slate-200">{item.value}</p>
-          </motion.div>
+          </div>
         ))}
       </div>
 
-      <div className="relative h-[680px] w-full overflow-hidden rounded-3xl border border-white/5 bg-[radial-gradient(circle_at_top,#0f172a,rgba(2,6,23,0.96)_55%,#020617_100%)] shadow-[0_0_60px_rgba(2,6,23,0.45)]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.05)_1px,transparent_1px)] bg-[size:28px_28px] pointer-events-none" />
-
-        <div className="absolute left-6 top-6 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/80 px-3 py-1.5 backdrop-blur-md">
+      <div className="relative h-[560px] md:h-[680px] w-full overflow-hidden rounded-3xl border border-white/5 bg-[radial-gradient(circle_at_top,#0f172a,rgba(2,6,23,0.96)_55%,#020617_100%)]">
+        <div className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/80 px-3 py-1.5 backdrop-blur-md">
           <Sparkles size={14} className="text-blue-400" />
           <span className="text-[10px] uppercase tracking-[0.18em] text-slate-300 font-mono">
-            Deployment Review Flow
+            Payment flow
           </span>
         </div>
 
@@ -289,30 +231,29 @@ export default function Architecture() {
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeClick={onNodeClick}
+          onNodeClick={(_, node) => setSelectedNode(node.id)}
+          nodesConnectable={false}
           fitView
-          fitViewOptions={{ padding: 0.2 }}
+          fitViewOptions={{ padding: 0.15 }}
           proOptions={{ hideAttribution: true }}
         >
           <Background color="#1e293b" gap={28} />
-          <Controls />
+          <Controls showInteractive={false} />
         </ReactFlow>
 
         <AnimatePresence>
-          {selectedNode && details && (
+          {details && (
             <motion.div
               initial={{ x: "100%", opacity: 0.6 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0.6 }}
               transition={{ duration: 0.28 }}
-              className="absolute top-0 right-0 z-30 h-full w-full md:w-[380px] border-l border-white/10 bg-slate-950/95 backdrop-blur-xl p-6 md:p-8"
+              className="absolute top-0 right-0 z-30 h-full w-full md:w-[380px] border-l border-white/10 bg-slate-950/95 backdrop-blur-xl p-6 md:p-8 overflow-y-auto"
             >
               <button
                 onClick={() => setSelectedNode(null)}
-                className="absolute top-4 right-4 rounded-full border border-white/10 bg-slate-900 p-2 text-slate-400 hover:text-white hover:border-white/20 transition-colors"
+                aria-label="Close details"
+                className="absolute top-4 right-4 rounded-full border border-white/10 bg-slate-900 p-2 text-slate-400 hover:text-white transition-colors"
               >
                 <X size={18} />
               </button>
@@ -322,39 +263,14 @@ export default function Architecture() {
                   <div className="rounded-2xl border border-white/10 bg-slate-900 p-3">
                     <details.icon size={20} className={details.accent} />
                   </div>
-
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-mono mb-2">
-                      Selected Node
-                    </p>
-                    <h3 className="text-2xl font-display font-bold text-white tracking-tight">
-                      {details.title}
-                    </h3>
-                  </div>
+                  <h3 className="text-xl font-display font-bold text-white tracking-tight">{details.title}</h3>
                 </div>
-
-                <p className="text-slate-300 leading-relaxed mb-6">
-                  {details.desc}
-                </p>
-
-                <div className="rounded-2xl border border-blue-400/20 bg-blue-500/10 p-4 mb-6">
+                <p className="text-slate-300 leading-relaxed mb-6">{details.desc}</p>
+                <div className="rounded-2xl border border-blue-400/20 bg-blue-500/10 p-4">
                   <p className="text-[10px] text-blue-300 uppercase tracking-[0.18em] font-mono mb-2">
-                    Key Impact
+                    Guarantee / role
                   </p>
-                  <p className="text-white text-lg leading-relaxed">
-                    {details.metrics}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-white/5 bg-slate-900/80 p-4">
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500 font-mono mb-3">
-                    Flow Context
-                  </p>
-                  <div className="flex items-center gap-2 text-sm text-slate-300">
-                    <span>Pipeline step</span>
-                    <ArrowRight size={14} className="text-slate-500" />
-                    <span>Validation-aware release flow</span>
-                  </div>
+                  <p className="text-white leading-relaxed">{details.key}</p>
                 </div>
               </div>
             </motion.div>

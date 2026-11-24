@@ -2,66 +2,143 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Cpu, ShieldCheck, FileText } from "lucide-react";
+import {
+    ChevronDown,
+    ShieldCheck,
+    Database,
+    Layers,
+    RotateCcw,
+    GitBranch,
+    Activity,
+    FileSearch,
+    ExternalLink,
+} from "lucide-react";
+
+// Sourced from the public READMEs and ADRs of my personal projects.
+// Each card links to the document it summarizes.
+const PF = "https://github.com/KulmeetSJ/payflow-sim#readme";
+const ADR = "https://github.com/KulmeetSJ/gitops-demo-platform/tree/main/docs/adr";
+const TF = "https://github.com/KulmeetSJ/tf-drift-detector#readme";
 
 const decisions = [
     {
-        id: "terraform",
-        title: "Why Terraform for Infrastructure Management?",
-        icon: Cpu,
+        id: "offsets",
+        project: "PayFlow Sim",
+        source: PF,
+        title: "Commit Kafka offsets only after the database commit",
+        icon: Database,
         problem:
-            "Managing hundreds of cloud resources manually or through ad-hoc scripts leads to configuration drift and difficult-to-reproduce deployments.",
+            "A consumer can crash between writing a payment and committing its offset. Committing first loses the payment; committing after can apply it twice.",
         options: [
-            "Shell scripts for infrastructure provisioning",
-            "Jenkins automation with manual configuration",
-            "Infrastructure as Code using Terraform",
+            "Auto-commit offsets on an interval",
+            "Commit the offset before processing",
+            "Commit after the DB transaction, and make processing idempotent",
         ],
         decision:
-            "Adopt Terraform to declaratively manage GCP infrastructure and enable consistent, repeatable deployments across environments.",
+            "Commit the offset only after the DB transaction. A processed_events primary key, derived from the client's Idempotency-Key, turns client retries and redeliveries into no-ops.",
         impact: [
-            "Infrastructure reproducibility",
-            "Reduced configuration drift",
-            "Improved auditability of infrastructure changes",
+            "At-least-once delivery with an idempotent effect",
+            "Trade-off: redeliveries do happen (one was absorbed during a rebalance in the scaling run)",
         ],
     },
-
     {
-        id: "compliance",
-        title: "Why Shift-Left Compliance Validation?",
+        id: "ordering",
+        project: "PayFlow Sim",
+        source: PF,
+        title: "Key events by the sending account",
+        icon: Layers,
+        problem:
+            "Balance checks depend on order: \"deposit then spend\" and \"spend then deposit\" can give different answers.",
+        options: ["Round-robin partitioning (no key)", "Key every event by fromAccount"],
+        decision:
+            "Key by fromAccount so an account always maps to one partition, owned by one consumer at a time.",
+        impact: [
+            "Payments from one account are applied in the order they were accepted (covered by an integration test)",
+            "Trade-off: parallelism is capped by partition count (with 6 partitions, a 7th consumer sat idle)",
+        ],
+    },
+    {
+        id: "retries",
+        project: "PayFlow Sim",
+        source: PF,
+        title: "Two-layer retries before the dead-letter topic",
+        icon: RotateCcw,
+        problem:
+            "A single failing payment must not block every payment behind it on the same partition, and poison messages must not be retried forever.",
+        options: [
+            "Blocking retries only",
+            "Send to the DLT on the first error",
+            "Short blocking retries, then retry topics, then the DLT",
+        ],
+        decision:
+            "2 blocking retries in place, then retry topics at 1 s / 2 s / 4 s, then the DLT. Poison messages skip straight to the DLT, which has an inspector and an idempotent replay endpoint.",
+        impact: [
+            "Short blips keep per-account order; longer failures don't stall the partition",
+            "Trade-off: a payment on the retry topics may be applied after later payments from the same account",
+        ],
+    },
+    {
+        id: "gitops",
+        project: "GitOps Delivery Platform",
+        source: ADR,
+        title: "Pull-based GitOps: CI never holds cluster credentials",
+        icon: GitBranch,
+        problem:
+            "Push-based deploys (kubectl/helm from CI) need powerful cluster credentials in CI, and the cluster drifts from what anyone reviewed.",
+        options: ["Push from CI with cluster credentials", "Pull-based delivery with Argo CD"],
+        decision:
+            "CI's only outputs are an image and a commit. Argo CD pulls from Git, self-heals manual changes, and prod promotion needs a required reviewer.",
+        impact: [
+            "Approval sits on the change to Git; the audit trail is commit history",
+            "Trade-off: deploy latency includes Argo CD's poll interval",
+        ],
+    },
+    {
+        id: "canary",
+        project: "GitOps Delivery Platform",
+        source: ADR,
+        title: "Judge canaries on their own metrics, not on health probes",
+        icon: Activity,
+        problem:
+            "A release can pass every health probe and still fail real requests. A rolling update would ship it.",
+        options: ["Rolling update gated on probes", "Blue-green", "Canary with metric analysis"],
+        decision:
+            "Argo Rollouts canary (10% → 25% → 50% → 100%). Prometheus analysis queries only the canary pods' success rate and p95 latency, and aborts automatically on failure. Blue-green was ruled out because it needs double capacity.",
+        impact: [
+            "Benchmark: rollback 30 s after the first failed analysis check in 5/5 drills (local kind cluster)",
+            "Trade-off: replica-based weights are approximate, and analysis needs steady traffic",
+        ],
+    },
+    {
+        id: "kyverno",
+        project: "GitOps Delivery Platform",
+        source: ADR,
+        title: "Admission policies, tested like code",
         icon: ShieldCheck,
         problem:
-            "IAM misconfigurations were sometimes detected only after deployment, increasing security risk and remediation effort.",
-        options: [
-            "Manual review of Terraform plan output",
-            "Post-deployment monitoring and remediation",
-            "Pre-deployment compliance validation inside CI/CD pipeline",
-        ],
+            "CI scanning only covers images our pipeline builds; a hand-applied manifest bypasses it.",
+        options: ["Rely on CI checks only", "Admission control in the cluster"],
         decision:
-            "Implement a shift-left compliance checker in the CI pipeline to validate IAM roles before infrastructure changes are applied.",
+            "Kyverno policies in Enforce mode: no :latest images, required requests/limits, no privileged or hostPath, runAsNonRoot. Policy tests run in CI.",
         impact: [
-            "Prevented unauthorized IAM role assignments",
-            "Reduced security risks before deployment",
-            "Faster developer feedback during CI pipeline execution",
+            "Benchmark: 7/7 non-compliant manifests blocked, 1/1 compliant admitted",
+            "Trade-off: platform namespaces are out of scope for now",
         ],
     },
-
     {
-        id: "logs",
-        title: "Why Terraform Log Summarization?",
-        icon: FileText,
+        id: "drift",
+        project: "Terraform Drift Detector",
+        source: TF,
+        title: "Separate real drift from code that isn't applied yet",
+        icon: FileSearch,
         problem:
-            "Terraform plans often generate large logs that engineers must manually inspect to identify critical infrastructure changes.",
-        options: [
-            "Manual inspection of Terraform plan logs",
-            "Filtering logs using Jenkins output",
-            "Automated log summarization highlighting key infrastructure changes",
-        ],
+            "A plain terraform plan mixes console changes with unapplied code, and can't see IAM grants Terraform doesn't manage.",
+        options: ["One terraform plan", "plan -refresh-only plus a normal plan plus a live IAM diff"],
         decision:
-            "Develop a Python-based summarizer that parses Terraform plan JSON and extracts important changes such as IAM updates and resource modifications.",
+            "Run both plans, label each action as \"reverts drift\" or \"code change not yet applied\", and diff the live IAM policy. Auth is keyless via Workload Identity Federation.",
         impact: [
-            "Reduced log analysis time from ~1 hour to a few minutes",
-            "Improved visibility of infrastructure changes",
-            "Faster debugging during CI/CD pipeline runs",
+            "Benchmark: 7/7 console-style changes detected (sandbox GCP project)",
+            "Trade-off: on the 6-hour schedule, detection can take up to 6 h; the 26 s median is for manual runs",
         ],
     },
 ];
@@ -70,17 +147,16 @@ export default function EngineeringDecisions() {
     const [active, setActive] = useState<string | null>(null);
 
     return (
-        <section className="py-24 px-6 md:px-12 max-w-5xl mx-auto scroll-mt-32" id="engineering-decisions">
+        <section className="py-24 px-4 md:px-12 max-w-5xl mx-auto scroll-mt-32" id="engineering-decisions">
             <div className="mb-16">
                 <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
-                    <span className="text-blue-400 font-black text-2xl">07.</span>
+                    <span className="text-blue-400 font-black text-2xl">06.</span>
                     Engineering Decisions
                 </h2>
 
                 <p className="text-slate-400 text-lg max-w-2xl">
-                    Building reliable systems requires thoughtful design decisions.
-                    Below are some key architectural decisions made while developing my
-                    cloud automation and infrastructure tooling.
+                    Design decisions and their trade-offs from my personal projects, summarized
+                    from each project&apos;s public README and architecture decision records.
                 </p>
             </div>
 
@@ -96,19 +172,24 @@ export default function EngineeringDecisions() {
                         >
                             <button
                                 onClick={() => setActive(isOpen ? null : d.id)}
-                                className="w-full flex items-center justify-between p-6 text-left"
+                                className="w-full flex items-center justify-between p-4 sm:p-6 text-left"
                             >
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-blue-500/10 p-2 rounded-lg text-blue-400">
+                                <div className="flex items-center gap-4 min-w-0">
+                                    <div className="bg-blue-500/10 p-2 rounded-lg text-blue-400 shrink-0">
                                         <Icon size={20} />
                                     </div>
-                                    <span className="text-slate-200 font-semibold">
-                                        {d.title}
-                                    </span>
+                                    <div className="min-w-0">
+                                        <span className="block text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-1">
+                                            {d.project}
+                                        </span>
+                                        <span className="text-slate-200 font-semibold">
+                                            {d.title}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <ChevronDown
-                                    className={`transition-transform ${isOpen ? "rotate-180 text-blue-400" : "text-slate-500"
+                                    className={`shrink-0 ml-3 transition-transform ${isOpen ? "rotate-180 text-blue-400" : "text-slate-500"
                                         }`}
                                 />
                             </button>
@@ -120,7 +201,7 @@ export default function EngineeringDecisions() {
                                         animate={{ opacity: 1, height: "auto" }}
                                         exit={{ opacity: 0, height: 0 }}
                                         transition={{ duration: 0.3 }}
-                                        className="px-6 pb-6 text-slate-400 text-sm space-y-6"
+                                        className="px-4 sm:px-6 pb-6 text-slate-400 text-sm space-y-6"
                                     >
                                         <div>
                                             <p className="text-slate-300 font-medium mb-1">
@@ -149,7 +230,7 @@ export default function EngineeringDecisions() {
 
                                         <div>
                                             <p className="text-slate-300 font-medium mb-1">
-                                                Impact
+                                                Outcome and trade-offs
                                             </p>
                                             <ul className="list-disc list-inside space-y-1">
                                                 {d.impact.map((i, idx) => (
@@ -157,6 +238,15 @@ export default function EngineeringDecisions() {
                                                 ))}
                                             </ul>
                                         </div>
+
+                                        <a
+                                            href={d.source}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 text-xs font-mono text-blue-400 hover:text-blue-300"
+                                        >
+                                            Source <ExternalLink size={12} />
+                                        </a>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
