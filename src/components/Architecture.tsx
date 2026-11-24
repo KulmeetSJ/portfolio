@@ -138,8 +138,8 @@ const nodes: Node[] = [
   n("kafka", 260, 260),
   n("processor", 260, 390),
   n("postgres", 0, 540),
-  n("retry", 260, 540),
-  n("dlt", 520, 540),
+  n("retry", 250, 540),
+  n("dlt", 500, 540),
   n("observability", 0, 260),
 ];
 
@@ -234,7 +234,8 @@ export default function Architecture() {
           onNodeClick={(_, node) => setSelectedNode(node.id)}
           nodesConnectable={false}
           fitView
-          fitViewOptions={{ padding: 0.15 }}
+          fitViewOptions={{ padding: 0.08, minZoom: 0.2 }}
+          minZoom={0.2}
           proOptions={{ hideAttribution: true }}
         >
           <Background color="#1e293b" gap={28} />
