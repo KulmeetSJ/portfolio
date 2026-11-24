@@ -88,7 +88,7 @@ function PageContent() {
                 See projects <ArrowDown size={16} />
               </a>
               <a
-                href="/Kulmeet_Singh_Resume.pdf"
+                href="/Kulmeet_Singh_Jaggi_Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-md border border-ink/25 px-5 py-2.5 text-sm font-medium text-ink hover:bg-card2 transition-colors"

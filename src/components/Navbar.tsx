@@ -81,7 +81,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-1.5">
           <a
-            href="/Kulmeet_Singh_Resume.pdf"
+            href="/Kulmeet_Singh_Jaggi_Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted hover:text-ink hover:bg-card2 transition-colors"

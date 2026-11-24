@@ -63,7 +63,7 @@ export default function CommandPalette() {
         category: "Documents",
         icon: <FileText size={16} />,
         perform: () =>
-          window.open("/Kulmeet_Singh_Resume.pdf", "_blank", "noopener,noreferrer"),
+          window.open("/Kulmeet_Singh_Jaggi_Resume.pdf", "_blank", "noopener,noreferrer"),
       },
       {
         id: "contact",

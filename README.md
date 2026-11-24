@@ -3,7 +3,7 @@
 Personal portfolio of Kulmeet Singh, a Software Engineer on HSBC's Payments Data Platform team in Pune, focused on
 **GCP data and platform engineering** and reliability. Google Cloud Certified Professional Cloud Architect.
 
-Live site: **[TODO: confirm live URL]**
+Live site: **https://portfolio-one-ashen-c8e7anc8i0.vercel.app/**
 
 ## What's on the site
 
