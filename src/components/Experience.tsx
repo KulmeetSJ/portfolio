@@ -12,6 +12,11 @@ const experiences = [
     role: "Software Engineer",
     location: "Pune, India",
     period: "Jul 2024 – Present",
+    // Joined as Trainee (probation); confirmed as Software Engineer in Jan 2025.
+    progression: [
+      { title: "Trainee Software Engineer", period: "Jul 2024 – Jan 2025" },
+      { title: "Software Engineer", period: "Jan 2025 – Present" },
+    ],
     type: "Payments Data Platform",
     description:
       "Ingestion work on the Payments Data Platform team: receiving payment data from upstream sources, then processing, transforming and delivering it to downstream consumers on Google Cloud.",
@@ -65,6 +70,7 @@ const experiences = [
     ],
     tech: ["Next.js", "TailwindCSS", "MongoDB"],
     impact: [] as string[],
+    progression: [] as { title: string; period: string }[],
     currentRole: false,
   },
   {
@@ -80,8 +86,9 @@ const experiences = [
       "Worked on backend routes and database operations with Node.js, Express and MongoDB.",
       "Did debugging, testing and deployment work.",
     ],
-    tech: ["JavaScript", "Node.js", "Express", "React", "MongoDB", "Docker", "Electron", "Git"],
+    tech: ["JavaScript", "Node.js", "Express", "React", "MongoDB", "Docker", "Electron", "Discord bots", "Git"],
     impact: [] as string[],
+    progression: [] as { title: string; period: string }[],
     currentRole: false,
   },
 ];
@@ -217,6 +224,18 @@ export default function Experience() {
                     <p className="text-slate-400 text-base md:text-lg">
                       {exp.company} · {exp.location}
                     </p>
+                    {exp.progression.length > 0 && (
+                      <ol className="mt-3 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1.5 sm:gap-2 text-xs font-mono text-slate-400">
+                        {exp.progression.map((step, i) => (
+                          <li key={step.title} className="flex items-center gap-2">
+                            {i > 0 && <span className="hidden sm:inline text-blue-400">→</span>}
+                            <span className="rounded-md border border-white/10 bg-slate-900/70 px-2 py-1">
+                              <span className="text-slate-200">{step.title}</span> · {step.period}
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
                   </div>
 
                   <div className="text-blue-400 font-mono text-sm md:text-base shrink-0">

@@ -1,210 +1,64 @@
-# Kulmeet Singh — Cloud & Data Engineering Portfolio
+# Kulmeet Singh: Portfolio
 
-A modern portfolio built with Next.js, TypeScript, and interactive system visualizations to showcase cloud infrastructure, CI/CD automation, Terraform workflows, and data engineering projects.
+Personal portfolio of Kulmeet Singh, a Software Engineer on HSBC's Payments Data Platform team in Pune, focused on
+**GCP data and platform engineering** and reliability. Google Cloud Certified Professional Cloud Architect.
 
-This site is designed to present engineering work the way I actually think about it: not just screenshots and bullet points, but systems, tradeoffs, deployment flow, and operational impact.
+Live site: **[TODO: confirm live URL]**
 
-## Live Demo
+## What's on the site
 
-**Portfolio:** [Kulmeet Singh](https://portfolio-one-ashen-c8e7anc8i0.vercel.app/)
+| Section | Content |
+| --- | --- |
+| Hero | Role, focus areas, certification |
+| Experience | HSBC (Payments Data Platform), plus internships at AnyaSoftek and Koders |
+| Impact at HSBC | Six production metrics, each tied to its own workstream |
+| Projects | PayFlow Sim, GitOps Delivery Platform, Terraform Drift Detector, GuruGranthi, AI-Powered RFP Management System, and two HSBC work items |
+| Architecture | Interactive diagram of PayFlow Sim, from its public README |
+| Engineering Decisions | Trade-offs summarized from the projects' public ADRs, with source links |
+| Canary / Drift simulations | **Illustrative** step-throughs of the GitOps and drift-detection projects, linking to the measured `RESULTS.md` |
+| Contact | Form that sends email via Resend |
+| KuliBot | Keyword-matching assistant that answers only from verified facts. It calls no model or API |
 
----
+### Content rules
+All claims come from a private evidence bank. Personal-project numbers are labelled as benchmarks
+(laptop, local kind cluster, or sandbox GCP project) and are never presented as HSBC or production results.
+The interactive sections are simulations, not live data.
 
-## About the Project
+## Tech stack
 
-This portfolio highlights my work across:
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion, React Flow, Lucide icons, Resend.
 
-- Cloud infrastructure automation
-- Terraform-based workflows
-- CI/CD systems and deployment visualization
-- Data ingestion and processing pipelines
-- Architecture storytelling for real engineering projects
-
-Instead of presenting projects as static cards only, the site uses interactive sections to explain:
-
-- how systems are structured
-- why certain technical decisions were made
-- how delivery and validation flows work
-- what operational improvements those systems create
-
----
-
-## Tech Stack
-
-### Frontend
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-
-### Visualization / UI
-- Recharts
-- React Flow
-- Lucide Icons
-
-### Engineering Focus Represented
-- Terraform
-- Jenkins
-- Google Cloud Platform
-- Apache Beam
-- Pub/Sub
-- BigQuery
-- Cloud Composer / Airflow
-
----
-
-## Features
-
-- Responsive portfolio built with the App Router
-- Interactive architecture visualization
-- Terraform and CI/CD themed project storytelling
-- Engineering decisions section for design rationale
-- Impact section for operational outcomes
-- Data ingestion demo for distributed pipeline concepts
-- Terminal-style contact experience
-- AI chatbot integration
-
----
-
-## Project Structure
+## Local development
 
 ```bash
-app/
-  layout.tsx
-  page.tsx
-
-components/
-  Navbar.tsx
-  Experience.tsx
-  Projects.tsx
-  Architecture.tsx
-  EngineeringDecisions.tsx
-  Impact.tsx
-  IngestionDemo.tsx
-  CICDVisualizer.tsx
-  TerminalContact.tsx
-  AiChatbot.tsx
+npm ci
+cp env.example .env   # then fill in the values; .env is gitignored
+npm run dev           # http://localhost:3000
 ```
 
----
+### Environment variables (contact form)
 
-## Why I Built It This Way
+| Variable | Purpose |
+| --- | --- |
+| `RESEND_API_KEY` | Resend API key (server-side only, used in `src/app/api/contact/route.ts`) |
+| `CONTACT_TO_EMAIL` | Inbox that receives contact-form messages |
 
-A lot of engineering portfolios feel generic: a hero section, a grid of cards, and some links.
+Without these, the site still renders, and the contact form returns a clear error instead of sending.
 
-I wanted this one to do more than list technologies.
-
-This portfolio is built to communicate:
-- how I think about systems
-- how I approach infra and automation
-- how I translate backend and cloud work into something visual and understandable
-- how technical decisions connect to developer experience and operational reliability
-
-## Environment Setup
-
-The contact form in the terminal section requires a Resend API key to send emails. Before running the project, create a `.env` file in the root directory:
-
-```env
-RESEND_API_KEY=your_resend_api_key
-CONTACT_TO_EMAIL=your_receiving_email@domain.com
-```
-
----
-
-## Local Development
-
-Clone the repo and install dependencies:
+### Scripts
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
-npm install
+npm run dev     # dev server
+npm run lint    # ESLint
+npm run build   # production build
+npm run start   # serve the production build
 ```
-
-Run the development server:
-
-```bash
-npm run dev
-```
-
-Open:
-
-```bash
-http://localhost:3000
-```
-
----
-
-## Available Scripts
-
-```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
-```
-
----
 
 ## Deployment
 
-This project is optimized for deployment on Vercel.
-
-To deploy:
-
-1. Push the repository to GitHub
-2. Import the repo into Vercel
-3. Configure any required environment variables
-4. Deploy
-
----
-
-## Customization
-
-To personalize this portfolio for your own updates, edit:
-
-- `app/page.tsx` for homepage structure
-- `components/Projects.tsx` for featured work
-- `components/Experience.tsx` for role history
-- `components/Architecture.tsx` for system storytelling
-- `components/TerminalContact.tsx` for contact details
-- metadata and social preview settings for SEO and sharing
-
----
-
-## Highlights
-
-Some themes this portfolio emphasizes:
-
-- Terraform-driven infrastructure workflows
-- CI/CD automation and deployment safety
-- Data pipeline design and orchestration
-- Cloud-native engineering
-- balancing technical depth with accessible storytelling
-
----
-
-## Future Improvements
-
-- performance audit for client-heavy interactive sections
-- reduce unnecessary `ssr: false` usage
-- improve accessibility labels and keyboard navigation
-- add richer project case-study pages
-- refine mobile animations and section density
-
----
+Vercel deploys automatically from `main`. Set `RESEND_API_KEY` and `CONTACT_TO_EMAIL` in the Vercel project settings.
 
 ## Contact
 
-- LinkedIn: `https://linkedin.com/in/kulmeet-singh`
-- GitHub: `https://github.com/KulmeetSJ`
-- Email: `singhkulmeet3@gmail.com`
-
----
-
-## License
-
-This project is open for inspiration and learning.
-
-If you reuse parts of the design or structure, please adapt it to reflect your own work and story.
+- LinkedIn: https://www.linkedin.com/in/kulmeet-singh/
+- GitHub: https://github.com/KulmeetSJ

@@ -23,7 +23,7 @@ const knowledgeBase: KnowledgeEntry[] = [
   },
   {
     keywords: ["hsbc", "job", "current", "role", "employer", "title"],
-    text: "At **HSBC** (Software Engineer, Payments Data Platform, Pune, Jul 2024 to present) he:\n• builds and maintains Java Apache Beam pipelines on Dataflow handling **10M+ daily payment transactions at 99.9% uptime**\n• authored reusable Terraform across **2,000+ GCP resources**\n• reduced Dataflow compute cost by **~30% (an estimated $150K+ annually)**\n• built MCP diagnostic servers that cut manual troubleshooting by **~70%**\n• configured Cloud Monitoring alerting (**~40%** better incident detection/MTTR in that workflow)\n• worked on Cloud Composer CI/CD supporting **100+ DAG deployments**",
+    text: "At **HSBC** (Payments Data Platform, Pune) he joined as **Trainee Software Engineer** in Jul 2024 and has been a **Software Engineer** since Jan 2025. He:\n• builds and maintains Java Apache Beam pipelines on Dataflow handling **10M+ daily payment transactions at 99.9% uptime**\n• authored reusable Terraform across **2,000+ GCP resources**\n• reduced Dataflow compute cost by **~30% (an estimated $150K+ annually)**\n• built MCP diagnostic servers that cut manual troubleshooting by **~70%**\n• configured Cloud Monitoring alerting (**~40%** better incident detection/MTTR in that workflow)\n• worked on Cloud Composer CI/CD supporting **100+ DAG deployments**",
   },
   {
     keywords: ["experience", "years", "how long", "tenure"],
