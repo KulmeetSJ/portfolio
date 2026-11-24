@@ -220,7 +220,7 @@ export default function ContactMinimal() {
                         <button
                             onClick={sendMessage}
                             disabled={status === "sending"}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-card bg-line px-5 py-3.5 font-semibold text-paper transition-all hover:bg-card disabled:cursor-not-allowed disabled:opacity-70"
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-card bg-accent px-5 py-3.5 font-semibold text-paper transition-all hover:bg-accent/90 disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             {status === "sending" ? (
                                 <>
