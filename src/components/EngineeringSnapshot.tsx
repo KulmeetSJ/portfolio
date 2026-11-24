@@ -4,34 +4,35 @@ import { motion } from "framer-motion";
 import { Database, Cloud, GitBranch, Cpu } from "lucide-react";
 import SpotlightCard from "@/components/SpotlightCard";
 
+// Wording follows master_resume_evidence_bank.yaml v1.9h.
 const focusAreas = [
     {
-        title: "Backend Systems",
-        value: "Java · Spring Boot",
+        title: "Data Engineering",
+        value: "Apache Beam · Dataflow · BigQuery",
         description:
-            "Building reliable backend services and scalable application workflows.",
-        icon: Cpu,
+            "Java Beam pipelines for payment-data ingestion at HSBC: 10M+ daily transactions at 99.9% uptime.",
+        icon: Database,
     },
     {
-        title: "Cloud Infrastructure",
-        value: "GCP · Terraform",
+        title: "Platform & IaC",
+        value: "GCP · Terraform · GKE",
         description:
-            "Designing and automating cloud-native infrastructure and deployments.",
+            "Reusable Terraform across 2,000+ GCP resources; Composer CI/CD supporting 100+ DAG deployments.",
         icon: Cloud,
     },
     {
-        title: "CI/CD Automation",
-        value: "Jenkins · Pipelines",
+        title: "Reliability",
+        value: "Monitoring · Alerting · SLOs",
         description:
-            "Improving delivery workflows with secure and repeatable automation.",
+            "Cloud Monitoring alerting at HSBC; SLOs, burn-rate alerts and canary rollbacks in personal projects.",
         icon: GitBranch,
     },
     {
-        title: "Data Engineering",
-        value: "Apache Beam · Batch/Realtime",
+        title: "Backend & AI Tooling",
+        value: "Java · Python · MCP",
         description:
-            "Working on ingestion systems handling high-volume data flows at scale.",
-        icon: Database,
+            "Spring Boot services and Python MCP diagnostic servers that cut manual troubleshooting by ~70%.",
+        icon: Cpu,
     },
 ];
 
@@ -47,7 +48,7 @@ export default function EngineeringSnapshot() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.1 * index }}
-                        className="col-span-1 md:col-span-3"
+                        className="col-span-1 md:col-span-6 lg:col-span-3"
                     >
                         <SpotlightCard className="p-6 h-full">
                             <div className="flex items-start justify-between mb-6">

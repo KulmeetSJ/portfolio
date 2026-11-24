@@ -7,44 +7,22 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { EMAIL_ADDRESS } from "@/constants/consts";
 
-// Infrastructure
-import { SystemProvider } from "@/components/SystemContext";
 import Toaster from "@/components/Toaster";
-
-// Standard Imports
 import Experience from "@/components/Experience";
 import Projects from "@/components/Projects";
-import ServerMonitor from "@/components/ServerMonitor";
 import SpotlightCard from "@/components/SpotlightCard";
 import CertificationsCard from "@/components/CertificationsCard";
 import EngineeringSnapshot from "@/components/EngineeringSnapshot";
 import Impact from "@/components/Impact";
-import Architecture from "@/components/Architecture";
 import MessageConsole from "@/components/MessageConsole";
 
-// Dynamic Imports
-const CICDVisualizer = dynamic(
-  () => import("@/components/CICDVisualizer"),
-  { ssr: false },
-);
-const TerraformPlayground = dynamic(() => import("@/components/TerraformPlayground"), {
-  ssr: false
-});
-const PerformanceEngineering = dynamic(() => import("@/components/PerformanceEngineering"), {
-  ssr: false
-});
-const IngestionDemo = dynamic(() => import("@/components/IngestionDemo"), {
-  ssr: false
-});
-const CommandPalette = dynamic(() => import("@/components/CommandPalette"), {
-  ssr: false
-});
-const AiChatbot = dynamic(() => import("@/components/AiChatbot"), {
-  ssr: false
-});
-const EngineeringDecisions = dynamic(() => import("@/components/EngineeringDecisions"), {
-  ssr: false
-});
+// Client-only, interactive sections
+const Architecture = dynamic(() => import("@/components/Architecture"), { ssr: false });
+const EngineeringDecisions = dynamic(() => import("@/components/EngineeringDecisions"), { ssr: false });
+const CICDVisualizer = dynamic(() => import("@/components/CICDVisualizer"), { ssr: false });
+const TerraformPlayground = dynamic(() => import("@/components/TerraformPlayground"), { ssr: false });
+const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
+const AiChatbot = dynamic(() => import("@/components/AiChatbot"), { ssr: false });
 
 function PageContent() {
   useEffect(() => {
@@ -55,7 +33,7 @@ function PageContent() {
     );
     console.table({
       Name: "Kulmeet Singh",
-      Specialty: "Cloud & Data Engineer",
+      Role: "Software Engineer · GCP data & platform engineering",
       Status: "Open to new opportunities",
       Contact: EMAIL_ADDRESS,
     });
@@ -78,22 +56,41 @@ function PageContent() {
               transition={{ duration: 0.5 }}
               className="col-span-1 md:col-span-8"
             >
-              <SpotlightCard className="p-8 md:p-12 h-full flex flex-col justify-center">
-                <span className="text-blue-400 font-mono text-sm tracking-wider uppercase mb-4 block">
-                  Software Engineer · Backend · Cloud · Platform
+              <SpotlightCard className="p-6 sm:p-8 md:p-12 h-full flex flex-col justify-center">
+                <span className="text-blue-400 font-mono text-xs sm:text-sm tracking-wider uppercase mb-4 block">
+                  Software Engineer · GCP Data &amp; Platform · Reliability
                 </span>
 
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-black text-slate-50 mb-4 tracking-tighter drop-shadow-sm leading-none">
+                <h1 className="text-[2.75rem] sm:text-5xl md:text-7xl lg:text-8xl font-display font-black text-slate-50 mb-4 tracking-tighter drop-shadow-sm leading-none">
                   Kulmeet Singh.
                 </h1>
 
                 <h2 className="text-2xl md:text-4xl font-display font-bold tracking-tight text-slate-300 mb-6 drop-shadow-sm">
-                  I build scalable backend systems, cloud infrastructure, and platform automation.
+                  I build payment-data pipelines and the cloud platform around them on Google Cloud.
                 </h2>
 
-                <p className="max-w-xl text-slate-400 text-lg leading-relaxed mb-10">
-                  Software Engineer focused on cloud-native systems, infrastructure automation, CI/CD workflows, and high-scale data platforms.
+                <p className="max-w-2xl text-slate-400 text-base md:text-lg leading-relaxed mb-6">
+                  Software Engineer on HSBC&apos;s Payments Data Platform team in Pune (2+ years).
+                  I build Apache Beam/Dataflow pipelines handling 10M+ daily payment transactions,
+                  manage GCP infrastructure with Terraform, and configure Cloud Monitoring alerting.
+                  In personal projects I go deeper into reliability: SLOs with burn-rate alerts,
+                  metric-driven canary rollbacks, and Terraform drift detection.
                 </p>
+
+                <a
+                  href="https://www.credly.com/badges/498cdb19-b30a-45d1-9221-7d44ff636c66/public_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-10 inline-flex w-fit max-w-full items-center gap-3 rounded-xl border border-blue-400/25 bg-blue-500/10 px-3 py-2 hover:border-blue-400/50 transition-colors"
+                >
+                  <span className="relative h-7 w-7 shrink-0 overflow-hidden rounded-md bg-white/95">
+                    <Image src="/google-cloud.png" alt="Google Cloud" fill className="object-contain p-1" />
+                  </span>
+                  <span className="text-xs sm:text-sm text-slate-200 leading-snug">
+                    Google Cloud Certified{" "}
+                    <span className="font-semibold text-white">Professional Cloud Architect</span>
+                  </span>
+                </a>
 
                 <div className="flex flex-wrap items-center gap-4 mb-10">
                   <motion.a
@@ -112,6 +109,7 @@ function PageContent() {
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     href="/Kulmeet_Singh_Resume.pdf"
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="px-6 py-3 bg-blue-500 text-slate-950 font-bold rounded-lg hover:bg-blue-400 transition-colors font-mono flex items-center gap-2 text-sm shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]"
                   >
                     <FileText size={18} /> View Resume
@@ -123,6 +121,8 @@ function PageContent() {
                     whileHover={{ y: -3, scale: 1.1 }}
                     href="https://github.com/KulmeetSJ"
                     target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="GitHub"
                     className="hover:text-slate-300 transition-colors"
                   >
                     <Github size={24} />
@@ -131,6 +131,8 @@ function PageContent() {
                     whileHover={{ y: -3, scale: 1.1 }}
                     href="https://www.linkedin.com/in/kulmeet-singh/"
                     target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="LinkedIn"
                     className="hover:text-slate-300 transition-colors"
                   >
                     <Linkedin size={24} />
@@ -138,6 +140,7 @@ function PageContent() {
                   <motion.a
                     whileHover={{ y: -3, scale: 1.1 }}
                     href={`mailto:${EMAIL_ADDRESS}`}
+                    aria-label="Email"
                     className="hover:text-slate-300 transition-colors"
                   >
                     <Mail size={24} />
@@ -166,45 +169,20 @@ function PageContent() {
             </motion.div>
 
             <EngineeringSnapshot />
-            {/* <CertificationsCard /> */}
-            <div className="col-span-1 md:col-span-12 max-w-xl">
-              <CertificationsCard />
-            </div>
-            <ServerMonitor />
+            <CertificationsCard />
 
           </div>
         </section>
 
         <div className="flex flex-col gap-28 pb-32 mt-32">
           <Experience />
+          <Impact />
           <Projects />
           <Architecture />
-          <Impact />
-          <TerraformPlayground />
           <EngineeringDecisions />
-          <PerformanceEngineering />
           <CICDVisualizer />
-          <IngestionDemo />
+          <TerraformPlayground />
           <MessageConsole />
-          {/* <section className="px-4 md:px-12 max-w-7xl mx-auto w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="mb-8 text-center"
-            >
-              <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-4 tracking-tight">
-                Live System Snapshot
-              </h2>
-              <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-                Real-time environment and request telemetry from the portfolio system.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-              <ServerMonitor />
-            </div>
-          </section> */}
           <AiChatbot />
         </div>
       </div>
@@ -215,9 +193,5 @@ function PageContent() {
 }
 
 export default function Home() {
-  return (
-    <SystemProvider>
-      <PageContent />
-    </SystemProvider>
-  );
+  return <PageContent />;
 }

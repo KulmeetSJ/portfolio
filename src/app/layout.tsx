@@ -16,10 +16,30 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
 });
 
+const description =
+  "Kulmeet Singh, Software Engineer (Payments Data Platform, HSBC, Pune) focused on GCP data and platform engineering and reliability: Apache Beam/Dataflow pipelines, Terraform on Google Cloud, Cloud Monitoring alerting. Google Cloud Certified Professional Cloud Architect.";
+
 export const metadata: Metadata = {
-  title: "Kulmeet Singh | Software Engineer",
-  description:
-    "Portfolio of Kulmeet Singh, a Software Engineer building scalable backend systems, cloud-native platforms, and infrastructure automation.",
+  title: "Kulmeet Singh | Software Engineer · GCP Data & Platform Engineering",
+  description,
+  keywords: [
+    "Software Engineer",
+    "GCP",
+    "Google Cloud Professional Cloud Architect",
+    "Data Engineering",
+    "Platform Engineering",
+    "Reliability",
+    "Dataflow",
+    "Apache Beam",
+    "BigQuery",
+    "Terraform",
+    "Pune",
+  ],
+  openGraph: {
+    title: "Kulmeet Singh | Software Engineer · GCP Data & Platform Engineering",
+    description,
+    type: "website",
+  },
 };
 
 export default function RootLayout({
