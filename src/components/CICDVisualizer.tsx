@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   GitBranch,
@@ -20,7 +20,8 @@ import {
   ExternalLink,
   LucideIcon,
 } from "lucide-react";
-import SpotlightCard from "./SpotlightCard";
+import Panel from "./Panel";
+import SectionHeader from "./SectionHeader";
 
 // Illustrative simulation of the release flow in my personal GitOps Delivery
 // Platform project. Nothing here is live. Real measurements are linked below.
@@ -55,6 +56,11 @@ export default function CICDVisualizer() {
   const [isRunning, setIsRunning] = useState(false);
   const [outcome, setOutcome] = useState<"none" | "promoted" | "rolledback">("none");
   const runId = useRef(0);
+  const logRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
+  }, [logs]);
 
   const log = (line: string) => setLogs((prev) => [...prev, line]);
   const set = (id: string, s: StepStatus) => setStatuses((prev) => ({ ...prev, [id]: s }));
@@ -137,36 +143,30 @@ export default function CICDVisualizer() {
   const badge = (s: StepStatus | undefined) => {
     switch (s) {
       case "running":
-        return { text: "Running", cls: "bg-blue-500/10 text-blue-400 border-blue-500/20" };
+        return { text: "Running", cls: "bg-accent/10 text-accent border-accent/20" };
       case "done":
-        return { text: "Done", cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" };
+        return { text: "Done", cls: "bg-ok/10 text-ok border-ok/20" };
       case "failed":
-        return { text: "Aborted", cls: "bg-red-500/10 text-red-400 border-red-500/20" };
+        return { text: "Aborted", cls: "bg-bad/10 text-bad border-bad/20" };
       case "skipped":
-        return { text: "Skipped", cls: "bg-slate-800 text-slate-500 border-slate-700" };
+        return { text: "Skipped", cls: "bg-card2 text-faint border-line" };
       default:
-        return { text: "Pending", cls: "bg-slate-800 text-slate-500 border-slate-700" };
+        return { text: "Pending", cls: "bg-card2 text-faint border-line" };
     }
   };
 
   return (
-    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32" id="canary-demo">
-      <div className="mb-10">
-        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 tracking-tight">
-          <span className="text-blue-400 font-black text-2xl">07.</span>
-          Canary Rollout Simulation
-        </h2>
-        <p className="text-slate-400 max-w-3xl text-lg leading-relaxed">
-          A step-through of the release flow in my GitOps Delivery Platform project. Run a bad
-          release to see the canary abort when its own metrics fail while its health probes
-          stay green.
-        </p>
-      </div>
+    <section className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-20" id="canary-demo">
+      <SectionHeader index="07" kicker="Simulation" title="Canary rollout, step by step">
+        A step-through of the release flow in my GitOps Delivery Platform project. Run a bad
+        release to see the canary abort when its own metrics fail while its health probes stay
+        green.
+      </SectionHeader>
 
-      <div className="mb-8 rounded-2xl border border-amber-400/20 bg-amber-500/5 px-5 py-4 flex items-start gap-3">
-        <Info size={18} className="text-amber-300 mt-0.5 shrink-0" />
-        <div className="text-sm text-slate-300 leading-relaxed">
-          <span className="font-semibold text-amber-200">Illustrative simulation.</span> Steps and
+      <div className="mb-8 rounded-card border border-signal/40 bg-signal/10 px-5 py-4 flex items-start gap-3">
+        <Info size={18} className="text-signal mt-0.5 shrink-0" />
+        <div className="text-sm text-muted leading-relaxed">
+          <span className="font-semibold text-signal">Illustrative simulation.</span> Steps and
           timing are compressed and nothing here is live. Measured results (personal benchmark,
           local kind cluster): automatic rollback 30 s after the first failed metric-analysis
           check in 5/5 drills, and a median of ~17 min from commit to prod, excluding the human
@@ -175,7 +175,7 @@ export default function CICDVisualizer() {
             href="https://github.com/KulmeetSJ/gitops-demo-platform/blob/main/RESULTS.md"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300"
+            className="inline-flex items-center gap-1 text-accent underline underline-offset-4"
           >
             RESULTS.md <ExternalLink size={12} />
           </a>
@@ -183,7 +183,7 @@ export default function CICDVisualizer() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        <SpotlightCard className="xl:col-span-7 p-5 md:p-8">
+        <Panel className="xl:col-span-7 p-5 md:p-8">
           <div className="flex flex-col gap-4 mb-6">
             <div className="flex flex-wrap gap-2">
               {(["healthy", "bad"] as Mode[]).map((m) => (
@@ -191,9 +191,9 @@ export default function CICDVisualizer() {
                   key={m}
                   onClick={() => !isRunning && setMode(m)}
                   disabled={isRunning}
-                  className={`px-3 py-2 rounded-lg border text-xs font-mono transition-all disabled:opacity-50 ${mode === m
-                    ? "bg-blue-500 text-slate-950 border-blue-400"
-                    : "border-slate-700 text-slate-300 hover:border-blue-400"
+                  className={`px-3 py-2 rounded-md border text-xs font-mono transition-all disabled:opacity-50 ${mode === m
+                    ? "bg-accent text-paper border-accent"
+                    : "border-line text-muted hover:border-accent"
                     }`}
                 >
                   {m === "healthy" ? "Healthy release" : "Bad release: 20% of requests fail"}
@@ -204,14 +204,14 @@ export default function CICDVisualizer() {
               <button
                 onClick={run}
                 disabled={isRunning}
-                className="px-4 py-2 rounded-lg bg-blue-500 text-slate-950 font-bold text-sm flex items-center gap-2 hover:bg-blue-400 disabled:opacity-60"
+                className="px-4 py-2 rounded-md bg-accent text-paper font-semibold text-sm flex items-center gap-2 hover:bg-accent/90 disabled:opacity-60"
               >
                 {isRunning ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
                 {isRunning ? "Running" : "Run release"}
               </button>
               <button
                 onClick={reset}
-                className="px-4 py-2 rounded-lg border border-slate-700 text-slate-300 font-bold text-sm flex items-center gap-2 hover:border-slate-500"
+                className="px-4 py-2 rounded-md border border-line text-muted font-semibold text-sm flex items-center gap-2 hover:border-line"
               >
                 <RotateCcw size={16} /> Reset
               </button>
@@ -227,66 +227,66 @@ export default function CICDVisualizer() {
                 <motion.div
                   key={step.id}
                   layout
-                  className={`rounded-xl border p-3 md:p-4 flex items-start gap-3 ${s === "running"
-                    ? "border-blue-500/40 bg-blue-500/10"
+                  className={`rounded-md border p-3 md:p-4 flex items-start gap-3 ${s === "running"
+                    ? "border-accent/40 bg-accent/10"
                     : s === "done"
-                      ? "border-emerald-500/20 bg-emerald-500/5"
+                      ? "border-ok/20 bg-ok/5"
                       : s === "failed"
-                        ? "border-red-500/30 bg-red-500/10"
-                        : "border-slate-800 bg-slate-900/50"
+                        ? "border-bad/30 bg-bad/10"
+                        : "border-line bg-card/50"
                     }`}
                 >
-                  <div className="mt-0.5 text-slate-300 shrink-0">
-                    {s === "running" ? <Loader2 size={18} className="animate-spin text-blue-400" /> : <Icon size={18} />}
+                  <div className="mt-0.5 text-muted shrink-0">
+                    {s === "running" ? <Loader2 size={18} className="animate-spin text-accent" /> : <Icon size={18} />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h4 className="text-slate-100 font-semibold text-sm md:text-base">{step.title}</h4>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono uppercase border ${b.cls}`}>
+                      <h4 className="text-ink font-semibold text-sm md:text-base">{step.title}</h4>
+                      <span className={`text-[10px] px-2 py-0.5 rounded font-mono uppercase border ${b.cls}`}>
                         {b.text}
                       </span>
                     </div>
-                    <p className="text-slate-400 text-xs md:text-sm mt-1">{step.description}</p>
+                    <p className="text-muted text-xs md:text-sm mt-1">{step.description}</p>
                   </div>
                 </motion.div>
               );
             })}
           </div>
-        </SpotlightCard>
+        </Panel>
 
         <div className="xl:col-span-5 space-y-6">
-          <SpotlightCard className="p-6">
-            <div className="text-slate-400 text-xs font-mono uppercase tracking-[0.2em] mb-2">Outcome</div>
-            {outcome === "none" && <p className="text-slate-400">Run a release to see the result.</p>}
+          <Panel className="p-6">
+            <div className="text-muted text-xs font-mono uppercase tracking-[0.2em] mb-2">Outcome</div>
+            {outcome === "none" && <p className="text-muted">Run a release to see the result.</p>}
             {outcome === "promoted" && (
-              <p className="text-emerald-400 font-semibold flex items-center gap-2">
+              <p className="text-ok font-semibold flex items-center gap-2">
                 <CheckCircle2 size={18} /> Canary promoted to 100%
               </p>
             )}
             {outcome === "rolledback" && (
-              <p className="text-amber-400 font-semibold flex items-center gap-2">
+              <p className="text-signal font-semibold flex items-center gap-2">
                 <Undo2 size={18} /> Rolled back automatically: analysis failed while probes were green
               </p>
             )}
-          </SpotlightCard>
+          </Panel>
 
-          <SpotlightCard className="p-6">
+          <Panel className="p-6">
             <div className="flex items-center gap-2 mb-4">
-              <TerminalSquare size={16} className="text-blue-400" />
-              <h3 className="text-slate-100 font-bold text-lg">Simulated log</h3>
+              <TerminalSquare size={16} className="text-accent" />
+              <h3 className="text-ink font-semibold text-lg">Simulated log</h3>
             </div>
-            <div className="bg-black rounded-xl border border-slate-800 p-4 h-[320px] overflow-y-auto font-mono text-xs space-y-1.5">
+            <div ref={logRef} className="bg-term rounded-md p-4 h-[320px] overflow-y-auto font-mono text-xs space-y-1.5 text-term-ink">
               {logs.length === 0 ? (
-                <div className="text-slate-500">Run the release to stream simulated events…</div>
+                <div className="text-term-dim">$ waiting for a release…</div>
               ) : (
                 logs.map((line, i) => (
                   <div
                     key={i}
                     className={`break-words ${line.includes("FAILED") || line.includes("ABORTED")
-                      ? "text-red-400"
+                      ? "text-term-bad"
                       : line.includes("scaled down")
-                        ? "text-amber-400"
-                        : "text-green-400"
+                        ? "text-term-warn"
+                        : "text-term-ok"
                       }`}
                   >
                     {line}
@@ -294,7 +294,7 @@ export default function CICDVisualizer() {
                 ))
               )}
             </div>
-          </SpotlightCard>
+          </Panel>
         </div>
       </div>
     </section>

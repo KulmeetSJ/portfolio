@@ -13,6 +13,7 @@ import {
     FileSearch,
     ExternalLink,
 } from "lucide-react";
+import SectionHeader from "./SectionHeader";
 
 // Sourced from the public READMEs and ADRs of my personal projects.
 // Each card links to the document it summarizes.
@@ -147,20 +148,13 @@ export default function EngineeringDecisions() {
     const [active, setActive] = useState<string | null>(null);
 
     return (
-        <section className="py-24 px-4 md:px-12 max-w-5xl mx-auto scroll-mt-32" id="engineering-decisions">
-            <div className="mb-16">
-                <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
-                    <span className="text-blue-400 font-black text-2xl">06.</span>
-                    Engineering Decisions
-                </h2>
+        <section className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-20" id="engineering-decisions">
+            <SectionHeader index="06" kicker="Engineering decisions" title="Trade-offs, written down">
+                Design decisions from my personal projects, summarized from each project&apos;s
+                public README and architecture decision records.
+            </SectionHeader>
 
-                <p className="text-slate-400 text-lg max-w-2xl">
-                    Design decisions and their trade-offs from my personal projects, summarized
-                    from each project&apos;s public README and architecture decision records.
-                </p>
-            </div>
-
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {decisions.map((d) => {
                     const Icon = d.icon;
                     const isOpen = active === d.id;
@@ -168,28 +162,28 @@ export default function EngineeringDecisions() {
                     return (
                         <div
                             key={d.id}
-                            className="border border-slate-800 rounded-xl bg-slate-900/50 backdrop-blur"
+                            className="border border-line rounded-card bg-card"
                         >
                             <button
                                 onClick={() => setActive(isOpen ? null : d.id)}
                                 className="w-full flex items-center justify-between p-4 sm:p-6 text-left"
                             >
                                 <div className="flex items-center gap-4 min-w-0">
-                                    <div className="bg-blue-500/10 p-2 rounded-lg text-blue-400 shrink-0">
+                                    <div className="bg-accent/10 p-2 rounded-lg text-accent shrink-0">
                                         <Icon size={20} />
                                     </div>
                                     <div className="min-w-0">
-                                        <span className="block text-[10px] font-mono uppercase tracking-widest text-slate-500 mb-1">
+                                        <span className="block text-[10px] font-mono uppercase tracking-widest text-faint mb-1">
                                             {d.project}
                                         </span>
-                                        <span className="text-slate-200 font-semibold">
+                                        <span className="text-ink font-semibold">
                                             {d.title}
                                         </span>
                                     </div>
                                 </div>
 
                                 <ChevronDown
-                                    className={`shrink-0 ml-3 transition-transform ${isOpen ? "rotate-180 text-blue-400" : "text-slate-500"
+                                    className={`shrink-0 ml-3 transition-transform ${isOpen ? "rotate-180 text-accent" : "text-faint"
                                         }`}
                                 />
                             </button>
@@ -201,17 +195,17 @@ export default function EngineeringDecisions() {
                                         animate={{ opacity: 1, height: "auto" }}
                                         exit={{ opacity: 0, height: 0 }}
                                         transition={{ duration: 0.3 }}
-                                        className="px-4 sm:px-6 pb-6 text-slate-400 text-sm space-y-6"
+                                        className="px-4 sm:px-6 pb-6 text-muted text-sm space-y-6"
                                     >
                                         <div>
-                                            <p className="text-slate-300 font-medium mb-1">
+                                            <p className="text-muted font-medium mb-1">
                                                 Problem
                                             </p>
                                             <p>{d.problem}</p>
                                         </div>
 
                                         <div>
-                                            <p className="text-slate-300 font-medium mb-1">
+                                            <p className="text-muted font-medium mb-1">
                                                 Options Considered
                                             </p>
                                             <ul className="list-disc list-inside space-y-1">
@@ -222,14 +216,14 @@ export default function EngineeringDecisions() {
                                         </div>
 
                                         <div>
-                                            <p className="text-slate-300 font-medium mb-1">
+                                            <p className="text-muted font-medium mb-1">
                                                 Decision
                                             </p>
                                             <p>{d.decision}</p>
                                         </div>
 
                                         <div>
-                                            <p className="text-slate-300 font-medium mb-1">
+                                            <p className="text-muted font-medium mb-1">
                                                 Outcome and trade-offs
                                             </p>
                                             <ul className="list-disc list-inside space-y-1">
@@ -243,7 +237,7 @@ export default function EngineeringDecisions() {
                                             href={d.source}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 text-xs font-mono text-blue-400 hover:text-blue-300"
+                                            className="inline-flex items-center gap-2 text-xs font-mono text-accent hover:text-accent"
                                         >
                                             Source <ExternalLink size={12} />
                                         </a>

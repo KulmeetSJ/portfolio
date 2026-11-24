@@ -1,20 +1,35 @@
-import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import BackgroundGrid from "@/components/BackgroundGrid";
 import Navbar from "@/components/Navbar";
 
-// Setup Inter for body text
-const inter = Inter({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-fraunces",
+  axes: ["opsz"],
 });
 
-// Setup Space Grotesk for headings and impact numbers
-const spaceGrotesk = Space_Grotesk({
+const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-plex-sans",
 });
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
+});
+
+// Apply a saved light/dark choice before first paint (no flash).
+const themeScript = `try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f2ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#141412" },
+  ],
+};
 
 const description =
   "Kulmeet Singh, Software Engineer (Payments Data Platform, HSBC, Pune) focused on GCP data and platform engineering and reliability: Apache Beam/Dataflow pipelines, Terraform on Google Cloud, Cloud Monitoring alerting. Google Cloud Certified Professional Cloud Architect.";
@@ -48,15 +63,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth theme-blue">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} font-sans relative bg-slate-950 text-slate-200 antialiased`}
+        className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable} font-sans antialiased bg-paper text-ink`}
       >
-        <div className="bg-noise" />
-
         <Navbar />
-        <BackgroundGrid />
-
         {children}
       </body>
     </html>

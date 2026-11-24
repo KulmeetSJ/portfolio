@@ -1,15 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Github,
-  ExternalLink,
-  FlaskConical,
-  Folder,
-  ChevronRight,
-  Gauge,
-} from "lucide-react";
-import SpotlightCard from "./SpotlightCard";
+import { Github, ExternalLink, Gauge } from "lucide-react";
+import Panel from "./Panel";
+import SectionHeader from "./SectionHeader";
 
 type Link = { label: string; href: string; kind: "github" | "results" | "live" };
 
@@ -218,7 +212,7 @@ function LinkButton({ link }: { link: Link }) {
       href={link.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-slate-900/70 px-3 py-2 text-xs font-mono text-slate-300 hover:border-blue-400/40 hover:text-blue-300 transition-colors"
+      className="inline-flex items-center gap-1.5 rounded-md border border-line bg-card px-3 py-1.5 text-sm text-ink hover:border-accent hover:text-accent transition-colors"
     >
       <Icon size={14} />
       {link.label}
@@ -226,92 +220,81 @@ function LinkButton({ link }: { link: Link }) {
   );
 }
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function Tag({ children, tone }: { children: React.ReactNode; tone: "neutral" | "hsbc" | "live" | "progress" }) {
+  const tones = {
+    neutral: "border-line text-muted",
+    hsbc: "border-signal/40 text-signal bg-signal/10",
+    live: "border-ok/40 text-ok bg-ok/10",
+    progress: "border-signal/40 text-signal bg-signal/10",
+  };
+  return (
+    <span className={`rounded border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${tones[tone]}`}>
+      {children}
+    </span>
+  );
+}
+
+function ProjectCard({ project, index, number }: { project: Project; index: number; number: string }) {
   const featured = project.featured;
   const isHsbc = project.kind === "HSBC work";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.45, delay: 0.05 * index }}
-      className={featured ? "" : "h-full"}
+      transition={{ duration: 0.4, delay: 0.04 * index }}
+      className="h-full"
     >
-      <SpotlightCard className="p-6 md:p-8 h-full flex flex-col border border-white/5">
-        {/* Header */}
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
-            {featured ? <FlaskConical size={18} /> : <Folder size={18} />}
-          </div>
-          <span
-            className={`text-[10px] font-mono uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border ${isHsbc
-              ? "text-amber-300 bg-amber-500/10 border-amber-400/20"
-              : "text-slate-300 bg-slate-900 border-white/10"
-              }`}
-          >
-            {project.kind}
-          </span>
+      <Panel className="h-full flex flex-col p-5 md:p-7">
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <span className="font-mono text-xs text-faint mr-1">{number}</span>
+          <Tag tone={isHsbc ? "hsbc" : "neutral"}>{project.kind}</Tag>
           {project.status && (
-            <span
-              className={`text-[10px] font-mono uppercase tracking-[0.18em] px-2.5 py-1 rounded-full border ${project.status === "Live"
-                ? "text-emerald-300 bg-emerald-500/10 border-emerald-400/20"
-                : "text-yellow-300 bg-yellow-500/10 border-yellow-400/20"
-                }`}
-            >
-              {project.status}
-            </span>
+            <Tag tone={project.status === "Live" ? "live" : "progress"}>{project.status}</Tag>
           )}
         </div>
 
         <h3
-          className={`font-display font-bold text-slate-100 tracking-tight leading-tight mb-3 ${featured ? "text-2xl md:text-4xl" : "text-xl md:text-2xl"
-            }`}
+          className={`font-display font-semibold text-ink tracking-tight leading-tight mb-4 ${featured ? "text-3xl md:text-4xl" : "text-2xl"}`}
         >
           {project.title}
         </h3>
 
-        <div className={featured ? "grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-10" : "flex flex-col gap-5 flex-grow"}>
-          {/* Problem + built */}
-          <div className={featured ? "xl:col-span-7" : ""}>
-            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-1">Problem</p>
-            <p className="text-slate-300 text-sm md:text-base leading-relaxed mb-5">{project.problem}</p>
-
-            <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-500 mb-2">
-              What I built
+        <div className={featured ? "grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 flex-grow" : "flex flex-col gap-5 flex-grow"}>
+          <div className={featured ? "lg:col-span-7" : ""}>
+            <p className="text-ink/85 leading-relaxed mb-5 border-l-2 border-accent pl-3">
+              {project.problem}
             </p>
+            <p className="font-mono text-[11px] uppercase tracking-wider text-faint mb-2">What I built</p>
             <ul className="space-y-2">
               {project.built.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-slate-400 text-sm leading-relaxed">
-                  <ChevronRight size={16} className="text-blue-500 mt-0.5 shrink-0" />
+                <li key={i} className="flex items-start gap-2.5 text-sm text-muted leading-relaxed">
+                  <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-faint" aria-hidden />
                   <span className="break-words min-w-0">{item}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Results + tech + links */}
-          <div className={`flex flex-col gap-5 ${featured ? "xl:col-span-5" : "mt-auto"}`}>
-            <div className="rounded-xl border border-blue-400/15 bg-blue-500/5 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-blue-300">Results</p>
-                <span className="text-[10px] font-mono text-slate-400">{project.resultsLabel}</span>
+          <div className={`flex flex-col gap-5 ${featured ? "lg:col-span-5" : "mt-auto"}`}>
+            <div className="rounded-md bg-card2 border border-line p-4">
+              <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+                <p className="font-mono text-[11px] uppercase tracking-wider text-accent">Results</p>
+                <span className="font-mono text-[10px] text-faint">{project.resultsLabel}</span>
               </div>
               <ul className="space-y-1.5">
                 {project.results.map((r, i) => (
-                  <li key={i} className="text-slate-200 text-sm leading-relaxed">
+                  <li key={i} className="text-sm text-ink leading-relaxed">
                     {r}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-x-3 gap-y-1.5">
               {project.tech.map((t) => (
-                <span
-                  key={t}
-                  className="text-[10px] font-mono text-slate-300 bg-slate-900 px-2.5 py-1.5 rounded-full border border-white/5 uppercase tracking-wider"
-                >
+                <span key={t} className="font-mono text-xs text-faint">
                   {t}
                 </span>
               ))}
@@ -326,44 +309,32 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             )}
           </div>
         </div>
-      </SpotlightCard>
-    </motion.div>
+      </Panel>
+    </motion.article>
   );
 }
 
 export default function Projects() {
   const featured = projects.filter((p) => p.featured);
   const others = projects.filter((p) => !p.featured);
+  const num = (i: number) => String(i + 1).padStart(2, "0");
 
   return (
-    <section id="projects" className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="mb-12 text-center"
-      >
-        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 tracking-tight">
-          <span className="text-blue-400 font-display font-black text-2xl md:text-3xl mr-3">04.</span>
-          Projects
-        </h2>
-        <p className="text-slate-400 max-w-3xl mx-auto text-lg leading-relaxed">
-          Personal projects in{" "}
-          <span className="text-blue-400">reliability, delivery and infrastructure</span>, plus
-          selected builds. Numbers from personal projects are benchmarks on a laptop, a local
-          cluster or a sandbox GCP project, never production results.
-        </p>
-      </motion.div>
+    <section id="projects" className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-20">
+      <SectionHeader index="04" kicker="Projects" title="Things I've built">
+        Personal projects in <span className="text-ink">reliability, delivery and infrastructure</span>,
+        plus selected builds. Numbers from personal projects are benchmarks on a laptop, a local
+        cluster or a sandbox GCP project, never production results.
+      </SectionHeader>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6">
         {featured.map((p, i) => (
-          <ProjectCard key={p.title} project={p} index={i} />
+          <ProjectCard key={p.title} project={p} index={i} number={num(i)} />
         ))}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {others.map((p, i) => (
-            <ProjectCard key={p.title} project={p} index={i} />
+            <ProjectCard key={p.title} project={p} index={i} number={num(featured.length + i)} />
           ))}
         </div>
       </div>

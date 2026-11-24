@@ -2,104 +2,124 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------- "Field Notes" design tokens (RGB triplets) ---------- */
 :root {
-  --foreground-rgb: 248, 250, 252;
-  /* Slate 50 */
-  --background-start-rgb: 2, 6, 23;
-  /* Slate 950 */
-  --background-end-rgb: 2, 6, 23;
+  --paper: 245 242 234;   /* warm paper */
+  --card: 255 253 248;
+  --card2: 238 233 221;
+  --ink: 27 26 23;
+  --muted: 84 80 72;
+  --faint: 128 122 110;
+  --line: 219 211 196;
+  --accent: 20 108 91;    /* pine */
+  --signal: 180 83 9;     /* burnt amber */
+  --ok: 21 128 61;
+  --bad: 180 35 24;
+  --term: 26 26 23;
+  --term-ink: 226 222 210;
+  --term-ok: 134 214 167;
+  --term-warn: 245 180 90;
+  --term-bad: 248 133 120;
+  --term-dim: 140 135 124;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: 20 20 18;
+    --card: 28 28 25;
+    --card2: 38 37 33;
+    --ink: 237 233 224;
+    --muted: 178 172 160;
+    --faint: 128 123 112;
+    --line: 56 54 48;
+    --accent: 92 200 168;
+    --signal: 240 168 70;
+    --ok: 110 205 140;
+    --bad: 240 120 105;
+    --term: 14 14 12;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: 20 20 18;
+  --card: 28 28 25;
+  --card2: 38 37 33;
+  --ink: 237 233 224;
+  --muted: 178 172 160;
+  --faint: 128 123 112;
+  --line: 56 54 48;
+  --accent: 92 200 168;
+  --signal: 240 168 70;
+  --ok: 110 205 140;
+  --bad: 240 120 105;
+  --term: 14 14 12;
+  color-scheme: dark;
+}
+
+html {
+  background: rgb(var(--paper));
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
-  font-family: sans-serif;
+  color: rgb(var(--ink));
+  background-color: rgb(var(--paper));
+  /* faint dot grid, like engineering paper */
+  background-image: radial-gradient(rgb(var(--line) / 0.9) 1px, transparent 1px);
+  background-size: 22px 22px;
   overflow-x: hidden;
-  /* Subtle radial gradient to give depth behind the Aurora blobs */
-  background-image:
-    radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.9) 0%, rgba(2, 6, 23, 1) 62%),
-    linear-gradient(to bottom, #020617, #020617);
 }
 
-/* --- UTILITIES --- */
-
-/* Grainy Texture Overlay */
-.bg-noise {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 50;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-/* Custom Text Selection Color */
 ::selection {
-  background: rgba(59, 130, 246, 0.22);
-  color: #60a5fa;
+  background: rgb(var(--accent) / 0.2);
+  color: rgb(var(--ink));
 }
 
-/* --- SCROLLBAR CUSTOMIZATION --- */
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  /* Slate 700 */
+  background: rgb(var(--line));
   border-radius: 10px;
+  border: 2px solid rgb(var(--paper));
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
-  /* Slate 600 */
-}
-
-/* --- REACT FLOW OVERRIDES (Architecture Diagram) --- */
+/* ---------- React Flow (Architecture diagram) ---------- */
 .react-flow__controls {
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: none !important;
   border-radius: 8px !important;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgb(var(--line)) !important;
 }
-
 .react-flow__controls-button {
-  background-color: #0f172a !important;
-  /* Slate 900 */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  fill: #94a3b8 !important;
-  /* Slate 400 */
+  background-color: rgb(var(--card)) !important;
+  border-bottom: 1px solid rgb(var(--line)) !important;
+  fill: rgb(var(--muted)) !important;
 }
-
 .react-flow__controls-button:hover {
-  background-color: #1e293b !important;
-  fill: #60a5fa !important;
+  background-color: rgb(var(--card2)) !important;
+  fill: rgb(var(--accent)) !important;
+}
+.react-flow__edge-text {
+  fill: rgb(var(--muted)) !important;
+}
+.react-flow__edge-textbg {
+  fill: rgb(var(--card)) !important;
 }
 
-/* --- INFINITE MARQUEE ANIMATION --- */
-/* Used in TechMarquee.tsx for the seamless loop */
-@keyframes scroll {
-  0% {
-    transform: translateX(0);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee {
-  animation: scroll 40s linear infinite;
-}
-
-/* Pause the animation when the user hovers over the container */
-.group:hover .animate-marquee {
-  animation-play-state: paused;
 }

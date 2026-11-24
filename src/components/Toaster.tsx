@@ -46,15 +46,15 @@ export default function Toaster() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="pointer-events-auto bg-slate-900/95 backdrop-blur border border-slate-700 p-4 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]"
+            className="pointer-events-auto bg-card border border-line p-4 rounded-lg flex items-center gap-3 min-w-[300px]"
           >
             {t.type === "success" && (
-              <CheckCircle size={18} className="text-blue-400" />
+              <CheckCircle size={18} className="text-accent" />
             )}
             {t.type === "error" && (
-              <AlertCircle size={18} className="text-red-400" />
+              <AlertCircle size={18} className="text-bad" />
             )}
-            <span className="text-sm font-mono text-slate-200">
+            <span className="text-sm font-mono text-ink">
               {t.message}
             </span>
           </motion.div>

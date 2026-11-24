@@ -1,73 +1,110 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Home, User, Briefcase, Mail, Search } from "lucide-react";
-import { useSyncExternalStore } from "react";
+import { Search, Sun, Moon, FileText } from "lucide-react";
+import { useCallback, useSyncExternalStore } from "react";
 
 const navItems = [
-  { name: "Home", href: "#home", icon: Home },
-  { name: "Experience", href: "#experience", icon: User },
-  { name: "Work", href: "#projects", icon: Briefcase },
-  { name: "Contact", href: "#contact", icon: Mail },
+  { name: "Experience", href: "#experience" },
+  { name: "Impact", href: "#impact" },
+  { name: "Projects", href: "#projects" },
+  { name: "Contact", href: "#contact" },
 ];
 
+// --- theme: explicit choice in <html data-theme>, otherwise the OS setting ---
+const themeListeners = new Set<() => void>();
+const subscribeTheme = (cb: () => void) => {
+  themeListeners.add(cb);
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener("change", cb);
+  return () => {
+    themeListeners.delete(cb);
+    mq.removeEventListener("change", cb);
+  };
+};
+const getIsDark = () => {
+  const t = document.documentElement.dataset.theme;
+  if (t) return t === "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+};
+
+const noopSubscribe = () => () => {};
+
 export default function Navbar() {
-  // Client-side detection for the keyboard shortcut label (server render assumes Mac)
   const isMac = useSyncExternalStore(
-    () => () => {},
+    noopSubscribe,
     () => navigator.userAgent.toUpperCase().includes("MAC"),
     () => true,
   );
+  const isDark = useSyncExternalStore(subscribeTheme, getIsDark, () => false);
+
+  const toggleTheme = useCallback(() => {
+    const next = getIsDark() ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      /* storage unavailable: choice lasts for this page view */
+    }
+    themeListeners.forEach((l) => l());
+  }, []);
 
   const openCommandPalette = () => {
     window.dispatchEvent(new CustomEvent("open-command-palette"));
   };
 
   return (
-    <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4" id="navbar">
-      <motion.div
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="flex items-center gap-1 p-2 rounded-full border border-white/10 bg-slate-950/50 backdrop-blur-md shadow-2xl"
-      >
-        {navItems.map((item) => (
-          <motion.a
-            key={item.name}
-            href={item.href}
-            aria-label={item.name}
-            whileHover={{ scale: 0.95 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="relative px-4 py-2 text-sm font-mono text-slate-400 hover:text-blue-400 transition-colors rounded-full hover:bg-white/5 flex items-center gap-2 group"
-          >
-            <item.icon size={16} />
-            <span className="hidden sm:block">{item.name}</span>
-            <span className="absolute inset-0 rounded-full bg-blue-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          </motion.a>
-        ))}
-
-        {/* Separator */}
-        <div className="w-px h-6 bg-white/10 mx-2 hidden sm:block"></div>
-
-        {/* CMD+K Trigger */}
-        <motion.button
-          onClick={openCommandPalette}
-          aria-label="Open command palette"
-          whileHover={{ scale: 0.95 }}
-          whileTap={{ scale: 0.9 }}
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          className="relative px-3 py-1.5 ml-1 text-sm font-mono text-slate-400 hover:text-blue-400 transition-colors rounded-full bg-slate-900 border border-white/5 flex items-center gap-2 group hover:border-blue-500/30"
-        >
-          <Search
-            size={14}
-            className="text-slate-500 group-hover:text-blue-400 transition-colors"
-          />
-          <span className="hidden sm:block text-xs text-slate-500 group-hover:text-blue-400">
-            {isMac ? "⌘K" : "Ctrl K"}
+    <header
+      id="navbar"
+      className="sticky top-0 z-50 border-b border-line bg-paper/85 backdrop-blur-md"
+    >
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
+        <a href="#home" className="flex items-center gap-2.5 min-w-0" aria-label="Kulmeet Singh, home">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-ink font-display text-sm font-bold text-paper">
+            KS
           </span>
-        </motion.button>
-      </motion.div>
-    </div>
+          <span className="truncate font-display text-base font-semibold tracking-tight text-ink">
+            Kulmeet Singh
+          </span>
+        </a>
+
+        <nav className="hidden md:flex items-center gap-1" aria-label="Sections">
+          {navItems.map((item) => (
+            <a
+              key={item.name}
+              href={item.href}
+              className="rounded-md px-3 py-1.5 text-sm text-muted hover:text-ink hover:bg-card2 transition-colors"
+            >
+              {item.name}
+            </a>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-1.5">
+          <a
+            href="/Kulmeet_Singh_Resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted hover:text-ink hover:bg-card2 transition-colors"
+          >
+            <FileText size={15} /> Résumé
+          </a>
+          <button
+            onClick={toggleTheme}
+            aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+            className="grid h-8 w-8 place-items-center rounded-md border border-line text-muted hover:text-ink hover:bg-card2 transition-colors"
+          >
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
+          <button
+            onClick={openCommandPalette}
+            aria-label="Open command palette"
+            className="inline-flex h-8 items-center gap-2 rounded-md border border-line px-2.5 text-muted hover:text-ink hover:bg-card2 transition-colors"
+          >
+            <Search size={14} />
+            <span className="hidden sm:block font-mono text-[11px]">{isMac ? "⌘K" : "Ctrl K"}</span>
+          </button>
+        </div>
+      </div>
+    </header>
   );
 }

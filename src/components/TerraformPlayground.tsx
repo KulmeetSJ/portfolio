@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Play, Loader2, Terminal, CheckCircle, Circle, XCircle, Info, ExternalLink } from "lucide-react";
+import SectionHeader from "./SectionHeader";
 
 // Illustrative simulation of my personal Terraform Drift Detector project
 // (github.com/KulmeetSJ/tf-drift-detector). Resource names are made up; nothing is live.
@@ -91,23 +92,17 @@ export default function TerraformPlayground() {
   }, [logs]);
 
   return (
-    <section className="py-24 px-4 md:px-12 max-w-7xl mx-auto scroll-mt-32" id="drift-demo">
-      <div className="mb-10">
-        <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 tracking-tight">
-          <span className="text-blue-400 font-black text-2xl">08.</span>
-          Drift Detection Simulation
-        </h2>
-        <p className="text-slate-400 max-w-3xl text-lg">
-          How my Terraform Drift Detector handles four situations: no drift, a console change, an
-          IAM grant Terraform doesn&apos;t manage, and a pull request that would make a dataset
-          public.
-        </p>
-      </div>
+    <section className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-20" id="drift-demo">
+      <SectionHeader index="08" kicker="Simulation" title="Catching drift before it bites">
+        How my Terraform Drift Detector handles four situations: no drift, a console change, an
+        IAM grant Terraform doesn&apos;t manage, and a pull request that would make a dataset
+        public.
+      </SectionHeader>
 
-      <div className="mb-8 rounded-2xl border border-amber-400/20 bg-amber-500/5 px-5 py-4 flex items-start gap-3">
-        <Info size={18} className="text-amber-300 mt-0.5 shrink-0" />
-        <div className="text-sm text-slate-300 leading-relaxed">
-          <span className="font-semibold text-amber-200">Illustrative simulation.</span> Resource
+      <div className="mb-8 rounded-card border border-signal/40 bg-signal/10 px-5 py-4 flex items-start gap-3">
+        <Info size={18} className="text-signal mt-0.5 shrink-0" />
+        <div className="text-sm text-muted leading-relaxed">
+          <span className="font-semibold text-signal">Illustrative simulation.</span> Resource
           names are made up and nothing is live. Measured results (personal benchmark, sandbox GCP
           project): 7/7 console-style changes detected, with a median of 26 s from change to issue
           on a manual run.{" "}
@@ -115,7 +110,7 @@ export default function TerraformPlayground() {
             href="https://github.com/KulmeetSJ/tf-drift-detector/blob/main/RESULTS.md"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300"
+            className="inline-flex items-center gap-1 text-accent underline underline-offset-4"
           >
             RESULTS.md <ExternalLink size={12} />
           </a>
@@ -123,7 +118,7 @@ export default function TerraformPlayground() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5 md:p-6">
+        <div className="bg-card border border-line rounded-card p-5 md:p-6">
           <div className="flex flex-wrap gap-2 mb-6">
             {(Object.keys(scenarios) as ScenarioId[]).map((id) => (
               <button
@@ -135,9 +130,9 @@ export default function TerraformPlayground() {
                   setDone(false);
                   setLogs("");
                 }}
-                className={`px-3 py-2 rounded-lg border text-xs font-mono transition disabled:opacity-50 ${scenario === id
-                  ? "bg-blue-500 text-slate-950 border-blue-400"
-                  : "border-slate-700 text-slate-300 hover:border-blue-400"
+                className={`px-3 py-2 rounded-md border text-xs font-mono transition disabled:opacity-50 ${scenario === id
+                  ? "bg-accent text-paper border-accent"
+                  : "border-line text-muted hover:border-accent"
                   }`}
               >
                 {scenarios[id].label}
@@ -153,25 +148,25 @@ export default function TerraformPlayground() {
               return (
                 <div
                   key={step.title}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition ${active
-                    ? "border-blue-400 bg-blue-500/10"
+                  className={`flex items-center gap-3 p-3 rounded-md border transition ${active
+                    ? "border-accent bg-accent/10"
                     : failed
-                      ? "border-red-500/30 bg-red-500/10"
+                      ? "border-bad/30 bg-bad/10"
                       : completed
-                        ? "border-green-500/30 bg-green-500/10"
-                        : "border-slate-700"
+                        ? "border-ok/30 bg-ok/10"
+                        : "border-line"
                     }`}
                 >
                   {active ? (
-                    <Loader2 size={18} className="text-blue-400 animate-spin shrink-0" />
+                    <Loader2 size={18} className="text-accent animate-spin shrink-0" />
                   ) : failed ? (
-                    <XCircle size={18} className="text-red-400 shrink-0" />
+                    <XCircle size={18} className="text-bad shrink-0" />
                   ) : completed ? (
-                    <CheckCircle size={18} className="text-green-400 shrink-0" />
+                    <CheckCircle size={18} className="text-ok shrink-0" />
                   ) : (
-                    <Circle size={18} className="text-slate-500 shrink-0" />
+                    <Circle size={18} className="text-faint shrink-0" />
                   )}
-                  <span className="text-slate-300 text-sm md:text-base min-w-0 break-words">{step.title}</span>
+                  <span className="text-muted text-sm md:text-base min-w-0 break-words">{step.title}</span>
                 </div>
               );
             })}
@@ -180,25 +175,25 @@ export default function TerraformPlayground() {
           <button
             onClick={run}
             disabled={isRunning}
-            className="mt-6 px-6 py-2 bg-blue-500 hover:bg-blue-400 text-black font-bold rounded flex items-center gap-2 disabled:opacity-50"
+            className="mt-6 px-6 py-2 bg-accent hover:bg-accent/90 text-paper font-semibold rounded-md flex items-center gap-2 disabled:opacity-50"
           >
             {isRunning ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} />}
             Run detection
           </button>
 
-          {done && <p className="mt-4 text-sm font-mono text-blue-300">Result: {current.result}</p>}
+          {done && <p className="mt-4 text-sm font-mono text-accent">Result: {current.result}</p>}
         </div>
 
-        <div className="bg-[#010409] border border-slate-800 rounded-xl p-5 md:p-6">
-          <div className="flex items-center gap-2 text-slate-400 text-sm mb-4">
+        <div className="bg-term rounded-card p-5 md:p-6">
+          <div className="flex items-center gap-2 text-term-dim text-sm mb-4">
             <Terminal size={16} />
             Simulated run log
           </div>
           <div
             ref={terminalRef}
-            className="bg-black rounded-lg p-4 min-h-[220px] md:min-h-[300px] max-h-[360px] text-green-400 font-mono text-xs md:text-sm whitespace-pre-wrap break-words overflow-y-auto"
+            className="bg-black/30 rounded-md p-4 min-h-[220px] md:min-h-[300px] max-h-[360px] text-term-ok font-mono text-xs md:text-sm whitespace-pre-wrap break-words overflow-y-auto"
           >
-            {logs || <div className="text-slate-500">Pick a scenario and run detection.</div>}
+            {logs || <div className="text-term-dim">$ pick a scenario and run detection</div>}
           </div>
         </div>
       </div>

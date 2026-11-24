@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Bot, User, Sparkles } from "lucide-react";
+import { X, Send, Bot, User, MessageSquareText } from "lucide-react";
 import { EMAIL_ADDRESS } from "@/constants/consts";
 
 // Keyword-matching assistant. It does NOT call any AI model or API, and it only
@@ -17,18 +17,6 @@ const PERSONAL =
   "This is a **personal project**; every number is a benchmark, not an HSBC or production result.";
 
 const knowledgeBase: KnowledgeEntry[] = [
-  {
-    keywords: ["about", "summary", "who", "introduce", "background", "profile", "overview"],
-    text: "Kulmeet Singh is a **Software Engineer on HSBC's Payments Data Platform team** in Pune (Jul 2024 to present, 2+ years). He focuses on **GCP data and platform engineering** and reliability. He is a **Google Cloud Certified Professional Cloud Architect**.",
-  },
-  {
-    keywords: ["hsbc", "job", "current", "role", "employer", "title"],
-    text: "At **HSBC** (Payments Data Platform, Pune) he joined as **Trainee Software Engineer** in Jul 2024 and has been a **Software Engineer** since Jan 2025. He:\n• builds and maintains Java Apache Beam pipelines on Dataflow handling **10M+ daily payment transactions at 99.9% uptime**\n• authored reusable Terraform across **2,000+ GCP resources**\n• reduced Dataflow compute cost by **~30% (an estimated $150K+ annually)**\n• built MCP diagnostic servers that cut manual troubleshooting by **~70%**\n• configured Cloud Monitoring alerting (**~40%** better incident detection/MTTR in that workflow)\n• worked on Cloud Composer CI/CD supporting **100+ DAG deployments**",
-  },
-  {
-    keywords: ["experience", "years", "how long", "tenure"],
-    text: "**2+ years** full-time at HSBC (since Jul 2024), or **2.5+ years including internships** at Koders (Jan–Apr 2024) and AnyaSoftek (May–Jun 2024).",
-  },
   {
     keywords: ["dataflow", "beam", "pipeline", "pipelines", "streaming", "ingestion", "bigquery", "data"],
     text: "At HSBC he builds and maintains **Java Apache Beam pipelines on GCP Dataflow** for payment-data ingestion and processing: **10M+ daily payment transactions at 99.9% uptime**. They handle XML and JSON payloads (including SWIFT MT/MX formats), and XML is flattened into BigQuery columns. He also reduced Dataflow compute cost by **~30% (an estimated $150K+ annually)**.",
@@ -73,6 +61,19 @@ const knowledgeBase: KnowledgeEntry[] = [
     keywords: ["parquet", "coldline", "storage"],
     text: "**Parquet Converter** (HSBC work, Sept 2024) is a Python script that converts BigQuery tables to Parquet and stores them in GCS: 1TB+ converted, a 55% query-performance improvement, and 50K+ files tiered to Coldline.",
   },
+  // General entries come after topic entries, so ties go to the specific topic.
+  {
+    keywords: ["summary", "who", "introduce", "background", "profile", "overview", "yourself", "himself"],
+    text: "Kulmeet Singh is a **Software Engineer on HSBC's Payments Data Platform team** in Pune (Jul 2024 to present, 2+ years). He focuses on **GCP data and platform engineering** and reliability. He is a **Google Cloud Certified Professional Cloud Architect**.",
+  },
+  {
+    keywords: ["hsbc", "job", "current", "role", "employer", "title"],
+    text: "At **HSBC** (Payments Data Platform, Pune) he joined as **Trainee Software Engineer** in Jul 2024 and has been a **Software Engineer** since Jan 2025. He:\n• builds and maintains Java Apache Beam pipelines on Dataflow handling **10M+ daily payment transactions at 99.9% uptime**\n• authored reusable Terraform across **2,000+ GCP resources**\n• reduced Dataflow compute cost by **~30% (an estimated $150K+ annually)**\n• built MCP diagnostic servers that cut manual troubleshooting by **~70%**\n• configured Cloud Monitoring alerting (**~40%** better incident detection/MTTR in that workflow)\n• worked on Cloud Composer CI/CD supporting **100+ DAG deployments**",
+  },
+  {
+    keywords: ["experience", "years", "how long", "tenure"],
+    text: "**2+ years** full-time at HSBC (since Jul 2024), or **2.5+ years including internships** at Koders (Jan–Apr 2024) and AnyaSoftek (May–Jun 2024).",
+  },
   {
     keywords: ["projects", "project", "built", "portfolio"],
     text: "Featured projects:\n• **PayFlow Sim** (in progress): event-driven payments simulator with SLOs\n• **GitOps Delivery Platform**: Argo CD and metric-driven canary rollbacks\n• **Terraform Drift Detector**: drift detection and policy-as-code for GCP\n• **GuruGranthi**: live marketplace\n• **AI-Powered RFP Management System**\n• HSBC work: **Parquet Converter** and **Terraform Log Summarizer + Compliance Checker**",
@@ -98,10 +99,6 @@ const knowledgeBase: KnowledgeEntry[] = [
     text: "Internships:\n• **Koders**, Software Development Engineer Intern (Jan–Apr 2024, Dehradun): Discord bots, keyword monitoring, an Electron app, backend routes with Node.js and MongoDB\n• **AnyaSoftek**, Full Stack Developer Intern (May–Jun 2024, remote): a client portfolio website and a rebuild of the company website (Next.js, TailwindCSS, MongoDB)",
   },
   {
-    keywords: ["aws", "azure", "redis", "rag", "fine-tune", "fine-tuning", "finetuning", "training", "settlement", "clearing", "authorization", "card"],
-    text: "That isn't in Kulmeet's verified profile, so I can't say anything about it. Please ask him directly at **" + EMAIL_ADDRESS + "**.",
-  },
-  {
     keywords: ["contact", "email", "hire", "reach", "interview", "available", "open"],
     text: `You can reach Kulmeet at **${EMAIL_ADDRESS}**. He is open to **GCP data engineering, platform engineering and reliability** roles in India.`,
   },
@@ -111,11 +108,23 @@ const knowledgeBase: KnowledgeEntry[] = [
   },
 ];
 
+const OUT_OF_SCOPE: KnowledgeEntry = {
+    keywords: ["aws", "azure", "redis", "rag", "fine-tune", "fine-tuning", "finetuning", "training", "settlement", "clearing", "authorization", "card"],
+    text: "That isn't in Kulmeet's verified profile, so I can't say anything about it. Please ask him directly at **" + EMAIL_ADDRESS + "**.",
+  };
+
 const FALLBACK = `I only answer from Kulmeet's verified profile, and I don't have that detail. Rather than guess, I'd suggest asking him at **${EMAIL_ADDRESS}**. You can also ask about his HSBC work, projects, skills or certification.`;
 
 const findBestMatch = (query: string): string => {
   const lower = query.toLowerCase();
   const words = new Set(lower.split(/[^a-z0-9/+-]+/).filter(Boolean));
+
+  const hits = (entry: KnowledgeEntry) =>
+    entry.keywords.some((kw) => (kw.includes(" ") ? lower.includes(kw) : words.has(kw)));
+
+  // Out-of-scope topics (AWS, RAG, settlement, ...) always win, so a question like
+  // "does he have AWS experience?" never gets an unrelated answer.
+  if (hits(OUT_OF_SCOPE)) return OUT_OF_SCOPE.text;
 
   let best: KnowledgeEntry | null = null;
   let maxScore = 0;
@@ -197,16 +206,16 @@ export default function AiChatbot() {
       <motion.button
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        whileTap={{ scale: 0.96 }}
         onClick={() => setIsOpen(true)}
         aria-label="Open portfolio assistant"
-        className={`fixed bottom-5 right-5 md:bottom-8 md:right-8 z-[9999] p-4 rounded-full shadow-2xl transition-all duration-300 ${isOpen
+        className={`fixed bottom-5 right-5 md:bottom-8 md:right-8 z-[9999] inline-flex items-center gap-2 px-4 py-3 rounded-md border border-ink/10 text-sm font-medium transition-colors duration-300 ${isOpen
           ? "scale-0 opacity-0"
-          : "bg-blue-500 hover:bg-blue-400 text-slate-900"
+          : "bg-ink hover:bg-ink/85 text-paper"
           }`}
       >
-        <Sparkles size={28} fill="currentColor" />
+        <MessageSquareText size={18} />
+        Ask about me
       </motion.button>
 
       {/* CHAT WINDOW - Increased Z-Index */}
@@ -216,19 +225,19 @@ export default function AiChatbot() {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9 }}
-            className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-[9999] w-[calc(100vw-2rem)] md:w-[400px] h-[min(500px,80vh)] bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-[9999] w-[calc(100vw-2rem)] md:w-[400px] h-[min(500px,80vh)] bg-card/95 backdrop-blur-xl border border-line rounded-card flex flex-col overflow-hidden"
           >
             {/* HEADER */}
-            <div className="p-4 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center">
+            <div className="p-4 bg-card2/50 border-b border-line flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/20 rounded-lg">
-                  <Bot size={20} className="text-blue-400" />
+                <div className="p-2 bg-accent/20 rounded-lg">
+                  <Bot size={20} className="text-accent" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-100 text-sm">
+                  <h3 className="font-bold text-ink text-sm">
                     KuliBot
                   </h3>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-muted">
                     Answers from verified facts only
                   </span>
                 </div>
@@ -236,7 +245,7 @@ export default function AiChatbot() {
               <button
                 onClick={() => setIsOpen(false)}
                 aria-label="Close assistant"
-                className="text-slate-400 hover:text-white transition-colors"
+                className="text-muted hover:text-ink transition-colors"
               >
                 <X size={20} />
               </button>
@@ -250,9 +259,9 @@ export default function AiChatbot() {
                   className={`flex items-start gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
                 >
                   <div
-                    className={`p-2 rounded-full flex-shrink-0 ${msg.role === "user"
-                      ? "bg-slate-700 text-slate-300"
-                      : "bg-blue-500/20 text-blue-400"
+                    className={`p-2 rounded-md flex-shrink-0 ${msg.role === "user"
+                      ? "bg-line text-muted"
+                      : "bg-accent/20 text-accent"
                       }`}
                   >
                     {msg.role === "user" ? (
@@ -262,14 +271,14 @@ export default function AiChatbot() {
                     )}
                   </div>
                   <div
-                    className={`p-3 rounded-2xl text-sm leading-relaxed max-w-[80%] ${msg.role === "user"
-                      ? "bg-slate-700 text-slate-200 rounded-tr-none"
-                      : "bg-slate-800 text-slate-300 border border-slate-700 rounded-tl-none"
+                    className={`p-3 rounded-card text-sm leading-relaxed max-w-[80%] ${msg.role === "user"
+                      ? "bg-line text-ink rounded-tr-none"
+                      : "bg-card2 text-muted border border-line rounded-tl-none"
                       }`}
                   >
                     {msg.text.split("**").map((part, i) =>
                       i % 2 === 1 ? (
-                        <strong key={i} className="text-blue-400 font-normal">
+                        <strong key={i} className="text-accent font-normal">
                           {part}
                         </strong>
                       ) : (
@@ -282,13 +291,13 @@ export default function AiChatbot() {
 
               {isTyping && (
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-blue-500/20 text-blue-400">
+                  <div className="p-2 rounded-md bg-accent/20 text-accent">
                     <Bot size={16} />
                   </div>
-                  <div className="bg-slate-800 border border-slate-700 p-3 rounded-2xl rounded-tl-none flex gap-1 items-center">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                  <div className="bg-card2 border border-line p-3 rounded-card rounded-tl-none flex gap-1 items-center">
+                    <span className="w-1.5 h-1.5 bg-line rounded-md animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-1.5 h-1.5 bg-line rounded-md animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-1.5 h-1.5 bg-line rounded-md animate-bounce"></span>
                   </div>
                 </div>
               )}
@@ -304,7 +313,7 @@ export default function AiChatbot() {
                     <button
                       key={prompt}
                       onClick={() => setInput(prompt)}
-                      className="text-xs px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300 hover:border-blue-400 hover:text-blue-400 transition"
+                      className="text-xs px-3 py-1 bg-card2 border border-line rounded-md text-muted hover:border-accent hover:text-accent transition"
                     >
                       {prompt}
                     </button>
@@ -314,7 +323,7 @@ export default function AiChatbot() {
             </div>
 
             {/* INPUT */}
-            <div className="p-4 bg-slate-800/50 border-t border-slate-700">
+            <div className="p-4 bg-card2/50 border-t border-line">
               <div className="relative">
                 <input
                   ref={inputRef}
@@ -324,13 +333,13 @@ export default function AiChatbot() {
                   onKeyDown={handleKeyPress}
                   placeholder="Ask about his work..."
                   // Added pointer-events-auto to ensure it catches clicks
-                  className="w-full bg-slate-950 border border-slate-700 rounded-full py-3 px-5 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-600 pointer-events-auto"
+                  className="w-full bg-paper border border-line rounded-md py-3 px-5 text-sm text-ink focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all placeholder:text-faint pointer-events-auto"
                 />
                 <button
                   onClick={handleSend}
                   aria-label="Send"
                   disabled={!input.trim()}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-500 text-slate-950 rounded-full hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-accent text-paper rounded-md hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <Send size={16} />
                 </button>

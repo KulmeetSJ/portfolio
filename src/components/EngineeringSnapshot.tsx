@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { Database, Cloud, GitBranch, Cpu } from "lucide-react";
-import SpotlightCard from "@/components/SpotlightCard";
 
 // Wording follows master_resume_evidence_bank.yaml v1.9h.
 const focusAreas = [
@@ -41,37 +40,21 @@ export default function EngineeringSnapshot() {
         <>
             {focusAreas.map((area, index) => {
                 const Icon = area.icon;
-
                 return (
                     <motion.div
                         key={area.title}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.1 * index }}
-                        className="col-span-1 md:col-span-6 lg:col-span-3"
+                        transition={{ duration: 0.35, delay: 0.05 * index }}
+                        className="md:col-span-6 lg:col-span-3 rounded-card border border-line bg-card p-5"
                     >
-                        <SpotlightCard className="p-6 h-full">
-                            <div className="flex items-start justify-between mb-6">
-                                <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                                    <Icon size={20} className="text-blue-400" />
-                                </div>
-                                <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">
-                                    Focus
-                                </span>
-                            </div>
-
-                            <h3 className="text-lg font-semibold text-slate-100 mb-2">
-                                {area.title}
-                            </h3>
-
-                            <p className="text-blue-400 font-mono text-sm mb-4">
-                                {area.value}
-                            </p>
-
-                            <p className="text-slate-400 text-sm leading-relaxed">
-                                {area.description}
-                            </p>
-                        </SpotlightCard>
+                        <div className="flex items-center justify-between mb-4">
+                            <Icon size={18} className="text-accent" />
+                            <span className="font-mono text-[11px] text-faint">0{index + 1}</span>
+                        </div>
+                        <h3 className="font-display text-lg font-semibold text-ink mb-1">{area.title}</h3>
+                        <p className="font-mono text-xs text-accent mb-3">{area.value}</p>
+                        <p className="text-sm text-muted leading-relaxed">{area.description}</p>
                     </motion.div>
                 );
             })}

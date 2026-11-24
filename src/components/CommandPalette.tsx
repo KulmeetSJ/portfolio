@@ -219,7 +219,7 @@ export default function CommandPalette() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closePalette}
-              className="fixed inset-0 z-[100] bg-slate-950/60 backdrop-blur-sm"
+              className="fixed inset-0 z-[100] bg-paper/60 backdrop-blur-sm"
             />
 
             <div className="fixed inset-0 z-[101] flex items-start justify-center pt-[15vh] px-4 pointer-events-none" id="command-palette">
@@ -228,21 +228,21 @@ export default function CommandPalette() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -20 }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="w-full max-w-2xl bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden pointer-events-auto shadow-black/50"
+                className="w-full max-w-2xl bg-card border border-line rounded-card overflow-hidden pointer-events-auto"
               >
-                <div className="flex items-center px-4 py-4 border-b border-white/5">
-                  <Search size={20} className="text-blue-400 mr-3 shrink-0" />
+                <div className="flex items-center px-4 py-4 border-b border-line">
+                  <Search size={20} className="text-accent mr-3 shrink-0" />
                   <input
                     ref={inputRef}
                     value={query}
                     onChange={handleInputChange}
                     onKeyDown={handleInputKeyDown}
                     placeholder="Type a command or search..."
-                    className="flex-1 bg-transparent border-none outline-none text-slate-200 text-lg placeholder:text-slate-500 font-sans"
+                    className="flex-1 bg-transparent border-none outline-none text-ink text-lg placeholder:text-faint font-sans"
                   />
                   <button
                     onClick={closePalette}
-                    className="p-1 rounded-md bg-white/5 text-slate-400 hover:text-slate-200 hover:bg-white/10 transition-colors"
+                    className="p-1 rounded-md bg-ink/5 text-muted hover:text-ink hover:bg-ink/10 transition-colors"
                   >
                     <X size={18} />
                   </button>
@@ -250,7 +250,7 @@ export default function CommandPalette() {
 
                 <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2">
                   {filteredActions.length === 0 ? (
-                    <div className="py-12 text-center text-slate-500 font-mono text-sm">
+                    <div className="py-12 text-center text-faint font-mono text-sm">
                       No results found for &quot;{query}&quot;
                     </div>
                   ) : (
@@ -270,30 +270,30 @@ export default function CommandPalette() {
                                 setQuery("");
                               }
                             }}
-                            className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ${isSelected
-                              ? "bg-blue-500/10 border border-blue-500/20 shadow-[inset_0_0_15px_rgba(45,212,191,0.05)]"
-                              : "bg-transparent border border-transparent hover:bg-white/5"
+                            className={`flex items-center justify-between px-4 py-3 rounded-md cursor-pointer transition-all duration-200 ${isSelected
+                              ? "bg-accent/10 border border-accent/20"
+                              : "bg-transparent border border-transparent hover:bg-ink/5"
                               }`}
                           >
                             <div className="flex items-center gap-3">
                               <div
-                                className={`p-2 rounded-lg ${isSelected ? "bg-blue-500/20 text-blue-400" : "bg-slate-800 text-slate-400"}`}
+                                className={`p-2 rounded-md ${isSelected ? "bg-accent/20 text-accent" : "bg-card2 text-muted"}`}
                               >
                                 {action.icon}
                               </div>
                               <div className="flex flex-col">
                                 <span
-                                  className={`text-sm font-bold ${isSelected ? "text-slate-100" : "text-slate-300"}`}
+                                  className={`text-sm font-bold ${isSelected ? "text-ink" : "text-muted"}`}
                                 >
                                   {action.title}
                                 </span>
-                                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-0.5">
+                                <span className="text-[10px] font-mono text-faint uppercase tracking-widest mt-0.5">
                                   {action.category}
                                 </span>
                               </div>
                             </div>
                             {isSelected && (
-                              <span className="text-blue-400 text-xs font-mono hidden md:flex items-center gap-1">
+                              <span className="text-accent text-xs font-mono hidden md:flex items-center gap-1">
                                 Return <ChevronRight size={14} />
                               </span>
                             )}
@@ -304,24 +304,24 @@ export default function CommandPalette() {
                   )}
                 </div>
 
-                <div className="bg-slate-950/50 p-3 border-t border-white/5 flex items-center justify-center gap-6 text-[10px] font-mono text-slate-500 uppercase">
+                <div className="bg-paper/50 p-3 border-t border-line flex items-center justify-center gap-6 text-[10px] font-mono text-faint uppercase">
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                    <kbd className="px-1.5 py-0.5 rounded bg-ink/10 text-muted">
                       ↑
                     </kbd>{" "}
-                    <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                    <kbd className="px-1.5 py-0.5 rounded bg-ink/10 text-muted">
                       ↓
                     </kbd>{" "}
                     to navigate
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                    <kbd className="px-1.5 py-0.5 rounded bg-ink/10 text-muted">
                       Enter
                     </kbd>{" "}
                     to select
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                    <kbd className="px-1.5 py-0.5 rounded bg-ink/10 text-muted">
                       Esc
                     </kbd>{" "}
                     to close

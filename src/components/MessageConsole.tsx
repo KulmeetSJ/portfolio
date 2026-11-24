@@ -11,6 +11,7 @@ import {
     Clock3,
 } from "lucide-react";
 import { toast } from "./Toaster";
+import SectionHeader from "./SectionHeader";
 
 export default function ContactMinimal() {
     const [email, setEmail] = useState("");
@@ -77,26 +78,12 @@ export default function ContactMinimal() {
     return (
         <section
             id="contact"
-            className="py-24 px-4 md:px-12 max-w-6xl mx-auto scroll-mt-32"
+            className="py-16 md:py-24 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-20"
         >
-            <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="mb-14"
-            >
-                <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
-                    <span className="text-blue-400 font-display font-black text-2xl">
-                        09.
-                    </span>
-                    Get in Touch
-                </h2>
-
-                <p className="max-w-2xl text-slate-400 text-lg leading-relaxed">
-                    Hiring for GCP data engineering, platform engineering or reliability roles in India? Send me a note and I&apos;ll reply by email.
-                </p>
-            </motion.div>
+            <SectionHeader index="09" kicker="Contact" title="Get in touch">
+                Hiring for GCP data engineering, platform engineering or reliability roles in
+                India? Send me a note and I&apos;ll reply by email.
+            </SectionHeader>
 
             <motion.div
                 initial={{ opacity: 0, y: 26 }}
@@ -107,35 +94,32 @@ export default function ContactMinimal() {
             >
                 {/* Left Content */}
                 <div className="space-y-5">
-                    <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 md:p-7">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.2em] text-emerald-300 mb-5">
-                            <span className="relative flex h-2 w-2">
-                                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-                                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                            </span>
+                    <div className="rounded-card border border-line bg-card p-6 md:p-7">
+                        <div className="inline-flex items-center gap-2 rounded border border-ok/40 bg-ok/10 px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider text-ok mb-5">
+                            <span className="h-2 w-2 rounded-full bg-ok" aria-hidden />
                             Open to connecting
                         </div>
 
-                        <h3 className="text-2xl md:text-3xl font-display font-bold text-slate-100 tracking-tight mb-3">
+                        <h3 className="text-2xl md:text-3xl font-display font-bold text-ink tracking-tight mb-3">
                             Open to GCP data, platform and reliability roles.
                         </h3>
 
-                        <p className="text-slate-400 leading-relaxed">
+                        <p className="text-muted leading-relaxed">
                             Based in Pune, India. Happy to talk about roles, my HSBC work at the level I can share publicly, or any of my projects.
                         </p>
                     </div>
 
                     <div className="grid gap-4">
-                        <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-5">
+                        <div className="rounded-card border border-line bg-paper/50 p-5">
                             <div className="flex items-start gap-3">
-                                <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                                <div className="p-2.5 rounded-md bg-accent/10 border border-accent/20 text-accent">
                                     <Briefcase size={18} />
                                 </div>
                                 <div>
-                                    <p className="text-slate-200 font-semibold mb-1">
+                                    <p className="text-ink font-semibold mb-1">
                                         Preferred conversations
                                     </p>
-                                    <p className="text-sm text-slate-500 leading-relaxed">
+                                    <p className="text-sm text-faint leading-relaxed">
                                         GCP data engineering, platform engineering and reliability
                                         roles, plus technical discussions about my projects.
                                     </p>
@@ -143,16 +127,16 @@ export default function ContactMinimal() {
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-5">
+                        <div className="rounded-card border border-line bg-paper/50 p-5">
                             <div className="flex items-start gap-3">
-                                <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                                <div className="p-2.5 rounded-md bg-accent/10 border border-accent/20 text-accent">
                                     <Clock3 size={18} />
                                 </div>
                                 <div>
-                                    <p className="text-slate-200 font-semibold mb-1">
+                                    <p className="text-ink font-semibold mb-1">
                                         Response time
                                     </p>
-                                    <p className="text-sm text-slate-500 leading-relaxed">
+                                    <p className="text-sm text-faint leading-relaxed">
                                         Usually within 24-48 hours, depending on message context and current
                                         schedule.
                                     </p>
@@ -160,16 +144,16 @@ export default function ContactMinimal() {
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-5">
+                        <div className="rounded-card border border-line bg-paper/50 p-5">
                             <div className="flex items-start gap-3">
-                                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                                <div className="p-2.5 rounded-md bg-ok/10 border border-ok/20 text-ok">
                                     <Mail size={18} />
                                 </div>
                                 <div>
-                                    <p className="text-slate-200 font-semibold mb-1">
+                                    <p className="text-ink font-semibold mb-1">
                                         Best way to reach out
                                     </p>
-                                    <p className="text-sm text-slate-500 leading-relaxed">
+                                    <p className="text-sm text-faint leading-relaxed">
                                         Share a short intro, project or discussion context, and any helpful
                                         links so I can respond clearly and quickly.
                                     </p>
@@ -180,19 +164,19 @@ export default function ContactMinimal() {
                 </div>
 
                 {/* Right Form */}
-                <div className="rounded-3xl border border-white/10 bg-slate-950/70 backdrop-blur-xl p-6 md:p-8 shadow-[0_20px_80px_rgba(0,0,0,0.3)]">
+                <div className="rounded-card border border-line bg-card p-6 md:p-8">
                     <div className="mb-8">
-                        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500 font-mono mb-3">
+                        <p className="text-[11px] uppercase tracking-[0.24em] text-faint font-mono mb-3">
                             Contact Form
                         </p>
-                        <h3 className="text-2xl font-display font-bold text-slate-100 tracking-tight">
+                        <h3 className="text-2xl font-display font-bold text-ink tracking-tight">
                             Start a conversation
                         </h3>
                     </div>
 
                     <div className="space-y-5">
                         <div>
-                            <label htmlFor="contact-email" className="block mb-2 text-sm text-slate-300">
+                            <label htmlFor="contact-email" className="block mb-2 text-sm text-muted">
                                 Email
                             </label>
                             <input
@@ -201,12 +185,12 @@ export default function ContactMinimal() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="you@example.com"
-                                className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-slate-100 placeholder:text-slate-600 outline-none transition-all focus:border-blue-400/50 focus:bg-white/[0.05]"
+                                className="w-full rounded-card border border-line bg-paper px-4 py-3.5 text-ink placeholder:text-faint outline-none transition-all focus:border-accent/50 focus:bg-card"
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="contact-subject" className="block mb-2 text-sm text-slate-300">
+                            <label htmlFor="contact-subject" className="block mb-2 text-sm text-muted">
                                 Subject
                             </label>
                             <input
@@ -215,12 +199,12 @@ export default function ContactMinimal() {
                                 value={subject}
                                 onChange={(e) => setSubject(e.target.value)}
                                 placeholder="Role, team, or discussion"
-                                className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-slate-100 placeholder:text-slate-600 outline-none transition-all focus:border-blue-400/50 focus:bg-white/[0.05]"
+                                className="w-full rounded-card border border-line bg-paper px-4 py-3.5 text-ink placeholder:text-faint outline-none transition-all focus:border-accent/50 focus:bg-card"
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="contact-message" className="block mb-2 text-sm text-slate-300">
+                            <label htmlFor="contact-message" className="block mb-2 text-sm text-muted">
                                 Message
                             </label>
                             <textarea
@@ -229,14 +213,14 @@ export default function ContactMinimal() {
                                 onChange={(e) => setMessage(e.target.value)}
                                 rows={7}
                                 placeholder="Tell me about the role or topic you'd like to discuss..."
-                                className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-slate-100 placeholder:text-slate-600 outline-none transition-all focus:border-blue-400/50 focus:bg-white/[0.05] resize-none"
+                                className="w-full rounded-card border border-line bg-paper px-4 py-3.5 text-ink placeholder:text-faint outline-none transition-all focus:border-accent/50 focus:bg-card resize-none"
                             />
                         </div>
 
                         <button
                             onClick={sendMessage}
                             disabled={status === "sending"}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-100 px-5 py-3.5 font-semibold text-slate-950 transition-all hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-card bg-line px-5 py-3.5 font-semibold text-paper transition-all hover:bg-card disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             {status === "sending" ? (
                                 <>
@@ -262,18 +246,18 @@ export default function ContactMinimal() {
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 8 }}
-                                    className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4"
+                                    className="rounded-card border border-ok/20 bg-ok/10 p-4"
                                 >
                                     <div className="flex items-start gap-3">
                                         <CheckCircle2
                                             size={18}
-                                            className="text-emerald-400 mt-0.5 shrink-0"
+                                            className="text-ok mt-0.5 shrink-0"
                                         />
                                         <div>
-                                            <p className="text-emerald-300 font-semibold">
+                                            <p className="text-ok font-semibold">
                                                 Message sent successfully.
                                             </p>
-                                            <p className="text-sm text-emerald-200/70 mt-1">
+                                            <p className="text-sm text-ok/70 mt-1">
                                                 Thanks for reaching out. I&apos;ll get back to you soon.
                                             </p>
                                         </div>
