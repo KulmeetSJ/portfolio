@@ -4,64 +4,68 @@ import { motion } from "framer-motion";
 import { Briefcase, ChevronRight } from "lucide-react";
 import SpotlightCard from "./SpotlightCard";
 
+// Source: master_resume_evidence_bank.yaml v1.9h (HSBC, KODERS).
+// Each metric stays attached to its own HSBC workstream.
 const experiences = [
   {
     company: "HSBC",
     role: "Software Engineer",
-    period: "Jan 2025 - Present",
-    type: "Data Engineering and DevOps",
+    location: "Pune, India",
+    period: "Jul 2024 – Present",
+    type: "Payments Data Platform",
     description:
-      "Building cloud-native data pipelines and deployment automation for payment platforms, with a focus on infrastructure reliability, operational efficiency, and scalable orchestration.",
+      "Ingestion work on the Payments Data Platform team: receiving payment data from upstream sources, then processing, transforming and delivering it to downstream consumers on Google Cloud.",
     achievements: [
-      "Built reusable Terraform modules to provision and manage large-scale GCP infrastructure across ~2000 resources.",
-      "Developed Jenkins automation for weekend shutdown and restart cycles of Dataflow jobs, reducing compute costs by 30%.",
-      "Optimized Apache Beam pipelines in Java and Spring Boot for streaming Pub/Sub events into BigQuery.",
-      "Designed CI/CD pipelines with Sonar, Nexus, and Checkmarx for Cloud Composer DAG deployments, replacing VM-based schedulers with managed orchestration.",
+      "Build and maintain Java Apache Beam pipelines on GCP Dataflow for payment-data ingestion and processing, handling 10M+ daily payment transactions at 99.9% uptime. The pipelines process XML and JSON payloads, including SWIFT MT/MX formats.",
+      "Reduced Dataflow compute cost by ~30% through automation and optimization (an estimated $150K+ annually).",
+      "Authored and used reusable Terraform to provision Pub/Sub, BigQuery, GCS and IAM across 2,000+ GCP resources, including a migration covering ~600 topics and 1,200 subscriptions.",
+      "Built MCP (Model Context Protocol) diagnostic servers in Python that connect AI clients to GCP, platform and payment-data diagnostics, reducing manual troubleshooting effort by ~70%.",
+      "Configured GCP Cloud Monitoring alerting policies, improving incident detection and MTTR by ~40% in the monitoring and incident-response workflow.",
+      "Worked on CI/CD for Cloud Composer (Airflow) DAG deployments, replacing a VM-scheduler-based workflow and supporting 100+ DAG deployments; integrated SonarQube, Checkmarx and Nexus scans into the pipeline.",
+      "Contribute to the internal Payments AI Platform: React/TypeScript frontend features, Kubernetes (GKE) manifests and Helm-based deployment, and SSO integration working with OAuth and SAML flows.",
+      "Investigate production issues in my own workstreams end to end with Cloud Logging, the gcloud CLI and SSH, from logs through RCA to the fix.",
     ],
     tech: [
-      "Terraform",
-      "Jenkins",
+      "Java",
       "Apache Beam",
-      "Spring Boot",
-      "Cloud Composer",
-      "GCP",
+      "Dataflow",
+      "Pub/Sub",
       "BigQuery",
-      "Sonar",
-      "Nexus",
-      "Checkmarx",
+      "GCS",
+      "Terraform",
+      "Cloud Composer / Airflow",
+      "Cloud Monitoring",
+      "Cloud Logging",
+      "Python",
+      "MCP",
+      "GKE",
+      "Helm",
+      "Jenkins",
+      "Ansible",
     ],
-    impact: ["2000+ resources", "30% cost reduction", "Managed orchestration"],
+    impact: [
+      "10M+ daily transactions",
+      "99.9% uptime",
+      "2,000+ GCP resources",
+      "~30% Dataflow cost",
+    ],
     currentRole: true,
   },
   {
-    company: "AnyaSoftek",
-    role: "Full Stack Developer Intern",
-    period: "May 2024 - Jun 2024",
-    type: "Full Stack Development",
-    description:
-      "Contributed to internal web platforms and client-facing portfolio builds, focusing on responsive frontend development and backend integration.",
-    achievements: [
-      "Developed a responsive and user-friendly interface for the consultancy website using Next.js and TailwindCSS.",
-      "Implemented a MongoDB backend to store and manage client data and project information.",
-      "Built a portfolio website for a client showcasing their projects and services.",
-    ],
-    tech: ["Next.js", "MongoDB", "TailwindCSS"],
-    impact: ["Responsive UI", "Client delivery", "Backend integration"],
-    currentRole: false,
-  },
-  {
     company: "Koders",
-    role: "Full Stack Developer Intern",
-    period: "Jan 2024 - Apr 2024",
-    type: "Full Stack Development",
+    role: "Software Development Engineer Intern",
+    location: "Dehradun, India",
+    period: "Jan 2024 – Apr 2024",
+    type: "Internship",
     description:
-      "Worked on fast-moving client projects across web development and automation, delivering full-stack features for real-world use cases.",
+      "Internship building JavaScript applications and backend features.",
     achievements: [
-      "Built Discord bot integrations that improved automated responses for a 300+ member developer community.",
-      "Developed an e-commerce platform with Razorpay checkout and automated email notifications, supporting 1000+ SKUs while improving page load performance by 30%.",
+      "Built Discord applications and bots, including keyword monitoring, and an Electron-based Keyword Pinger app.",
+      "Worked on backend routes and database operations with Node.js, Express and MongoDB.",
+      "Did debugging, testing and deployment work.",
     ],
-    tech: ["React", "Node.js", "MongoDB", "REST API", "Python", "TailwindCSS"],
-    impact: ["300+ community", "1000+ SKUs", "30% faster load time"],
+    tech: ["JavaScript", "Node.js", "Express", "React", "MongoDB", "Docker", "Electron", "Git"],
+    impact: [] as string[],
     currentRole: false,
   },
 ];
@@ -86,11 +90,11 @@ export default function Experience() {
           Professional Path
         </h2>
         <p className="text-slate-400 max-w-3xl mx-auto text-lg leading-relaxed">
-          A progression across{" "}
+          2+ years as a full-time{" "}
           <span className="text-blue-400">
-            full-stack engineering, cloud infrastructure, and data platforms
+            Software Engineer on GCP data and platform engineering
           </span>
-          , focused on building reliable systems and better developer workflows.
+          {" "}at HSBC (2.5+ years including internship).
         </p>
       </motion.div>
 
@@ -143,7 +147,7 @@ export default function Experience() {
                       </p>
 
                       <p className="text-slate-500 text-xs font-mono uppercase tracking-wider mb-3">
-                        {exp.period}
+                        {exp.period} · {exp.location}
                       </p>
 
                       <p className="text-slate-400 text-sm leading-relaxed">
@@ -195,7 +199,7 @@ export default function Experience() {
                       {exp.role}
                     </h3>
                     <p className="text-slate-400 text-base md:text-lg">
-                      {exp.company}
+                      {exp.company} · {exp.location}
                     </p>
                   </div>
 
@@ -230,7 +234,7 @@ export default function Experience() {
                   </div>
 
                   <div className="xl:col-span-4 space-y-6">
-                    <div>
+                    {exp.impact.length > 0 && (<div>
                       <h4 className="text-slate-200 font-semibold mb-4 text-sm uppercase tracking-wider">
                         Impact
                       </h4>
@@ -244,7 +248,7 @@ export default function Experience() {
                           </span>
                         ))}
                       </div>
-                    </div>
+                    </div>)}
 
                     <div>
                       <h4 className="text-slate-200 font-semibold mb-4 text-sm uppercase tracking-wider">
