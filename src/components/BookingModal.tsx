@@ -1,11 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Loader2, ShieldCheck } from "lucide-react";
+import { X, Loader2, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
-// REPLACE THIS WITH YOUR ACTUAL CALENDLY OR CAL.COM LINK
-// Example: "https://calendly.com/your-username" or "https://cal.com/your-username"
 const CALENDAR_URL = "https://calendly.com/singhkulmeet3/30min";
 
 interface BookingModalProps {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, AlertCircle, Info, X } from "lucide-react";
+import { CheckCircle, AlertCircle } from "lucide-react";
 
 type ToastType = "success" | "error" | "info";
 type ToastEvent = { message: string; type: ToastType; id: number };

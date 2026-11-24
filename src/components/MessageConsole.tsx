@@ -88,13 +88,13 @@ export default function ContactMinimal() {
             >
                 <h2 className="text-3xl md:text-5xl font-display font-bold text-slate-100 mb-6 flex items-center gap-4 tracking-tight">
                     <span className="text-blue-400 font-display font-black text-2xl">
-                        11.
+                        09.
                     </span>
                     Get in Touch
                 </h2>
 
                 <p className="max-w-2xl text-slate-400 text-lg leading-relaxed">
-                    I work across backend engineering, cloud infrastructure, and full-stack development. If you'd like to discuss a project, collaboration, or engineering ideas, feel free to reach out.
+                    Hiring for GCP data engineering, platform engineering or reliability roles in India? Send me a note and I&apos;ll reply by email.
                 </p>
             </motion.div>
 
@@ -117,11 +117,11 @@ export default function ContactMinimal() {
                         </div>
 
                         <h3 className="text-2xl md:text-3xl font-display font-bold text-slate-100 tracking-tight mb-3">
-                            Let's build something solid.
+                            Open to GCP data, platform and reliability roles.
                         </h3>
 
                         <p className="text-slate-400 leading-relaxed">
-                            Whether it's a project, collaboration, or an interesting engineering conversation, I'd be glad to connect.
+                            Based in Pune, India. Happy to talk about roles, my HSBC work at the level I can share publicly, or any of my projects.
                         </p>
                     </div>
 
@@ -136,8 +136,8 @@ export default function ContactMinimal() {
                                         Preferred conversations
                                     </p>
                                     <p className="text-sm text-slate-500 leading-relaxed">
-                                        Backend engineering, cloud infrastructure, DevOps, full-stack
-                                        systems, and technical collaborations.
+                                        GCP data engineering, platform engineering and reliability
+                                        roles, plus technical discussions about my projects.
                                     </p>
                                 </div>
                             </div>
@@ -192,10 +192,11 @@ export default function ContactMinimal() {
 
                     <div className="space-y-5">
                         <div>
-                            <label className="block mb-2 text-sm text-slate-300">
+                            <label htmlFor="contact-email" className="block mb-2 text-sm text-slate-300">
                                 Email
                             </label>
                             <input
+                                id="contact-email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -205,27 +206,29 @@ export default function ContactMinimal() {
                         </div>
 
                         <div>
-                            <label className="block mb-2 text-sm text-slate-300">
+                            <label htmlFor="contact-subject" className="block mb-2 text-sm text-slate-300">
                                 Subject
                             </label>
                             <input
+                                id="contact-subject"
                                 type="text"
                                 value={subject}
                                 onChange={(e) => setSubject(e.target.value)}
-                                placeholder="Project, collaboration, or discussion"
+                                placeholder="Role, team, or discussion"
                                 className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-slate-100 placeholder:text-slate-600 outline-none transition-all focus:border-blue-400/50 focus:bg-white/[0.05]"
                             />
                         </div>
 
                         <div>
-                            <label className="block mb-2 text-sm text-slate-300">
+                            <label htmlFor="contact-message" className="block mb-2 text-sm text-slate-300">
                                 Message
                             </label>
                             <textarea
+                                id="contact-message"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 rows={7}
-                                placeholder="Tell me a bit about the project, context, or topic you'd like to discuss..."
+                                placeholder="Tell me about the role or topic you'd like to discuss..."
                                 className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-slate-100 placeholder:text-slate-600 outline-none transition-all focus:border-blue-400/50 focus:bg-white/[0.05] resize-none"
                             />
                         </div>
@@ -271,7 +274,7 @@ export default function ContactMinimal() {
                                                 Message sent successfully.
                                             </p>
                                             <p className="text-sm text-emerald-200/70 mt-1">
-                                                Thanks for reaching out. I'll get back to you soon.
+                                                Thanks for reaching out. I&apos;ll get back to you soon.
                                             </p>
                                         </div>
                                     </div>

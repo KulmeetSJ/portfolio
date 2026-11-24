@@ -6,7 +6,6 @@ import {
   Search,
   FileText,
   Briefcase,
-  Database,
   Mail,
   Github,
   Linkedin,
@@ -64,16 +63,8 @@ export default function CommandPalette() {
         category: "Documents",
         icon: <FileText size={16} />,
         perform: () =>
-          window.open("/Kulmeet_Singh_Resume.pdf", "_blank"),
+          window.open("/Kulmeet_Singh_Resume.pdf", "_blank", "noopener,noreferrer"),
       },
-      // {
-      //   id: "pydb",
-      //   title: "View PyDB Source Code",
-      //   category: "Projects",
-      //   icon: <Database size={16} />,
-      //   perform: () =>
-      //     window.open("https://github.com/KulmeetSJ", "_blank"),
-      // },
       {
         id: "contact",
         title: "Contact Kulmeet (Email)",
@@ -89,14 +80,14 @@ export default function CommandPalette() {
         category: "Connect",
         icon: <Github size={16} />,
         perform: () =>
-          window.open("https://github.com/KulmeetSJ", "_blank"),
+          window.open("https://github.com/KulmeetSJ", "_blank", "noopener,noreferrer"),
       },
       {
         id: "linkedin",
         title: "Open LinkedIn Profile",
         category: "Connect",
         icon: <Linkedin size={16} />,
-        perform: () => window.open("https://www.linkedin.com/in/kulmeet-singh/", "_blank"),
+        perform: () => window.open("https://www.linkedin.com/in/kulmeet-singh/", "_blank", "noopener,noreferrer"),
       },
       {
         id: "nav-experience",
@@ -107,6 +98,14 @@ export default function CommandPalette() {
           document
             .getElementById("experience")
             ?.scrollIntoView({ behavior: "smooth" }),
+      },
+      {
+        id: "nav-impact",
+        title: "Go to Impact at HSBC",
+        category: "Navigation",
+        icon: <Briefcase size={16} />,
+        perform: () =>
+          document.getElementById("impact")?.scrollIntoView({ behavior: "smooth" }),
       },
       {
         id: "nav-projects",
@@ -120,7 +119,7 @@ export default function CommandPalette() {
       },
       {
         id: "nav-architecture",
-        title: "Go to System Architecture",
+        title: "Go to PayFlow Sim Architecture",
         category: "Navigation",
         icon: <Cpu size={16} />,
         perform: () =>
